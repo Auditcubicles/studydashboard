@@ -559,7 +559,7 @@
                 <i class="fa-solid fa-file-arrow-down text-3xl text-indigo-500 mb-2"></i>
                 <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Export Backup File</h4>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Downloads a single <code class="font-mono text-indigo-500">CA_Study_Notion_Backup.json</code> file to your device.
+                  Downloads a single <code class="font-mono text-indigo-500">CA_Study_Pulse_Backup.json</code> file to your device.
                 </p>
               </div>
               <button onclick="exportDataFile()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
@@ -1377,7 +1377,7 @@
       const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
       const downloadAnchor = document.createElement('a');
       downloadAnchor.setAttribute("href", jsonString);
-      downloadAnchor.setAttribute("download", `CA_Study_Notion_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      downloadAnchor.setAttribute("download", `CA_Study_Pulse_Backup_${new Date().toISOString().split('T')[0]}.json`);
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
