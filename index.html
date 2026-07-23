@@ -141,14 +141,14 @@
     <!-- Main Container -->
     <main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
 
-      <!-- Page Banner Area: Title, Quote & Relocated Time/Streak Widgets -->
+      <!-- Page Banner Area -->
       <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 id="page-title" class="text-2xl font-black text-slate-900 dark:text-slate-100">Holistic Performance Report</h2>
           <p id="daily-quote" class="text-xs text-slate-500 dark:text-slate-400 italic mt-0.5">"Loading daily motivation..."</p>
         </div>
 
-        <!-- Relocated Time & Streak Cards Container -->
+        <!-- Relocated Time & Streak Cards -->
         <div class="flex items-center gap-3">
           <!-- Live Clock -->
           <div class="glass-card px-4 py-2 rounded-xl text-center shadow-sm">
@@ -169,7 +169,7 @@
         </div>
       </div>
 
-      <!-- PAGE 1: OVERVIEW PAGE (HOLISTIC EXECUTIVE REPORT) -->
+      <!-- PAGE 1: OVERVIEW PAGE -->
       <div id="page-overview" class="page-view space-y-8">
         
         <!-- Metrics Dashboard -->
@@ -1382,7 +1382,7 @@
       renderStickyNotes();
     }
 
-    // Backup Engine (iPhone / Safari & Desktop Cross-Compatible)
+    // Backup Engine
     function getBackupDataObj() {
       return {
         tasks: state.tasks,
@@ -1411,7 +1411,6 @@
       playAudioChime('complete');
     }
 
-    // iPhone Safari Fix: View Raw JSON Text in New Tab
     function viewRawJsonData() {
       const backupData = getBackupDataObj();
       const jsonString = JSON.stringify(backupData, null, 2);
@@ -1424,7 +1423,6 @@
       }
     }
 
-    // iPhone Safari Fix: Direct Copy Backup String
     function copyDataStringToClipboard() {
       const backupData = getBackupDataObj();
       const b64Str = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
@@ -1432,7 +1430,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(b64Str).then(() => {
           playAudioChime('complete');
-          alert("📋 Backup string copied to clipboard! You can paste it into Apple Notes or send it via WhatsApp.");
+          alert("📋 Backup string copied to clipboard!");
         }).catch(() => {
           prompt("Copy your backup string below:", b64Str);
         });
@@ -1470,7 +1468,7 @@
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
           alert("❌ Invalid backup file format! Try using 'Paste Backup String' instead.");
-        } fontally {
+        } finally {
           event.target.value = '';
         }
       };
