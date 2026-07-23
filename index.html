@@ -579,6 +579,19 @@
             <i class="fa-solid fa-cloud-arrow-down"></i> Pull from Cloud
           </button>
         </div>
+
+        <!-- Fail-Safe Direct Code Copy/Paste Option -->
+        <div class="border-t border-slate-200 dark:border-slate-800 pt-3 mt-3">
+          <p class="text-[10px] text-slate-400 mb-2 font-bold uppercase tracking-wider text-center">Instant 1-Click Code Backup (Offline Backup)</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="copyDataString()" class="sub-box hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 rounded-xl font-bold transition-all flex items-center justify-center gap-1">
+              <i class="fa-solid fa-copy"></i> Copy Sync Code
+            </button>
+            <button onclick="pasteDataString()" class="sub-box hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 rounded-xl font-bold transition-all flex items-center justify-center gap-1">
+              <i class="fa-solid fa-paste"></i> Paste Sync Code
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -916,12 +929,12 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v15')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v15')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v16')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v16')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v15')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v15')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v16')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v16')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1342,13 +1355,13 @@
       renderStickyNotes();
     }
 
-    // Secret Sync Code Engine
+    // Secret Sync Code Cloud Engine (CORS-Fixed Engine)
     const cloudModal = document.getElementById('cloud-modal');
     const syncCodeInput = document.getElementById('sync-code-input');
     const syncStatusMsg = document.getElementById('sync-status-msg');
 
     function openCloudModal() {
-      const savedCode = localStorage.getItem('sp_sync_code_v15');
+      const savedCode = localStorage.getItem('sp_sync_code_v16');
       if (savedCode) syncCodeInput.value = savedCode;
       syncStatusMsg.classList.add('hidden');
       cloudModal.classList.remove('hidden');
@@ -1368,43 +1381,59 @@
       syncStatusMsg.classList.remove('hidden');
     }
 
+    function getExportDataObject() {
+      return {
+        tasks: state.tasks,
+        logs: state.logs,
+        subjects: state.subjects,
+        stickyNotes: state.stickyNotes,
+        examDate: localStorage.getItem('sp_exam_date_v14'),
+        updatedAt: new Date().toISOString()
+      };
+    }
+
+    function applyImportDataObject(data) {
+      if (data.tasks) state.tasks = data.tasks;
+      if (data.logs) state.logs = data.logs;
+      if (data.subjects) state.subjects = data.subjects;
+      if (data.stickyNotes) state.stickyNotes = data.stickyNotes;
+      if (data.examDate) localStorage.setItem('sp_exam_date_v14', data.examDate);
+
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+      initCharts();
+      renderMemoryWall();
+      updateExamCountdown();
+    }
+
     async function uploadToCloud() {
       const code = syncCodeInput.value.trim().toLowerCase();
       if (!code) {
-        showSyncStatus("Please enter a secret sync code first!", false);
+        showSyncStatus("Please enter a secret sync code!", false);
         return;
       }
 
-      localStorage.setItem('sp_sync_code_v15', code);
+      localStorage.setItem('sp_sync_code_v16', code);
       showSyncStatus("Syncing to cloud...");
 
-      const payload = {
-        code,
-        data: {
-          tasks: state.tasks,
-          logs: state.logs,
-          subjects: state.subjects,
-          stickyNotes: state.stickyNotes,
-          examDate: localStorage.getItem('sp_exam_date_v14'),
-          updatedAt: new Date().toISOString()
-        }
-      };
+      const payload = getExportDataObject();
 
       try {
-        const response = await fetch(`https://api.restful-api.dev/objects`, {
+        const response = await fetch(`https://keyvalue.imsky.org/set/${code}`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: `sp_data_${code}`, data: payload.data })
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `value=${encodeURIComponent(JSON.stringify(payload))}`
         });
 
         if (response.ok) {
           showSyncStatus("☁️ Successfully backed up to Cloud!");
           playAudioChime('complete');
         } else {
-          showSyncStatus("Sync failed. Check connection.", false);
+          showSyncStatus("Sync failed. Try copying code string below.", false);
         }
       } catch (err) {
-        showSyncStatus("Error connecting to sync server.", false);
+        showSyncStatus("Network error. Use 'Copy Sync Code' fallback.", false);
       }
     }
 
@@ -1415,40 +1444,53 @@
         return;
       }
 
-      localStorage.setItem('sp_sync_code_v15', code);
+      localStorage.setItem('sp_sync_code_v16', code);
       showSyncStatus("Fetching from cloud...");
 
       try {
-        const response = await fetch(`https://api.restful-api.dev/objects`);
+        const response = await fetch(`https://keyvalue.imsky.org/get/${code}`);
         if (response.ok) {
-          const allObjects = await response.json();
-          const userObject = allObjects.filter(obj => obj.name === `sp_data_${code}`).pop();
-
-          if (userObject && userObject.data) {
-            const cloudData = userObject.data;
-            if (cloudData.tasks) state.tasks = cloudData.tasks;
-            if (cloudData.logs) state.logs = cloudData.logs;
-            if (cloudData.subjects) state.subjects = cloudData.subjects;
-            if (cloudData.stickyNotes) state.stickyNotes = cloudData.stickyNotes;
-            if (cloudData.examDate) localStorage.setItem('sp_exam_date_v14', cloudData.examDate);
-
-            saveData();
-            renderTasks();
-            renderCalendarGrid();
-            initCharts();
-            renderMemoryWall();
-            updateExamCountdown();
-
+          const rawText = await response.text();
+          if (rawText && rawText !== 'null') {
+            const data = JSON.parse(rawText);
+            applyImportDataObject(data);
             showSyncStatus("📥 Data successfully restored from Cloud!");
             playAudioChime('complete');
           } else {
             showSyncStatus("No backup found for this code!", false);
           }
         } else {
-          showSyncStatus("Unable to reach cloud server.", false);
+          showSyncStatus("Unable to reach cloud server. Use Paste Code.", false);
         }
       } catch (err) {
-        showSyncStatus("Error fetching data.", false);
+        showSyncStatus("Network error fetching data.", false);
+      }
+    }
+
+    // Direct String Copy/Paste Fallback Engine
+    function copyDataString() {
+      const payload = getExportDataObject();
+      const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+      navigator.clipboard.writeText(b64).then(() => {
+        showSyncStatus("📋 Sync Code copied to clipboard! Paste it on your phone.");
+        playAudioChime('complete');
+      }).catch(() => {
+        prompt("Copy this Sync Code string:", b64);
+      });
+    }
+
+    function pasteDataString() {
+      const b64 = prompt("Paste your Sync Code string here:");
+      if (!b64) return;
+
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(b64.trim())));
+        const data = JSON.parse(jsonStr);
+        applyImportDataObject(data);
+        showSyncStatus("📥 Restored successfully from pasted code!");
+        playAudioChime('complete');
+      } catch (err) {
+        showSyncStatus("Invalid sync string pasted!", false);
       }
     }
 
@@ -1844,10 +1886,10 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v15', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v15', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v15', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v15', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v16', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v16', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v16', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_stickies_v16', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
