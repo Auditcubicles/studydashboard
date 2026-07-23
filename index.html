@@ -421,7 +421,7 @@
         </div>
       </div>
 
-      <!-- PAGE 4: DETAILED ANALYTICS PAGE (Scaled 0 to 18 Hours) -->
+      <!-- PAGE 4: DETAILED ANALYTICS PAGE -->
       <div id="page-analytics" class="page-view hidden space-y-8">
         
         <!-- Spline Progress Graph -->
@@ -446,7 +446,7 @@
           </div>
         </section>
 
-        <!-- Date-Wise Specific Day Analysis Graph (0 to 18 Hours Fixed Y-Axis) -->
+        <!-- Date-Wise Specific Day Analysis Graph -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -559,7 +559,7 @@
                 <i class="fa-solid fa-file-arrow-down text-3xl text-indigo-500 mb-2"></i>
                 <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Export Backup File</h4>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Downloads a single <code class="font-mono text-indigo-500">CA_Study_Pulse_Backup.json</code> file to your device.
+                  Downloads a clean <code class="font-mono text-indigo-500">CA_Study_Notion_Backup.json</code> file to your device.
                 </p>
               </div>
               <button onclick="exportDataFile()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
@@ -1363,24 +1363,28 @@
       renderStickyNotes();
     }
 
-    // Offline 1-Click File Export & Import Engine
+    // Pure Blob-Based 1-Click File Export & Import Engine (Fixes Invalid Format Error)
     function exportDataFile() {
       const backupData = {
         tasks: state.tasks,
         logs: state.logs,
         subjects: state.subjects,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v14'),
+        examDate: localStorage.getItem('sp_exam_date_v17'),
         exportedAt: new Date().toISOString()
       };
 
-      const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
       const downloadAnchor = document.createElement('a');
-      downloadAnchor.setAttribute("href", jsonString);
-      downloadAnchor.setAttribute("download", `CA_Study_Pulse_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      downloadAnchor.href = url;
+      downloadAnchor.download = `CA_Study_Notion_Backup_${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(downloadAnchor);
       downloadAnchor.click();
       downloadAnchor.remove();
+      URL.revokeObjectURL(url);
 
       playAudioChime('complete');
     }
@@ -1392,12 +1396,18 @@
       const reader = new FileReader();
       reader.onload = function(e) {
         try {
-          const data = JSON.parse(e.target.result);
-          if (data.tasks) state.tasks = data.tasks;
-          if (data.logs) state.logs = data.logs;
-          if (data.subjects) state.subjects = data.subjects;
-          if (data.stickyNotes) state.stickyNotes = data.stickyNotes;
-          if (data.examDate) localStorage.setItem('sp_exam_date_v14', data.examDate);
+          const rawText = e.target.result;
+          const data = JSON.parse(rawText);
+
+          if (!data || typeof data !== 'object') {
+            throw new Error("Invalid JSON structure");
+          }
+
+          if (data.tasks && Array.isArray(data.tasks)) state.tasks = data.tasks;
+          if (data.logs && Array.isArray(data.logs)) state.logs = data.logs;
+          if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
+          if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
+          if (data.examDate) localStorage.setItem('sp_exam_date_v17', data.examDate);
 
           saveData();
           renderTasks();
@@ -1409,7 +1419,9 @@
           playAudioChime('complete');
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
-          alert("❌ Invalid backup file format!");
+          alert("❌ Invalid backup file format! Please upload a valid CA_Study_Notion_Backup.json file.");
+        } finally {
+          event.target.value = ''; // Reset input to allow re-uploading same file
         }
       };
       reader.readAsText(file);
@@ -1607,7 +1619,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v14');
+      const savedDate = localStorage.getItem('sp_exam_date_v17');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -1619,14 +1631,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v14', val);
+        localStorage.setItem('sp_exam_date_v17', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v14');
+      const savedDate = localStorage.getItem('sp_exam_date_v17');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
