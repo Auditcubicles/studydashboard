@@ -1,118 +1,156 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyPulse - CA Final Advanced Dashboard</title>
+  <title>StudyPulse - Focus Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              500: '#10b981',
+              600: '#059669',
+              700: '#047857'
+            }
+          }
+        }
+      }
+    }
+  </script>
   <!-- FontAwesome CDN -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap');
     
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
-      background: #0f172a;
-      color: #f8fafc;
+      transition: background-color 0.3s, color 0.3s;
     }
 
-    .glass-card {
-      background: rgba(30, 41, 59, 0.7);
+    /* Glassmorphism Dynamic */
+    .dark .glass-card {
+      background: rgba(15, 23, 42, 0.75);
       backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
-
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: rgba(15, 23, 42, 0.6);
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: rgba(51, 65, 85, 0.8);
-      border-radius: 4px;
+    .light .glass-card {
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
     }
 
-    /* --- Flip Clock Styles --- */
+    /* --- True 3D Flip Clock Animation --- */
     .flip-clock {
       display: flex;
       justify-content: center;
       gap: 12px;
-      font-family: 'Share Tech Mono', monospace;
+      font-family: 'Space Grotesk', sans-serif;
     }
     .flip-unit {
       display: flex;
       flex-direction: column;
       align-items: center;
     }
-    .flip-card {
+    .flip-card-container {
       position: relative;
-      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
-      color: #6366f1;
-      font-size: 3.5rem;
-      font-weight: 800;
-      padding: 10px 18px;
-      border-radius: 12px;
-      border: 1px solid rgba(99, 102, 241, 0.3);
-      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
-      min-width: 90px;
-      text-align: center;
+      width: 90px;
+      height: 90px;
+      perspective: 400px;
     }
-    .flip-card::before {
-      content: '';
+    .flip-card-face {
       position: absolute;
-      top: 50%;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: rgba(15, 23, 42, 0.8);
-      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
-      z-index: 10;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3.25rem;
+      font-weight: 800;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px -4px rgba(0,0,0,0.3);
+      backface-visibility: hidden;
     }
+    .dark .flip-card-face {
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      color: #10b981;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .light .flip-card-face {
+      background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 100%);
+      color: #059669;
+      border: 1px solid rgba(5, 150, 105, 0.3);
+    }
+
+    /* Flip Animation Keyframes */
+    .flip-animate {
+      animation: flip3D 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
+    }
+    @keyframes flip3D {
+      0% { transform: rotateX(0deg); }
+      50% { transform: rotateX(-90deg); }
+      100% { transform: rotateX(0deg); }
+    }
+
     .fullscreen-mode {
       position: fixed !important;
       inset: 0 !important;
       z-index: 9999 !important;
-      background: #090d16 !important;
       display: flex !important;
       flex-direction: column !important;
       justify-content: center !important;
       align-items: center !important;
       padding: 2rem !important;
     }
-    .fullscreen-mode .flip-card {
-      font-size: 7rem !important;
-      min-width: 170px !important;
-      padding: 20px 30px !important;
+    .fullscreen-mode .flip-card-container {
+      width: 160px !important;
+      height: 160px !important;
     }
+    .fullscreen-mode .flip-card-face {
+      font-size: 6rem !important;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.4); border-radius: 4px; }
   </style>
 </head>
-<body class="min-h-screen p-4 md:p-8 custom-scrollbar">
+<body class="bg-slate-950 text-slate-100 dark:bg-slate-950 dark:text-slate-100 light:bg-slate-50 light:text-slate-800 min-h-screen p-4 md:p-8 custom-scrollbar">
 
-  <!-- Header with Live Time, Quote & Streak -->
+  <!-- Header -->
   <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
-      <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-        StudyPulse <span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30 font-medium">v3.0</span>
+      <h1 class="text-3xl font-extrabold bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-500 bg-clip-text text-transparent">
+        StudyPulse <span class="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30 font-medium">v4.0</span>
       </h1>
-      <p id="daily-quote" class="text-slate-400 text-sm mt-1 italic max-w-xl">"Loading daily motivation..."</p>
+      <p id="daily-quote" class="text-slate-400 dark:text-slate-400 light:text-slate-600 text-sm mt-1 italic max-w-xl">"Loading daily motivation..."</p>
     </div>
 
-    <div class="flex items-center gap-4">
-      <div class="glass-card px-4 py-2 rounded-xl text-center border border-slate-700/50">
-        <p class="text-xs text-slate-400 font-medium">Current Time</p>
-        <p id="live-clock" class="text-sm font-extrabold font-mono text-indigo-300">00:00:00 AM</p>
+    <div class="flex items-center gap-3">
+      <!-- Theme Switcher -->
+      <button id="theme-toggle-btn" class="glass-card p-2.5 rounded-xl text-slate-300 hover:text-emerald-400 transition-colors" title="Toggle Light/Dark Theme">
+        <i id="theme-icon" class="fa-solid fa-moon text-lg"></i>
+      </button>
+
+      <!-- Live Clock -->
+      <div class="glass-card px-4 py-2 rounded-xl text-center">
+        <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Current Time</p>
+        <p id="live-clock" class="text-sm font-extrabold font-mono text-emerald-400">00:00:00 AM</p>
       </div>
 
-      <div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3 border border-slate-700/50">
+      <!-- Streak Counter -->
+      <div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3">
         <i class="fa-solid fa-fire text-amber-500 text-lg"></i>
         <div>
-          <p class="text-xs text-slate-400 font-medium">Study Streak</p>
-          <p id="streak-counter" class="text-sm font-bold text-slate-100">0 Days</p>
+          <p class="text-[10px] text-slate-400 font-semibold uppercase tracking-wider">Streak</p>
+          <p id="streak-counter" class="text-sm font-bold text-emerald-400">0 Days</p>
         </div>
       </div>
     </div>
@@ -128,14 +166,13 @@
       <section id="pomodoro-card" class="glass-card p-6 rounded-2xl shadow-xl relative transition-all">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-stopwatch text-indigo-400"></i> Flip Pomodoro
+            <i class="fa-solid fa-stopwatch text-emerald-400"></i> Focus Pomodoro
           </h2>
           <div class="flex gap-2">
-            <!-- Fullscreen Mode Button -->
-            <button id="fullscreen-btn" class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700" title="Focus Mode">
-              <i class="fa-solid fa-expand"></i> Fullscreen
+            <button id="fullscreen-btn" class="text-slate-400 hover:text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700/50 bg-slate-900/40">
+              <i class="fa-solid fa-expand"></i>
             </button>
-            <button id="open-settings-btn" class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+            <button id="open-settings-btn" class="text-slate-400 hover:text-emerald-400 text-xs px-3 py-1.5 rounded-lg border border-slate-700/50 bg-slate-900/40">
               <i class="fa-solid fa-sliders"></i>
             </button>
           </div>
@@ -143,39 +180,43 @@
 
         <!-- Modes -->
         <div class="flex bg-slate-900/60 p-1 rounded-xl mb-6 border border-slate-800">
-          <button id="mode-work" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all">Work</button>
+          <button id="mode-work" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all">Work</button>
           <button id="mode-short" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Short Break</button>
           <button id="mode-long" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Long Break</button>
         </div>
 
-        <!-- 3D Flip Watch Display -->
+        <!-- True Animated 3D Flip Clock Display -->
         <div class="my-8 flex justify-center">
           <div class="flip-clock">
             <div class="flip-unit">
-              <div id="flip-min" class="flip-card">25</div>
+              <div class="flip-card-container">
+                <div id="flip-min" class="flip-card-face">25</div>
+              </div>
               <span class="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">Minutes</span>
             </div>
-            <div class="text-4xl font-extrabold text-slate-600 self-center -mt-6">:</div>
+            <div class="text-4xl font-extrabold text-emerald-500/50 self-center -mt-6">:</div>
             <div class="flip-unit">
-              <div id="flip-sec" class="flip-card">00</div>
+              <div class="flip-card-container">
+                <div id="flip-sec" class="flip-card-face">00</div>
+              </div>
               <span class="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">Seconds</span>
             </div>
           </div>
         </div>
 
-        <!-- Active Task Label -->
+        <!-- Active Task Tag -->
         <div class="text-center mb-6">
-          <p id="active-task-label" class="text-xs text-indigo-300 font-medium bg-indigo-950/60 py-1.5 px-3 rounded-full inline-block border border-indigo-500/40">
+          <p id="active-task-label" class="text-xs text-emerald-400 font-medium bg-emerald-950/40 py-1.5 px-3 rounded-full inline-block border border-emerald-800/40">
             No Active Task Selected
           </p>
         </div>
 
         <!-- Controls -->
         <div class="flex justify-center gap-3">
-          <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
+          <button id="start-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-2">
             <i class="fa-solid fa-play"></i> Start
           </button>
-          <button id="stop-btn" class="bg-rose-600/80 hover:bg-rose-600 text-white font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-2" title="Stop & Log Elapsed Time">
+          <button id="stop-btn" class="bg-rose-600/80 hover:bg-rose-600 text-white font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-2">
             <i class="fa-solid fa-square"></i> Stop & Log
           </button>
           <button id="reset-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-3 rounded-xl transition-all border border-slate-700">
@@ -188,23 +229,23 @@
       <section class="glass-card p-6 rounded-2xl shadow-xl">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-purple-400"></i> Task Manager
+            <i class="fa-solid fa-list-check text-indigo-400"></i> Task Manager
           </h2>
           <span id="task-completion-stats" class="text-xs text-slate-400 font-medium">0 / 0 Done</span>
         </div>
 
         <!-- Form for Adding Tasks -->
-        <form id="add-task-form" class="space-y-3 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
+        <form id="add-task-form" class="space-y-3 mb-6 bg-slate-900/40 p-4 rounded-xl border border-slate-800">
           <div class="flex gap-2">
             <input type="text" id="task-input" placeholder="Chapter / Topic name..." required
-              class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-indigo-500">
+              class="flex-1 bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-emerald-500">
             <input type="number" id="task-est-input" min="1" max="20" value="1" title="Estimated Pomodoros"
-              class="w-16 bg-slate-800/80 border border-slate-700 rounded-xl px-2 py-2 text-sm text-center focus:outline-none focus:border-indigo-500">
+              class="w-16 bg-slate-800/80 border border-slate-700 rounded-xl px-2 py-2 text-sm text-center focus:outline-none focus:border-emerald-500">
           </div>
 
           <div class="grid grid-cols-2 gap-2">
             <!-- Subject Dropdown List -->
-            <select id="task-subject-select" required class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-200">
+            <select id="task-subject-select" required class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500 text-slate-200">
               <option value="" disabled selected>Select Subject</option>
               <option value="FR">FR (Financial Reporting)</option>
               <option value="AFM">AFM (Advanced Financial Mgmt)</option>
@@ -216,9 +257,8 @@
             </select>
             <input type="text" id="custom-subject-input" placeholder="Enter Subject Name" class="hidden bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-200">
 
-            <!-- Type of Study -->
             <input type="text" id="task-type-input" list="study-types" placeholder="Type (e.g. Revision)" required
-              class="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
+              class="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
             <datalist id="study-types">
               <option value="Lecture Watch">
               <option value="Revision">
@@ -227,7 +267,6 @@
             </datalist>
           </div>
 
-          <!-- Date & Recurring Repeat Option -->
           <div class="grid grid-cols-2 gap-2 pt-1">
             <div>
               <label class="block text-[10px] text-slate-400 mb-0.5">Start Date:</label>
@@ -244,7 +283,7 @@
             </div>
           </div>
 
-          <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
             <i class="fa-solid fa-plus"></i> Schedule Task
           </button>
         </form>
@@ -266,14 +305,14 @@
     <!-- Right Column: Analytics & Advanced Calendar Scheduler -->
     <div class="lg:col-span-7 space-y-8">
       
-      <!-- Graphical Analytics Section -->
+      <!-- Graphical Analytics Section (0 to 24 Hours Y-Axis) -->
       <section class="glass-card p-6 rounded-2xl shadow-xl">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h2 class="text-lg font-bold flex items-center gap-2">
               <i class="fa-solid fa-chart-column text-emerald-400"></i> Study Analytics
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Real-time study duration logs</p>
+            <p class="text-xs text-slate-400 mt-0.5">Track study hours (0 to 24 Hrs)</p>
           </div>
 
           <div class="flex bg-slate-900/60 p-1 rounded-xl border border-slate-800">
@@ -286,7 +325,7 @@
         <div class="grid grid-cols-3 gap-4 mb-6">
           <div class="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800">
             <p class="text-xs text-slate-400 font-medium">Today's Focus</p>
-            <p id="metric-today" class="text-lg font-extrabold text-emerald-400 mt-1">0m</p>
+            <p id="metric-today" class="text-lg font-extrabold text-emerald-400 mt-1">0h 0m</p>
           </div>
           <div class="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800">
             <p class="text-xs text-slate-400 font-medium">This Week</p>
@@ -310,47 +349,76 @@
             <i class="fa-solid fa-calendar-days text-amber-400"></i> Calendar Scheduler
           </h2>
           
-          <!-- Month & Year Controls -->
-          <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-bold text-indigo-300">
+          <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-bold text-emerald-400">
             <button id="prev-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-left"></i></button>
             <span id="calendar-month-year-label">July 2026</span>
             <button id="next-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-right"></i></button>
-            <button id="today-jump-btn" class="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px]">Today</button>
+            <button id="today-jump-btn" class="ml-2 px-2 py-0.5 bg-emerald-600 text-white rounded text-[10px]">Today</button>
           </div>
         </div>
 
-        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-circle-info text-indigo-400"></i> Click on any calendar date to add or inspect tasks for that day!</p>
+        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-circle-info text-emerald-400"></i> Click on any date on the calendar to open the schedule popup modal!</p>
 
         <!-- Calendar Grid -->
-        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 mb-4">
+        <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800">
           <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 mb-2">
             <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
           </div>
           <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
-        </div>
-
-        <!-- Tasks for Selected Date -->
-        <div>
-          <div class="flex justify-between items-center mb-2">
-            <h3 id="selected-date-label" class="text-xs font-bold text-indigo-300 uppercase tracking-wider">
-              Tasks for Selected Date
-            </h3>
-            <button id="quick-add-date-btn" class="text-xs bg-indigo-600/80 hover:bg-indigo-600 text-white px-2.5 py-1 rounded-lg">
-              <i class="fa-solid fa-plus"></i> Add Task for Date
-            </button>
-          </div>
-          <div id="calendar-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
       </section>
 
     </div>
   </main>
 
+  <!-- Popup Calendar Date Task Modal -->
+  <div id="calendar-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+    <div class="glass-card bg-slate-900 p-6 rounded-2xl max-w-lg w-full border border-slate-700 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="modal-date-title" class="text-base font-bold text-emerald-400 flex items-center gap-2">
+          <i class="fa-solid fa-calendar-day"></i> Schedule for Selected Date
+        </h3>
+        <button id="close-calendar-modal-btn" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <!-- Popup Add Task Form -->
+      <form id="modal-add-task-form" class="space-y-3 mb-6 bg-slate-800/50 p-4 rounded-xl border border-slate-700">
+        <input type="text" id="modal-task-title" placeholder="Topic name..." required
+          class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-emerald-500">
+        
+        <div class="grid grid-cols-3 gap-2">
+          <select id="modal-task-subject" required class="bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs focus:outline-none">
+            <option value="FR">FR</option>
+            <option value="AFM">AFM</option>
+            <option value="AUDIT">AUDIT</option>
+            <option value="DT">DT</option>
+            <option value="IDT">IDT</option>
+            <option value="IBS">IBS</option>
+          </select>
+
+          <input type="text" id="modal-task-type" placeholder="Type (e.g. Revision)" required
+            class="bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs focus:outline-none">
+
+          <input type="number" id="modal-task-est" min="1" max="20" value="1" placeholder="Pomos"
+            class="bg-slate-900 border border-slate-700 rounded-xl px-2 py-2 text-xs text-center focus:outline-none">
+        </div>
+
+        <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-2 rounded-xl text-xs font-bold transition-all">
+          <i class="fa-solid fa-plus"></i> Add Task To Date
+        </button>
+      </form>
+
+      <!-- Task List inside Modal -->
+      <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Tasks Scheduled</h4>
+      <div id="modal-task-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
+    </div>
+  </div>
+
   <!-- Timer Preferences Modal -->
   <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
     <div class="glass-card bg-slate-900 p-6 rounded-2xl max-w-sm w-full border border-slate-700 shadow-2xl">
       <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
-        <i class="fa-solid fa-gear text-indigo-400"></i> Timer Preferences
+        <i class="fa-solid fa-gear text-emerald-400"></i> Timer Preferences
       </h3>
       <div class="space-y-4 text-sm">
         <div>
@@ -368,14 +436,13 @@
       </div>
       <div class="flex justify-end gap-3 mt-6">
         <button id="close-settings-btn" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white">Cancel</button>
-        <button id="save-settings-btn" class="px-5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white">Save Changes</button>
+        <button id="save-settings-btn" class="px-5 py-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white">Save Changes</button>
       </div>
     </div>
   </div>
 
   <!-- JavaScript Engine -->
   <script>
-    // --- 30 Shuffling Motivational Quotes ---
     const quotes = [
       "Mastering the mindset behind the CA Signature.",
       "Consistency turns averages into chartered excellence.",
@@ -385,28 +452,8 @@
       "The expert in anything was once a beginner.",
       "Your future self will thank you for the work you do today.",
       "Productivity isn't about being busy; it's about being effective.",
-      "The secret of getting ahead is getting started.",
       "Hard work beats talent when talent doesn't work hard.",
-      "Action is the foundational key to all success.",
-      "Disciplined execution beats inspiration every single time.",
-      "Success is the sum of small efforts repeated day in and day out.",
-      "You don't have to be extreme, just consistent.",
-      "The best way to predict your future is to create it.",
-      "Focus on process, and the results will follow naturally.",
-      "Push yourself, because no one else is going to do it for you.",
-      "Dream big, execute daily, remain patient.",
-      "Excellence is not an act, but a habit.",
-      "Energy flows where attention goes.",
-      "Doubt kills more dreams than failure ever will.",
-      "Believe you can and you're halfway there.",
-      "Turn your excuses into your execution.",
-      "One hour of deep focus beats five hours of distracted reading.",
-      "Strive for progress, not perfection.",
-      "Quiet momentum builds undeniable success.",
-      "Your signature will carry weight because of the effort behind it.",
-      "Keep going. Everything you need will come to you at the perfect time.",
-      "Make today count towards your ultimate goal.",
-      "Clear minds make decisive progress."
+      "Action is the foundational key to all success."
     ];
 
     function setDailyQuote() {
@@ -422,7 +469,31 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // --- State ---
+    // Theme Switcher Engine
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      themeIcon.className = "fa-solid fa-sun text-lg text-amber-500";
+    }
+
+    themeToggleBtn.addEventListener('click', () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.className = "fa-solid fa-sun text-lg text-amber-500";
+      } else {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.className = "fa-solid fa-moon text-lg";
+      }
+    });
+
+    // App State
     let state = {
       timer: {
         mode: 'work',
@@ -437,14 +508,14 @@
       activeTaskId: null,
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v3')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v3')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v4')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v4')) || [],
       currentChartTab: 'daily'
     };
 
     document.getElementById('task-date-input').value = state.selectedCalendarDate;
 
-    // --- DOM Reference ---
+    // DOM Reference
     const flipMinEl = document.getElementById('flip-min');
     const flipSecEl = document.getElementById('flip-sec');
     const startBtn = document.getElementById('start-btn');
@@ -456,10 +527,7 @@
     const addTaskForm = document.getElementById('add-task-form');
     const taskSubjectSelect = document.getElementById('task-subject-select');
     const customSubjectInput = document.getElementById('custom-subject-input');
-    const pomodoroCard = document.getElementById('pomodoro-card');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-    // Handle Custom Subject Toggle
     taskSubjectSelect.addEventListener('change', (e) => {
       if (e.target.value === 'CUSTOM') {
         customSubjectInput.classList.remove('hidden');
@@ -470,33 +538,41 @@
       }
     });
 
-    // Toggle Fullscreen Mode
-    fullscreenBtn.addEventListener('click', () => {
+    // Fullscreen Mode
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const pomodoroCard = document.getElementById('pomodoro-card');
+    fullscreenBtn.onclick = () => {
       if (!document.fullscreenElement) {
         pomodoroCard.classList.add('fullscreen-mode');
-        fullscreenBtn.innerHTML = `<i class="fa-solid fa-compress"></i> Exit Fullscreen`;
         if (pomodoroCard.requestFullscreen) pomodoroCard.requestFullscreen();
       } else {
         document.exitFullscreen();
       }
-    });
-
+    };
     document.addEventListener('fullscreenchange', () => {
-      if (!document.fullscreenElement) {
-        pomodoroCard.classList.remove('fullscreen-mode');
-        fullscreenBtn.innerHTML = `<i class="fa-solid fa-expand"></i> Fullscreen`;
-      }
+      if (!document.fullscreenElement) pomodoroCard.classList.remove('fullscreen-mode');
     });
 
-    // --- Flip Watch Timer ---
+    // True Flip Timer Engine
     function updateTimerDisplay() {
-      const mins = Math.floor(state.timer.timeLeft / 60);
-      const secs = state.timer.timeLeft % 60;
-      
-      flipMinEl.textContent = mins.toString().padStart(2, '0');
-      flipSecEl.textContent = secs.toString().padStart(2, '0');
-      
-      document.title = `${flipMinEl.textContent}:${flipSecEl.textContent} - StudyPulse`;
+      const mins = Math.floor(state.timer.timeLeft / 60).toString().padStart(2, '0');
+      const secs = (state.timer.timeLeft % 60).toString().padStart(2, '0');
+
+      if (flipMinEl.textContent !== mins) {
+        flipMinEl.textContent = mins;
+        flipMinEl.classList.remove('flip-animate');
+        void flipMinEl.offsetWidth; 
+        flipMinEl.classList.add('flip-animate');
+      }
+
+      if (flipSecEl.textContent !== secs) {
+        flipSecEl.textContent = secs;
+        flipSecEl.classList.remove('flip-animate');
+        void flipSecEl.offsetWidth;
+        flipSecEl.classList.add('flip-animate');
+      }
+
+      document.title = `${mins}:${secs} - StudyPulse`;
     }
 
     function setMode(mode) {
@@ -511,13 +587,13 @@
 
       if (mode === 'work') {
         state.timer.timeLeft = state.timer.workDuration * 60;
-        document.getElementById('mode-work').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all";
+        document.getElementById('mode-work').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
       } else if (mode === 'short') {
         state.timer.timeLeft = state.timer.shortDuration * 60;
-        document.getElementById('mode-short').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
+        document.getElementById('mode-short').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-teal-600 text-white transition-all";
       } else {
         state.timer.timeLeft = state.timer.longDuration * 60;
-        document.getElementById('mode-long').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-purple-600 text-white transition-all";
+        document.getElementById('mode-long').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all";
       }
       state.timer.initialTime = state.timer.timeLeft;
       updateTimerDisplay();
@@ -592,7 +668,7 @@
       setMode('work');
     }
 
-    // --- Task Manager Functions ---
+    // Task Manager Functions
     function renderTasks() {
       todoTaskListEl.innerHTML = '';
       completedTaskListEl.innerHTML = '';
@@ -607,7 +683,7 @@
         const isSelected = state.activeTaskId === task.id;
         const taskEl = document.createElement('div');
         taskEl.className = `p-3 rounded-xl border transition-all ${
-          isSelected ? 'bg-indigo-950/40 border-indigo-500/60' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          isSelected ? 'bg-emerald-950/40 border-emerald-500/60' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
         }`;
 
         taskEl.innerHTML = `
@@ -618,7 +694,7 @@
               </button>
               <div class="truncate">
                 <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
-                <p class="text-[10px] text-slate-400"><span class="font-bold text-indigo-400">${task.subject}</span> • ${task.type}</p>
+                <p class="text-[10px] text-slate-400"><span class="font-bold text-emerald-400">${task.subject}</span> • ${task.type}</p>
               </div>
             </div>
 
@@ -626,7 +702,7 @@
               <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-fire text-amber-500/80 mr-0.5"></i>${task.completedPomos}/${task.estPomos}</span>
               ${!task.completed ? `
                 <button onclick="selectActiveTask('${task.id}')" class="text-[10px] px-2 py-1 rounded-md ${
-                  isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'
+                  isSelected ? 'bg-emerald-600 text-white' : 'bg-slate-800 text-slate-400 hover:text-white'
                 }">
                   ${isSelected ? 'Active' : 'Select'}
                 </button>
@@ -651,14 +727,13 @@
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updateActiveTaskLabel();
-      renderCalendarTasks();
     }
 
     function updateActiveTaskLabel() {
       const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
       if (activeTask) {
         activeTaskLabel.innerHTML = `<span class="font-bold text-white">[${activeTask.subject}]</span> ${activeTask.title} (${activeTask.type})`;
-        activeTaskLabel.className = "text-xs text-indigo-300 font-medium bg-indigo-950/60 py-1.5 px-3 rounded-full inline-block border border-indigo-500/40";
+        activeTaskLabel.className = "text-xs text-emerald-300 font-medium bg-emerald-950/60 py-1.5 px-3 rounded-full inline-block border border-emerald-500/40";
       } else {
         activeTaskLabel.textContent = "No Active Task Selected";
         activeTaskLabel.className = "text-xs text-slate-400 font-medium bg-slate-900/60 py-1.5 px-3 rounded-full inline-block border border-slate-800";
@@ -686,9 +761,9 @@
       saveData();
       renderTasks();
       renderCalendarGrid();
+      renderModalTasks();
     }
 
-    // Add Task with Recurring Repeat Options
     addTaskForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const title = document.getElementById('task-input').value.trim();
@@ -728,13 +803,7 @@
       datesToSchedule.forEach(dateStr => {
         state.tasks.push({
           id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
-          title,
-          subject,
-          type,
-          date: dateStr,
-          estPomos,
-          completedPomos: 0,
-          completed: false
+          title, subject, type, date: dateStr, estPomos, completedPomos: 0, completed: false
         });
       });
 
@@ -744,7 +813,66 @@
       renderCalendarGrid();
     });
 
-    // --- Calendar Engine with Navigation ---
+    // Calendar & Modal Popup System
+    const calendarModal = document.getElementById('calendar-modal');
+    const closeCalendarModalBtn = document.getElementById('close-calendar-modal-btn');
+    const modalAddTaskForm = document.getElementById('modal-add-task-form');
+
+    function openCalendarModal(dateStr) {
+      state.selectedCalendarDate = dateStr;
+      document.getElementById('modal-date-title').innerHTML = `<i class="fa-solid fa-calendar-day"></i> Schedule for ${dateStr}`;
+      renderModalTasks();
+      calendarModal.classList.remove('hidden');
+    }
+
+    closeCalendarModalBtn.onclick = () => calendarModal.classList.add('hidden');
+
+    function renderModalTasks() {
+      const modalTaskList = document.getElementById('modal-task-list');
+      modalTaskList.innerHTML = '';
+
+      const scheduledTasks = state.tasks.filter(t => t.date === state.selectedCalendarDate);
+
+      if (scheduledTasks.length === 0) {
+        modalTaskList.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No tasks scheduled for this date yet.</p>`;
+        return;
+      }
+
+      scheduledTasks.forEach(task => {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 flex justify-between items-center text-xs";
+        item.innerHTML = `
+          <div>
+            <p class="font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
+            <p class="text-[10px] text-slate-400"><span class="text-emerald-400 font-bold">${task.subject}</span> • ${task.type}</p>
+          </div>
+          <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+        `;
+        modalTaskList.appendChild(item);
+      });
+    }
+
+    modalAddTaskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('modal-task-title').value.trim();
+      const subject = document.getElementById('modal-task-subject').value;
+      const type = document.getElementById('modal-task-type').value.trim();
+      const estPomos = parseInt(document.getElementById('modal-task-est').value) || 1;
+
+      if (!title || !subject || !type) return;
+
+      state.tasks.push({
+        id: Date.now().toString(),
+        title, subject, type, date: state.selectedCalendarDate, estPomos, completedPomos: 0, completed: false
+      });
+
+      document.getElementById('modal-task-title').value = '';
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+      renderModalTasks();
+    });
+
     function renderCalendarGrid() {
       const calendarGridEl = document.getElementById('calendar-days-grid');
       const monthYearLabelEl = document.getElementById('calendar-month-year-label');
@@ -766,15 +894,12 @@
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const hasTasks = state.tasks.some(t => t.date === dateStr);
-        const isSelected = state.selectedCalendarDate === dateStr;
         const isToday = dateStr === new Date().toISOString().split('T')[0];
 
         const dayEl = document.createElement('button');
-        dayEl.className = `p-2 rounded-lg transition-all text-xs font-semibold relative ${
-          isSelected 
-            ? 'bg-indigo-600 text-white' 
-            : isToday 
-            ? 'border border-indigo-500 text-indigo-300 bg-indigo-950/20' 
+        dayEl.className = `p-2.5 rounded-xl transition-all text-xs font-semibold relative ${
+          isToday 
+            ? 'border border-emerald-500 text-emerald-400 bg-emerald-950/20' 
             : 'hover:bg-slate-800 text-slate-300'
         }`;
         dayEl.textContent = day;
@@ -785,48 +910,11 @@
           dayEl.appendChild(dot);
         }
 
-        dayEl.onclick = () => {
-          state.selectedCalendarDate = dateStr;
-          document.getElementById('task-date-input').value = dateStr;
-          renderCalendarGrid();
-          renderCalendarTasks();
-        };
-
+        dayEl.onclick = () => openCalendarModal(dateStr);
         calendarGridEl.appendChild(dayEl);
       }
     }
 
-    function renderCalendarTasks() {
-      const container = document.getElementById('calendar-task-list');
-      const label = document.getElementById('selected-date-label');
-      container.innerHTML = '';
-
-      label.textContent = `Tasks for ${state.selectedCalendarDate}`;
-
-      const scheduledTasks = state.tasks.filter(t => t.date === state.selectedCalendarDate);
-
-      if (scheduledTasks.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No tasks scheduled for this date. Click 'Add Task for Date' to schedule!</p>`;
-        return;
-      }
-
-      scheduledTasks.forEach(task => {
-        const item = document.createElement('div');
-        item.className = "p-2.5 rounded-xl bg-slate-900/40 border border-slate-800 flex justify-between items-center text-xs";
-        item.innerHTML = `
-          <div>
-            <p class="font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
-            <p class="text-[10px] text-slate-400"><span class="text-indigo-400 font-bold">${task.subject}</span> • ${task.type}</p>
-          </div>
-          <span class="text-[10px] px-2 py-0.5 rounded ${task.completed ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-300'}">
-            ${task.completed ? 'Completed' : 'Scheduled'}
-          </span>
-        `;
-        container.appendChild(item);
-      });
-    }
-
-    // Calendar Controls
     document.getElementById('prev-month-btn').onclick = () => {
       state.calendarViewDate.setMonth(state.calendarViewDate.getMonth() - 1);
       renderCalendarGrid();
@@ -837,23 +925,16 @@
     };
     document.getElementById('today-jump-btn').onclick = () => {
       state.calendarViewDate = new Date();
-      state.selectedCalendarDate = new Date().toISOString().split('T')[0];
-      document.getElementById('task-date-input').value = state.selectedCalendarDate;
       renderCalendarGrid();
-      renderCalendarTasks();
-    };
-    document.getElementById('quick-add-date-btn').onclick = () => {
-      document.getElementById('task-date-input').value = state.selectedCalendarDate;
-      document.getElementById('task-input').focus();
     };
 
-    // --- LocalStorage ---
+    // LocalStorage
     function saveData() {
-      localStorage.setItem('sp_tasks_v3', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v3', JSON.stringify(state.logs));
+      localStorage.setItem('sp_tasks_v4', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v4', JSON.stringify(state.logs));
     }
 
-    // --- Analytics ---
+    // Chart.js with Y-Axis 0 to 24 Hours
     let studyChart;
     function initChart() {
       const ctx = document.getElementById('studyChart').getContext('2d');
@@ -862,10 +943,10 @@
         data: {
           labels: [],
           datasets: [{
-            label: 'Study Minutes',
+            label: 'Study Hours',
             data: [],
-            backgroundColor: 'rgba(99, 102, 241, 0.5)',
-            borderColor: 'rgba(129, 140, 248, 1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.5)',
+            borderColor: 'rgba(16, 185, 129, 1)',
             borderWidth: 1.5,
             borderRadius: 6
           }]
@@ -873,9 +954,18 @@
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: { legend: { display: false } },
+          plugins: {
+            legend: { display: false },
+            tooltip: { callbacks: { label: (c) => ` ${c.raw} hrs` } }
+          },
           scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+            y: {
+              min: 0,
+              max: 24,
+              ticks: { stepSize: 4, color: '#94a3b8' },
+              grid: { color: 'rgba(255, 255, 255, 0.05)' },
+              title: { display: true, text: 'Hours', color: '#94a3b8' }
+            },
             x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
           }
         }
@@ -888,7 +978,7 @@
       const todayStr = now.toISOString().split('T')[0];
 
       const todayMins = state.logs.filter(l => l.date === todayStr).reduce((acc, curr) => acc + curr.minutes, 0);
-      document.getElementById('metric-today').textContent = `${todayMins}m`;
+      document.getElementById('metric-today').textContent = `${Math.floor(todayMins / 60)}h ${todayMins % 60}m`;
 
       const sevenDaysAgo = new Date(now);
       sevenDaysAgo.setDate(now.getDate() - 6);
@@ -937,7 +1027,8 @@
           d.setDate(now.getDate() - i);
           const dateStr = d.toISOString().split('T')[0];
           labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
-          data.push(state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0));
+          const mins = state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
         }
       } else if (state.currentChartTab === 'weekly') {
         for (let i = 3; i >= 0; i--) {
@@ -946,19 +1037,21 @@
           const endOfWeek = new Date(now);
           endOfWeek.setDate(now.getDate() - (i * 7));
           labels.push(`Wk ${4 - i}`);
-          data.push(state.logs.filter(l => {
+          const mins = state.logs.filter(l => {
             const d = new Date(l.date);
             return d >= startOfWeek && d <= endOfWeek;
-          }).reduce((a, c) => a + c.minutes, 0));
+          }).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
         }
       } else if (state.currentChartTab === 'monthly') {
         for (let i = 5; i >= 0; i--) {
           const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
           labels.push(d.toLocaleDateString('en-US', { month: 'short' }));
-          data.push(state.logs.filter(l => {
+          const mins = state.logs.filter(l => {
             const logD = new Date(l.date);
             return logD.getMonth() === d.getMonth() && logD.getFullYear() === d.getFullYear();
-          }).reduce((a, c) => a + c.minutes, 0));
+          }).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
         }
       }
 
@@ -967,7 +1060,7 @@
       studyChart.update();
     }
 
-    // Modal
+    // Timer Preferences Modal
     document.getElementById('open-settings-btn').onclick = () => {
       document.getElementById('custom-work-min').value = state.timer.workDuration;
       document.getElementById('custom-short-min').value = state.timer.shortDuration;
@@ -983,7 +1076,7 @@
       setMode(state.timer.mode);
     };
 
-    // Event Listeners
+    // Event Controls
     startBtn.onclick = toggleTimer;
     stopBtn.onclick = stopAndLogPartial;
     resetBtn.onclick = () => setMode(state.timer.mode);
@@ -1004,7 +1097,7 @@
       updateChartData();
     }
 
-    // Init
+    // Init Application
     setDailyQuote();
     setMode('work');
     renderTasks();
