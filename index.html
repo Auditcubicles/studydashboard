@@ -126,24 +126,8 @@
         </button>
       </nav>
 
-      <!-- Controls -->
+      <!-- Top Right Controls -->
       <div class="flex items-center gap-3">
-        <div class="glass-card px-3 py-1.5 rounded-xl text-center">
-          <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Time</p>
-          <p id="live-clock" class="text-xs font-extrabold font-mono text-indigo-500">00:00:00 AM</p>
-        </div>
-
-        <!-- Streak Card -->
-        <div onclick="openStreakModal()" class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all">
-          <i class="fa-solid fa-fire text-amber-500 text-sm"></i>
-          <div>
-            <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-1">
-              Streak <i class="fa-solid fa-circle-question text-[9px] text-indigo-400"></i>
-            </p>
-            <p id="streak-counter" class="text-xs font-extrabold text-amber-500">0 Days</p>
-          </div>
-        </div>
-
         <button id="sound-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Audio Chimes">
           <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
         </button>
@@ -157,11 +141,31 @@
     <!-- Main Container -->
     <main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
 
-      <!-- Page Title & Quote -->
-      <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
+      <!-- Page Banner Area: Title, Quote & Relocated Time/Streak Widgets -->
+      <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h2 id="page-title" class="text-2xl font-black text-slate-900 dark:text-slate-100">Holistic Performance Report</h2>
           <p id="daily-quote" class="text-xs text-slate-500 dark:text-slate-400 italic mt-0.5">"Loading daily motivation..."</p>
+        </div>
+
+        <!-- Relocated Time & Streak Cards Container -->
+        <div class="flex items-center gap-3">
+          <!-- Live Clock -->
+          <div class="glass-card px-4 py-2 rounded-xl text-center shadow-sm">
+            <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">Time</p>
+            <p id="live-clock" class="text-xs font-extrabold font-mono text-indigo-600 dark:text-indigo-400">00:00:00 AM</p>
+          </div>
+
+          <!-- Interactive Streak Card -->
+          <div onclick="openStreakModal()" class="glass-card px-4 py-2 rounded-xl flex items-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all shadow-sm">
+            <i class="fa-solid fa-fire text-amber-500 text-base"></i>
+            <div>
+              <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1">
+                Streak <i class="fa-solid fa-circle-question text-[9px] text-indigo-400"></i>
+              </p>
+              <p id="streak-counter" class="text-xs font-extrabold text-amber-500">0 Days</p>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -539,7 +543,7 @@
         </section>
       </div>
 
-      <!-- PAGE 7: DEDICATED 1-CLICK OFFLINE BACKUP & RESTORE PAGE (WITH IPHONE / SAFARI FIX) -->
+      <!-- PAGE 7: DEDICATED 1-CLICK OFFLINE BACKUP & RESTORE PAGE -->
       <div id="page-backup" class="page-view hidden space-y-8">
         <section class="glass-card p-6 md:p-8 rounded-2xl max-w-3xl mx-auto shadow-xl">
           <div class="text-center mb-8">
@@ -1466,7 +1470,7 @@
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
           alert("❌ Invalid backup file format! Try using 'Paste Backup String' instead.");
-        } finally {
+        } fontally {
           event.target.value = '';
         }
       };
