@@ -55,9 +55,21 @@
     .timer-mono { font-family: 'JetBrains Mono', monospace; }
 
     /* Strict Fullscreen Container Fix */
-    #pomodoro-card:-webkit-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
-    #pomodoro-card:-moz-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
-    #pomodoro-card:fullscreen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
+    .pomo-fullscreen-active {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999 !important;
+      width: 100vw !important;
+      height: 100vh !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      border-radius: 0 !important;
+      padding: 2rem !important;
+    }
+    .dark .pomo-fullscreen-active { background: #070a12 !important; }
+    .light .pomo-fullscreen-active { background: #ffffff !important; }
 
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -67,7 +79,7 @@
 </head>
 <body class="min-h-screen custom-scrollbar flex flex-col">
 
-  <!-- Modern Top Navigation Bar -->
+  <!-- Clean Top Navigation Bar -->
   <header class="top-nav sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/30">
@@ -82,7 +94,7 @@
     </div>
 
     <!-- Center Navigation Tabs -->
-    <nav class="flex flex-wrap justify-center bg-slate-200 dark:bg-slate-900/60 light:bg-slate-200 p-1 rounded-2xl border border-slate-300 dark:border-slate-800/80">
+    <nav class="flex flex-wrap justify-center bg-slate-200 dark:bg-slate-900/60 p-1 rounded-2xl border border-slate-300 dark:border-slate-800/80">
       <button id="nav-overview" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-2">
         <i class="fa-solid fa-chart-pie"></i> Holistic Report
       </button>
@@ -99,20 +111,12 @@
         <i class="fa-solid fa-clock-rotate-left"></i> Logs
       </button>
       <button id="nav-tools" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
-        <i class="fa-solid fa-bolt"></i> Boosters (6)
+        <i class="fa-solid fa-bolt"></i> Boosters (5)
       </button>
     </nav>
 
-    <!-- Top Right Quick Stats & Controls -->
+    <!-- Top Right Quick Controls -->
     <div class="flex items-center gap-3">
-      <!-- Exam Countdown Badge (Always Visible Header Widget) -->
-      <div onclick="switchPage('tools')" class="glass-card px-3 py-1.5 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition-all">
-        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-1">
-          <i class="fa-solid fa-hourglass-start text-indigo-500"></i> Exam Countdown
-        </p>
-        <p id="header-exam-countdown" class="text-xs font-extrabold font-mono text-indigo-600 dark:text-indigo-400">Set Date</p>
-      </div>
-
       <!-- Live Clock -->
       <div class="glass-card px-3 py-1.5 rounded-xl text-center">
         <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Time</p>
@@ -130,7 +134,7 @@
         </div>
       </div>
 
-      <!-- Audio Mute Toggle Button -->
+      <!-- Mute Toggle -->
       <button id="sound-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Audio Chimes">
         <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
       </button>
@@ -156,7 +160,7 @@
     <!-- PAGE 1: OVERVIEW PAGE (HOLISTIC EXECUTIVE REPORT) -->
     <div id="page-overview" class="page-view space-y-8">
       
-      <!-- Top Metrics Dashboard -->
+      <!-- Metrics Dashboard -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
         <!-- Today's Hours -->
         <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
@@ -202,14 +206,20 @@
           </div>
         </div>
 
-        <!-- Streak -->
-        <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+        <!-- Exam Countdown (Replaced Down Tab Metric + Inline Date Setting) -->
+        <div class="glass-card p-5 rounded-2xl flex items-center justify-between relative group">
           <div>
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Active Study Streak</p>
-            <p id="report-streak-days" class="text-2xl font-black text-amber-500 mt-1">0 Days</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-1">
+              Target Exam Date
+            </p>
+            <p id="report-exam-days" class="text-2xl font-black text-amber-500 mt-1">Set Date</p>
           </div>
-          <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-lg">
-            <i class="fa-solid fa-fire"></i>
+          <div class="flex flex-col items-end gap-1">
+            <input type="date" id="overview-exam-date-picker" class="opacity-0 absolute inset-0 cursor-pointer w-full h-full z-10" title="Click to Change Target Exam Date">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-lg">
+              <i class="fa-solid fa-hourglass-start"></i>
+            </div>
+            <span class="text-[9px] text-indigo-500 font-bold underline cursor-pointer">Change Date</span>
           </div>
         </div>
       </div>
@@ -244,14 +254,14 @@
     <!-- PAGE 2: FOCUS POMODORO TIMER PAGE -->
     <div id="page-pomodoro" class="page-view hidden space-y-8">
       <div class="max-w-2xl mx-auto">
-        <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl">
+        <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl transition-all">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-lg font-bold flex items-center gap-2">
               <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Pomodoro
             </h3>
             <div class="flex gap-2">
               <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
-                <i class="fa-solid fa-expand"></i> Fullscreen
+                <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Fullscreen
               </button>
               <button id="open-settings-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
                 <i class="fa-solid fa-sliders"></i> Adjust
@@ -260,18 +270,28 @@
           </div>
 
           <!-- Modes -->
-          <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-8 border border-slate-300 dark:border-slate-800/60">
+          <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60">
             <button id="mode-work" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
             <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
             <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
           </div>
 
+          <!-- Active Task Select Dropdown directly inside Pomodoro Card -->
+          <div class="mb-6">
+            <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 text-center">
+              Active Task for this Session:
+            </label>
+            <select id="pomo-active-task-select" class="input-field border rounded-xl px-3 py-2 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500">
+              <option value="">-- Select Active Scheduled Task for Today --</option>
+            </select>
+          </div>
+
           <!-- Timer Display (HH:MM:SS) -->
-          <div class="text-center my-10">
+          <div class="text-center my-8">
             <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
               01:00:00
             </div>
-            <p id="active-task-label" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-100 dark:bg-indigo-950/40 py-2 px-4 rounded-full inline-block border border-indigo-200 dark:border-indigo-800/40 mt-6">
+            <p id="active-task-label" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-100 dark:bg-indigo-950/40 py-2 px-4 rounded-full inline-block border border-indigo-200 dark:border-indigo-800/40 mt-4">
               No Active Task Selected
             </p>
           </div>
@@ -476,80 +496,72 @@
       </section>
     </div>
 
-    <!-- PAGE 6: 6 HIGH-UTILITY PRODUCTIVITY BOOSTERS -->
+    <!-- PAGE 6: 5 ULTRA-PRO PRODUCTIVITY BOOSTERS -->
     <div id="page-tools" class="page-view hidden space-y-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
-        <!-- Booster 1: Active Focus Distraction Blocker & Logger -->
+        <!-- Booster 1: Formula & Key Provision Memory Board -->
         <section class="glass-card p-5 rounded-2xl">
           <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-ban text-rose-500"></i> 1. Distraction Blocker & Logger
+            <i class="fa-solid fa-note-sticky text-amber-500"></i> 1. Formula & Key Notes Scratchpad
           </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Log interruptions to build self-awareness during study hours.</p>
-          <div class="flex gap-2 mb-3">
-            <input type="text" id="distraction-input" placeholder="e.g. Phone Call, Instagram..." class="input-field border rounded-xl px-3 py-1.5 text-xs flex-1">
-            <button onclick="logDistraction()" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Log</button>
-          </div>
-          <div id="distraction-log-list" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar text-[11px] text-slate-600 dark:text-slate-400"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Quick pinboard for Ind AS provisions, Forex formulas, or Tax sections.</p>
+          <textarea id="booster-notes-textarea" placeholder="Type key formulas or SA standards..." class="input-field border rounded-xl p-2.5 text-xs w-full h-32 focus:outline-none custom-scrollbar"></textarea>
         </section>
 
-        <!-- Booster 2: CA Final Core Chapter Checklist -->
+        <!-- Booster 2: Focus Audio Noise Generator -->
         <section class="glass-card p-5 rounded-2xl">
           <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-square-check text-emerald-500"></i> 2. CA Final Module Checklist
+            <i class="fa-solid fa-headphones text-purple-500"></i> 2. Focus Ambient Waves
           </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Track completion of high-weightage topics.</p>
-          <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300 max-h-36 overflow-y-auto custom-scrollbar">
-            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> FR: Ind AS 115 & 116 (Revenue & Leases)</label>
-            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> AFM: Portfolio Management & Forex</label>
-            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> AUDIT: Professional Ethics & Standards</label>
-            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> DT: International Taxation & Assessment</label>
-            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> IDT: GST Input Tax Credit & Refunds</label>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Mask surrounding noise with Web Audio ambient frequencies.</p>
+          <div class="grid grid-cols-2 gap-2">
+            <button onclick="toggleAmbientSound('rain')" id="btn-rain" class="py-2.5 bg-indigo-600 text-white rounded-xl text-xs font-bold">Rain Focus</button>
+            <button onclick="toggleAmbientSound('noise')" id="btn-noise" class="py-2.5 bg-purple-600 text-white rounded-xl text-xs font-bold">Alpha Waves</button>
           </div>
         </section>
 
-        <!-- Booster 3: Exam Countdown Timer Setup -->
+        <!-- Booster 3: Daily Target Pace Calculator -->
         <section class="glass-card p-5 rounded-2xl">
           <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-hourglass-start text-amber-500"></i> 3. Exam Date Target
+            <i class="fa-solid fa-calculator text-emerald-500"></i> 3. Study Pace & Pace Calculator
           </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Set your target exam date to pin urgency to your header.</p>
-          <input type="date" id="exam-date-input" class="input-field border rounded-xl px-3 py-2 text-xs w-full mb-2 font-bold">
-        </section>
-
-        <!-- Booster 4: Target Daily Hours Goal Tracker -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-bullseye text-purple-500"></i> 4. Daily Study Target (Hours)
-          </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Set target study hours per day (default 8 hrs):</p>
-          <input type="number" id="target-hours-input" value="8" min="1" max="24" class="input-field border rounded-xl px-3 py-1.5 text-xs w-full mb-3 font-bold">
-          <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
-            <div id="target-progress-bar" class="bg-indigo-600 h-full w-0 transition-all"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Required daily pace calculator based on exam date:</p>
+          <div id="booster-pace-output" class="sub-box p-3 rounded-xl text-xs space-y-1 font-semibold text-slate-700 dark:text-slate-300">
+            <p>Target Exam: <span id="pace-exam-label" class="font-bold text-amber-500">Set Date</span></p>
+            <p>Daily Pace: <span id="pace-hours-label" class="font-bold text-indigo-500">8.0 hrs/day required</span></p>
           </div>
         </section>
 
-        <!-- Booster 5: ICAI 3-Step Answer Structuring Guide -->
+        <!-- Booster 4: Interruption Log Counter -->
         <section class="glass-card p-5 rounded-2xl">
           <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-pen-to-square text-indigo-500"></i> 5. ICAI Answer Framework
+            <i class="fa-solid fa-ban text-rose-500"></i> 4. Interruption & Urge Log
           </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Standard formatting for case law & practical questions:</p>
-          <div class="sub-box p-2.5 rounded-xl text-[11px] space-y-1 font-semibold text-slate-700 dark:text-slate-300">
-            <p>1. <span class="text-indigo-500">Provision:</span> Relevant Section / Ind AS / SA</p>
-            <p>2. <span class="text-indigo-500">Analysis:</span> Connect facts of the question</p>
-            <p>3. <span class="text-indigo-500">Conclusion:</span> Direct, concise final answer</p>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Track urges to check phone during active pomodoro:</p>
+          <div class="flex justify-between items-center sub-box p-2.5 rounded-xl mb-2">
+            <span class="text-xs text-slate-600 dark:text-slate-400 font-bold">Interruption Tally:</span>
+            <span id="interruption-count" class="text-lg font-black text-rose-500">0</span>
           </div>
+          <button onclick="logInterruption()" class="w-full py-2 bg-rose-600 hover:bg-rose-500 text-white rounded-xl text-xs font-bold transition-all">
+            + Log Distraction Urge
+          </button>
         </section>
 
-        <!-- Booster 6: Spaced Repetition Revision Date Calculator -->
+        <!-- Booster 5: Fast Index for ICAI Standards (SA & Ind AS) -->
         <section class="glass-card p-5 rounded-2xl">
           <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
-            <i class="fa-solid fa-brain text-teal-500"></i> 6. Spaced Revision Calculator
+            <i class="fa-solid fa-book-bookmark text-indigo-500"></i> 5. Quick Standard Reference
           </h4>
-          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Enter topic completion date to generate review dates:</p>
-          <input type="date" id="spaced-date-input" class="input-field border rounded-xl px-3 py-1.5 text-xs w-full mb-2">
-          <div id="spaced-output" class="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 space-y-0.5"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Search key SAs & Ind AS Standards:</p>
+          <input type="text" id="standard-search-input" placeholder="Search (e.g. SA 700, Ind AS 115)..." onkeyup="filterStandards()" class="input-field border rounded-xl px-3 py-1.5 text-xs w-full mb-2">
+          <div id="standards-list" class="space-y-1 max-h-24 overflow-y-auto custom-scrollbar text-[11px] font-medium text-slate-600 dark:text-slate-300">
+            <p><strong>SA 200:</strong> Overall Objectives of Auditor</p>
+            <p><strong>SA 315:</strong> Identifying Risks of Misstatement</p>
+            <p><strong>SA 700:</strong> Forming Opinion on Financial Statements</p>
+            <p><strong>Ind AS 115:</strong> Revenue from Contracts</p>
+            <p><strong>Ind AS 116:</strong> Leases</p>
+          </div>
         </section>
 
       </div>
@@ -605,7 +617,7 @@
     </div>
   </div>
 
-  <!-- Interactive Streak Breakdown & Explainer Modal -->
+  <!-- Interactive Streak Breakdown Modal -->
   <div id="streak-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
     <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
@@ -679,7 +691,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // Sound & Audio Engine (Web Audio API Synthesizer)
+    // Sound Engine (Web Audio API Synthesizer)
     let audioMuted = false;
     const soundToggleBtn = document.getElementById('sound-toggle-btn');
     const soundIcon = document.getElementById('sound-icon');
@@ -699,9 +711,9 @@
         gain.connect(ctx.destination);
 
         if (type === 'complete') {
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
-          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
-          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
           gain.gain.setValueAtTime(0.3, ctx.currentTime);
           gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
           osc.start();
@@ -741,7 +753,7 @@
       scheduler: "Advance Study Scheduler",
       analytics: "Graphical Analytics & Focus Pattern",
       history: "Date-Wise Session Logs",
-      tools: "6x Productivity Booster Tools"
+      tools: "5x Ultra-Pro Study Booster Tools"
     };
 
     function switchPage(pageKey) {
@@ -755,6 +767,7 @@
       navButtons[pageKey].className = "nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-2";
       document.getElementById('page-title').textContent = pageTitles[pageKey];
 
+      if (pageKey === 'pomodoro') updatePomoTaskDropdown();
       if (pageKey === 'overview' || pageKey === 'analytics') updateMetricsAndCharts();
       if (pageKey === 'history') renderSessionHistory();
     }
@@ -801,16 +814,33 @@
         initialTime: 60 * 60
       },
       activeTaskId: null,
+      interruptions: 0,
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v8')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v8')) || [],
-      distractions: JSON.parse(localStorage.getItem('sp_distractions_v8')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v9')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v9')) || [],
       currentChartTab: 'daily'
     };
 
     document.getElementById('task-date-input').value = state.selectedCalendarDate;
     document.getElementById('graph-date-picker').value = state.selectedCalendarDate;
+
+    // Fixed Fullscreen Toggle Logic
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
+    const pomodoroCard = document.getElementById('pomodoro-card');
+    const fullscreenIcon = document.getElementById('fullscreen-icon');
+
+    fullscreenBtn.onclick = () => {
+      if (!pomodoroCard.classList.contains('pomo-fullscreen-active')) {
+        pomodoroCard.classList.add('pomo-fullscreen-active');
+        fullscreenIcon.className = "fa-solid fa-compress";
+        if (pomodoroCard.requestFullscreen) pomodoroCard.requestFullscreen().catch(()=>{});
+      } else {
+        pomodoroCard.classList.remove('pomo-fullscreen-active');
+        fullscreenIcon.className = "fa-solid fa-expand";
+        if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+      }
+    };
 
     // Timer Engine (HH:MM:SS)
     const timerDisplay = document.getElementById('timer-display');
@@ -818,6 +848,27 @@
     const stopBtn = document.getElementById('stop-btn');
     const resetBtn = document.getElementById('reset-btn');
     const activeTaskLabel = document.getElementById('active-task-label');
+    const pomoTaskSelect = document.getElementById('pomo-active-task-select');
+
+    function updatePomoTaskDropdown() {
+      pomoTaskSelect.innerHTML = `<option value="">-- Select Active Scheduled Task for Today --</option>`;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todaysTasks = state.tasks.filter(t => t.date === todayStr && !t.completed);
+
+      todaysTasks.forEach(task => {
+        const opt = document.createElement('option');
+        opt.value = task.id;
+        opt.textContent = `[${task.subject}] ${task.title} (${task.type})`;
+        if (state.activeTaskId === task.id) opt.selected = true;
+        pomoTaskSelect.appendChild(opt);
+      });
+    }
+
+    pomoTaskSelect.onchange = (e) => {
+      state.activeTaskId = e.target.value || null;
+      updateActiveTaskLabel();
+      renderTasks();
+    };
 
     function updateTimerDisplay() {
       const hours = Math.floor(state.timer.timeLeft / 3600);
@@ -999,6 +1050,7 @@
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updateActiveTaskLabel();
+      updatePomoTaskDropdown();
     }
 
     function updateActiveTaskLabel() {
@@ -1263,72 +1315,84 @@
       }
     };
 
-    // 6 Booster Tools Mechanics
-    function logDistraction() {
-      const input = document.getElementById('distraction-input');
-      const val = input.value.trim();
-      if (!val) return;
-
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-      state.distractions.push({ text: val, time });
-      input.value = '';
-      saveData();
-      renderDistractions();
+    // Booster Tools Functionalities
+    function logInterruption() {
+      state.interruptions++;
+      document.getElementById('interruption-count').textContent = state.interruptions;
     }
 
-    function renderDistractions() {
-      const list = document.getElementById('distraction-log-list');
-      list.innerHTML = '';
-      if (state.distractions.length === 0) {
-        list.innerHTML = `<p class="italic text-slate-400">No distractions logged today!</p>`;
-        return;
-      }
-      state.distractions.slice(-4).reverse().forEach(d => {
-        const item = document.createElement('div');
-        item.className = "p-1.5 sub-box rounded-lg flex justify-between";
-        item.innerHTML = `<span>${d.text}</span><span class="font-mono text-slate-400">${d.time}</span>`;
-        list.appendChild(item);
+    function filterStandards() {
+      const q = document.getElementById('standard-search-input').value.toLowerCase();
+      const items = document.querySelectorAll('#standards-list p');
+      items.forEach(item => {
+        item.style.display = item.textContent.toLowerCase().includes(q) ? 'block' : 'none';
       });
     }
 
-    document.getElementById('exam-date-input').onchange = (e) => {
-      const date = new Date(e.target.value);
+    // Exam Date Tracker Logic
+    const examPicker = document.getElementById('overview-exam-date-picker');
+    examPicker.onchange = (e) => {
+      const dateVal = e.target.value;
+      localStorage.setItem('sp_exam_date_v9', dateVal);
+      updateExamCountdown();
+    };
+
+    function updateExamCountdown() {
+      const savedDate = localStorage.getItem('sp_exam_date_v9');
+      if (!savedDate) {
+        document.getElementById('report-exam-days').textContent = 'Set Date';
+        document.getElementById('pace-exam-label').textContent = 'Set Date';
+        return;
+      }
+      examPicker.value = savedDate;
+      const target = new Date(savedDate);
       const today = new Date();
-      const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
-      const label = diffDays > 0 ? `${diffDays} Days Left` : 'Exam Day!';
-      document.getElementById('header-exam-countdown').textContent = label;
-      localStorage.setItem('sp_exam_date', e.target.value);
-    };
-
-    const savedExamDate = localStorage.getItem('sp_exam_date');
-    if (savedExamDate) {
-      document.getElementById('exam-date-input').value = savedExamDate;
-      const date = new Date(savedExamDate);
-      const diffDays = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
-      document.getElementById('header-exam-countdown').textContent = diffDays > 0 ? `${diffDays} Days Left` : 'Exam Day!';
+      const diffTime = target - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      const label = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
+      document.getElementById('report-exam-days').textContent = label;
+      document.getElementById('pace-exam-label').textContent = `${diffDays} Days Left`;
     }
 
-    document.getElementById('spaced-date-input').onchange = (e) => {
-      const base = new Date(e.target.value);
-      if (isNaN(base)) return;
-      const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r.toISOString().split('T')[0]; };
-      document.getElementById('spaced-output').innerHTML = `
-        <p>1st Review: ${addDays(base, 1)}</p>
-        <p>2nd Review: ${addDays(base, 3)}</p>
-        <p>3rd Review: ${addDays(base, 7)}</p>
-        <p>Final Review: ${addDays(base, 15)}</p>
-      `;
-    };
+    let currentAudio = null;
+    let activeSoundType = null;
+    function toggleAmbientSound(type) {
+      if (activeSoundType === type && currentAudio) {
+        currentAudio.pause();
+        currentAudio = null;
+        activeSoundType = null;
+        document.getElementById('btn-rain').textContent = 'Rain Focus';
+        document.getElementById('btn-noise').textContent = 'Alpha Waves';
+        return;
+      }
 
-    function updateGoalTracker() {
-      const todayStr = new Date().toISOString().split('T')[0];
-      const todayMins = state.logs.filter(l => l.date === todayStr).reduce((a, c) => a + c.minutes, 0);
-      const todayHours = parseFloat((todayMins / 60).toFixed(1));
-      const targetHours = parseInt(document.getElementById('target-hours-input').value) || 8;
-      const pct = Math.min(100, Math.round((todayHours / targetHours) * 100));
-      document.getElementById('target-progress-bar').style.width = `${pct}%`;
+      if (currentAudio) currentAudio.pause();
+
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const bufferSize = ctx.sampleRate * 2;
+      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+      const output = noiseBuffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
+
+      const whiteNoise = ctx.createBufferSource();
+      whiteNoise.buffer = noiseBuffer;
+      whiteNoise.loop = true;
+
+      const filter = ctx.createBiquadFilter();
+      filter.type = type === 'rain' ? 'lowpass' : 'bandpass';
+      filter.frequency.value = type === 'rain' ? 800 : 1000;
+
+      whiteNoise.connect(filter);
+      filter.connect(ctx.destination);
+      whiteNoise.start();
+
+      currentAudio = { pause: () => ctx.close() };
+      activeSoundType = type;
+
+      document.getElementById('btn-rain').textContent = type === 'rain' ? 'Stop' : 'Rain Focus';
+      document.getElementById('btn-noise').textContent = type === 'noise' ? 'Stop' : 'Alpha Waves';
     }
-    document.getElementById('target-hours-input').onchange = updateGoalTracker;
 
     // Charts Engine
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
@@ -1410,7 +1474,7 @@
 
       calculateStreak();
       updateSplineChartData();
-      updateGoalTracker();
+      updateExamCountdown();
     }
 
     document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
@@ -1465,7 +1529,6 @@
     function calculateStreak() {
       if (state.logs.length === 0) {
         document.getElementById('streak-counter').textContent = '0 Days';
-        document.getElementById('report-streak-days').textContent = '0 Days';
         return;
       }
       const uniqueDates = [...new Set(state.logs.map(l => l.date))].sort().reverse();
@@ -1486,7 +1549,6 @@
         } else break;
       }
       document.getElementById('streak-counter').textContent = `${streak} Days`;
-      document.getElementById('report-streak-days').textContent = `${streak} Days`;
     }
 
     function updateChartColors() {
@@ -1507,9 +1569,8 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v8', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v8', JSON.stringify(state.logs));
-      localStorage.setItem('sp_distractions_v8', JSON.stringify(state.distractions));
+      localStorage.setItem('sp_tasks_v9', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v9', JSON.stringify(state.logs));
     }
 
     // Modal Preferences
@@ -1554,7 +1615,6 @@
     setMode('work');
     renderTasks();
     renderCalendarGrid();
-    renderDistractions();
     initCharts();
   </script>
 </body>
