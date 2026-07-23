@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Studypulse - Pro Student Dashboard</title>
+  <title>StudyPulse - Pro Student Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -89,12 +89,14 @@
     <!-- Top Navigation Bar -->
     <header class="top-nav sticky top-0 z-40 px-4 md:px-8 py-3 flex flex-col md:flex-row items-center justify-between gap-4 backdrop-blur-md">
       <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-lg shadow-indigo-600/30">
-          N
+        <!-- Brand Box with "CA" -->
+        <div class="w-10 h-10 bg-indigo-600 rounded-xl flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-600/30 tracking-tighter">
+          CA
         </div>
         <div>
+          <!-- App Name set to StudyPulse -->
           <h1 class="text-xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-600 bg-clip-text text-transparent">
-            Studypulse
+            StudyPulse
           </h1>
           <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">CA Final Pro Hub</p>
         </div>
@@ -277,24 +279,21 @@
               <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
             </div>
 
-            <!-- Active Task Select Dropdown inside Pomodoro Card -->
+            <!-- Active Task Select Dropdown (Single Source of Truth) -->
             <div class="mb-6">
-              <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1 text-center">
+              <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1.5 text-center tracking-wider">
                 Active Task for this Session:
               </label>
-              <select id="pomo-active-task-select" class="input-field border rounded-xl px-3 py-2 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500">
+              <select id="pomo-active-task-select" class="input-field border rounded-xl px-4 py-2.5 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500 shadow-sm">
                 <option value="">-- Select Active Scheduled Task for Today --</option>
               </select>
             </div>
 
-            <!-- Timer Display (HH:MM:SS) -->
+            <!-- Timer Display with De-emphasized Small Seconds (:SS) -->
             <div class="text-center my-8">
-              <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
-                01:00:00
+              <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center">
+                <span id="timer-main">01:00</span><span id="timer-sec" class="text-3xl opacity-60 ml-1 font-bold">:00</span>
               </div>
-              <p id="active-task-label" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-100 dark:bg-indigo-950/40 py-2 px-4 rounded-full inline-block border border-indigo-200 dark:border-indigo-800/40 mt-4">
-                No Active Task Selected
-              </p>
             </div>
 
             <!-- Controls -->
@@ -853,12 +852,12 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v12')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v12')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v13')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v13')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v12')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v12')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v13')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v13')) || [],
       currentChartTab: 'daily'
     };
 
@@ -883,11 +882,11 @@
     };
 
     // Timer Engine
-    const timerDisplay = document.getElementById('timer-display');
+    const timerMain = document.getElementById('timer-main');
+    const timerSec = document.getElementById('timer-sec');
     const startBtn = document.getElementById('start-btn');
     const stopBtn = document.getElementById('stop-btn');
     const resetBtn = document.getElementById('reset-btn');
-    const activeTaskLabel = document.getElementById('active-task-label');
     const pomoTaskSelect = document.getElementById('pomo-active-task-select');
 
     function updatePomoTaskDropdown() {
@@ -906,7 +905,6 @@
 
     pomoTaskSelect.onchange = (e) => {
       state.activeTaskId = e.target.value || null;
-      updateActiveTaskLabel();
       renderTasks();
     };
 
@@ -915,9 +913,13 @@
       const mins = Math.floor((state.timer.timeLeft % 3600) / 60);
       const secs = state.timer.timeLeft % 60;
 
-      const formatted = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      timerDisplay.textContent = formatted;
-      document.title = `${formatted} - Studypulse`;
+      const formattedMain = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+      const formattedSec = `:${secs.toString().padStart(2, '0')}`;
+      
+      timerMain.textContent = formattedMain;
+      timerSec.textContent = formattedSec;
+      
+      document.title = `${formattedMain}${formattedSec} - StudyPulse`;
     }
 
     function setMode(mode) {
@@ -1089,17 +1091,7 @@
       }
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
-      updateActiveTaskLabel();
       updatePomoTaskDropdown();
-    }
-
-    function updateActiveTaskLabel() {
-      const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
-      if (activeTask) {
-        activeTaskLabel.innerHTML = `<span class="font-bold">[${activeTask.subject}]</span> ${activeTask.title} (${activeTask.type})`;
-      } else {
-        activeTaskLabel.textContent = "No Active Task Selected";
-      }
     }
 
     function toggleTaskCompletion(id) {
@@ -1471,7 +1463,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v12');
+      const savedDate = localStorage.getItem('sp_exam_date_v13');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -1483,14 +1475,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v12', val);
+        localStorage.setItem('sp_exam_date_v13', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v12');
+      const savedDate = localStorage.getItem('sp_exam_date_v13');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -1678,10 +1670,10 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v12', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v12', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v12', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v12', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v13', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v13', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v13', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_stickies_v13', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
