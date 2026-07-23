@@ -53,7 +53,6 @@
     .light .top-nav { background: #ffffff; border-bottom: 1px solid #cbd5e1; }
 
     .timer-mono { font-family: 'JetBrains Mono', monospace; }
-    .sticky-font { font-family: 'Kalam', cursive; }
 
     /* Fullscreen Container */
     .pomo-fullscreen-active {
@@ -210,36 +209,21 @@
           </div>
         </div>
 
-        <!-- Target Exam Date Setting (Explicit Working Date Picker) -->
-        <div class="glass-card p-5 rounded-2xl flex flex-col justify-between">
-          <div class="flex justify-between items-center mb-1">
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Target Exam Date</p>
-            <span id="report-exam-days" class="text-xs font-black text-amber-500">Set Date</span>
+        <!-- Target Exam Date Card (Sleek Clean High-Contrast Countdown) -->
+        <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Exam Countdown</p>
+            <p id="report-exam-days" class="text-2xl font-black text-amber-500 mt-0.5">Set Target</p>
+            <!-- Sleek trigger button for modal date selector -->
+            <button onclick="openExamDateModal()" class="text-[10px] font-bold text-indigo-500 hover:text-indigo-400 underline mt-1 block">
+              📅 Set / Change Date
+            </button>
           </div>
-          <input type="date" id="overview-exam-date-picker" class="input-field border rounded-xl px-2 py-1 text-xs font-bold w-full cursor-pointer focus:outline-none focus:border-indigo-500">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-lg">
+            <i class="fa-solid fa-hourglass-start"></i>
+          </div>
         </div>
       </div>
-
-      <!-- Pace & Efficiency Calculator Block -->
-      <section class="glass-card p-6 rounded-2xl">
-        <h3 class="text-base font-bold mb-3 flex items-center gap-2 text-indigo-500">
-          <i class="fa-solid fa-calculator"></i> Required Daily Pace Calculator
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="sub-box p-4 rounded-xl">
-            <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Target Total Study Hours:</label>
-            <input type="number" id="pace-target-total-hrs" value="400" min="50" max="2000" class="input-field border rounded-xl px-3 py-2 text-xs font-bold w-full">
-          </div>
-          <div class="sub-box p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Days Remaining Until Exam:</p>
-            <p id="pace-days-left" class="text-xl font-black text-indigo-500 mt-1">0 Days</p>
-          </div>
-          <div class="sub-box p-4 rounded-xl">
-            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Calculated Daily Target Pace:</p>
-            <p id="pace-required-hours" class="text-xl font-black text-emerald-500 mt-1">0.0 hrs/day</p>
-          </div>
-        </div>
-      </section>
 
       <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -512,7 +496,7 @@
       </section>
     </div>
 
-    <!-- PAGE 6: SUBJECT MEMORY WALL & FORMULA PINBOARD (REPLACED BOOSTERS TAB) -->
+    <!-- PAGE 6: SUBJECT MEMORY WALL & FORMULA PINBOARD -->
     <div id="page-wall" class="page-view hidden space-y-8">
       <section class="glass-card p-6 rounded-2xl">
         <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -555,6 +539,28 @@
     </div>
 
   </main>
+
+  <!-- Target Exam Date Modal Picker -->
+  <div id="exam-date-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+    <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-sm w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-base font-bold text-amber-500 flex items-center gap-2">
+          <i class="fa-solid fa-hourglass-start"></i> Target Exam Date
+        </h3>
+        <button onclick="closeExamDateModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <label class="block text-xs text-slate-500 dark:text-slate-400 font-bold mb-1">Select Target Exam Date:</label>
+          <input type="date" id="exam-date-modal-input" class="input-field border rounded-xl px-3 py-2 text-xs w-full font-bold focus:outline-none focus:border-indigo-500">
+        </div>
+        <button onclick="saveTargetExamDate()" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md">
+          Save Target Date
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Add Sticky Note Modal -->
   <div id="sticky-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
@@ -841,19 +847,19 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v10')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v10')) || [], // [{id, subject, title, content, color}]
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v11')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v11')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v10')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v10')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v11')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v11')) || [],
       currentChartTab: 'daily'
     };
 
     document.getElementById('task-date-input').value = state.selectedCalendarDate;
     document.getElementById('graph-date-picker').value = state.selectedCalendarDate;
 
-    // Fixed Fullscreen Toggle Logic
+    // Fullscreen Toggle
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const pomodoroCard = document.getElementById('pomodoro-card');
     const fullscreenIcon = document.getElementById('fullscreen-icon');
@@ -1454,49 +1460,41 @@
       }
     };
 
-    // Target Exam Date Tracker & Pace Calculator Logic
-    const overviewExamPicker = document.getElementById('overview-exam-date-picker');
-    const paceTargetTotalHrsInput = document.getElementById('pace-target-total-hrs');
+    // Target Exam Date Modal Selector
+    const examDateModal = document.getElementById('exam-date-modal');
+    const examDateModalInput = document.getElementById('exam-date-modal-input');
 
-    overviewExamPicker.onchange = (e) => {
-      const dateVal = e.target.value;
-      localStorage.setItem('sp_exam_date_v10', dateVal);
-      updateExamCountdownAndPace();
-    };
+    function openExamDateModal() {
+      const savedDate = localStorage.getItem('sp_exam_date_v12');
+      if (savedDate) examDateModalInput.value = savedDate;
+      examDateModal.classList.remove('hidden');
+    }
 
-    paceTargetTotalHrsInput.onchange = (e) => {
-      localStorage.setItem('sp_target_total_hrs_v10', e.target.value);
-      updateExamCountdownAndPace();
-    };
+    function closeExamDateModal() {
+      examDateModal.classList.add('hidden');
+    }
 
-    function updateExamCountdownAndPace() {
-      const savedDate = localStorage.getItem('sp_exam_date_v10');
-      const savedTargetHrs = parseFloat(localStorage.getItem('sp_target_total_hrs_v10')) || 400;
-      paceTargetTotalHrsInput.value = savedTargetHrs;
+    function saveTargetExamDate() {
+      const val = examDateModalInput.value;
+      if (val) {
+        localStorage.setItem('sp_exam_date_v12', val);
+        updateExamCountdown();
+        closeExamDateModal();
+      }
+    }
 
+    function updateExamCountdown() {
+      const savedDate = localStorage.getItem('sp_exam_date_v12');
       if (!savedDate) {
-        document.getElementById('report-exam-days').textContent = 'Set Date';
-        document.getElementById('pace-days-left').textContent = '0 Days';
-        document.getElementById('pace-required-hours').textContent = '0.0 hrs/day';
+        document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
       }
-
-      overviewExamPicker.value = savedDate;
       const targetDate = new Date(savedDate);
       const today = new Date();
       const diffTime = targetDate - today;
-      const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
-      document.getElementById('report-exam-days').textContent = `${diffDays} Days Left`;
-      document.getElementById('pace-days-left').textContent = `${diffDays} Days Left`;
-
-      // Calculate total studied hours so far
-      const totalLoggedMins = state.logs.reduce((a, c) => a + c.minutes, 0);
-      const totalLoggedHrs = totalLoggedMins / 60;
-      const remainingHrsToStudy = Math.max(0, savedTargetHrs - totalLoggedHrs);
-      const dailyPaceHrs = (remainingHrsToStudy / diffDays).toFixed(1);
-
-      document.getElementById('pace-required-hours').textContent = `${dailyPaceHrs} hrs/day`;
+      document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
     // Charts Engine
@@ -1579,7 +1577,7 @@
 
       calculateStreak();
       updateSplineChartData();
-      updateExamCountdownAndPace();
+      updateExamCountdown();
     }
 
     document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
@@ -1674,10 +1672,10 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v10', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v10', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v10', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v10', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v11', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v11', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v11', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_stickies_v11', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
