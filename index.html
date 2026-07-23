@@ -94,7 +94,6 @@
           CA
         </div>
         <div>
-          <!-- App Name set to StudyPulse -->
           <h1 class="text-xl font-extrabold bg-gradient-to-r from-indigo-400 via-purple-400 to-indigo-600 bg-clip-text text-transparent">
             StudyPulse
           </h1>
@@ -233,7 +232,7 @@
             <h3 class="text-base font-bold mb-1 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-indigo-500"></i> Overall Performance Study Trend
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Historical view of total hours logged across daily cycles</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Historical view of study hours logged across daily cycles (0 to 18 hrs)</p>
             <div class="relative h-64 w-full">
               <canvas id="overviewSplineChart"></canvas>
             </div>
@@ -279,7 +278,7 @@
               <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
             </div>
 
-            <!-- Active Task Select Dropdown (Single Source of Truth) -->
+            <!-- Active Task Dropdown Selector -->
             <div class="mb-6">
               <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1.5 text-center tracking-wider">
                 Active Task for this Session:
@@ -289,7 +288,7 @@
               </select>
             </div>
 
-            <!-- Timer Display with De-emphasized Small Seconds (:SS) -->
+            <!-- Timer Display with Small Seconds (:SS) -->
             <div class="text-center my-8">
               <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center">
                 <span id="timer-main">01:00</span><span id="timer-sec" class="text-3xl opacity-60 ml-1 font-bold">:00</span>
@@ -419,7 +418,7 @@
         </div>
       </div>
 
-      <!-- PAGE 4: DETAILED ANALYTICS PAGE -->
+      <!-- PAGE 4: DETAILED ANALYTICS PAGE (Scaled 0 to 18 Hours) -->
       <div id="page-analytics" class="page-view hidden space-y-8">
         
         <!-- Spline Progress Graph -->
@@ -429,7 +428,7 @@
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-chart-area text-indigo-500"></i> Study Trends & Progress
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Interactive spline curve tracking study hours (0 to 24 hours)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Interactive spline curve tracking study hours (0 to 18 hours)</p>
             </div>
 
             <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
@@ -444,14 +443,14 @@
           </div>
         </section>
 
-        <!-- Date-Wise Specific Day Analysis Graph -->
+        <!-- Date-Wise Specific Day Analysis Graph (0 to 18 Hours Fixed Y-Axis) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown (0 to 24 Hours)
+                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown (0 to 18 Hours)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Bar chart breakdown strictly scaled from 0 to 24 hours for any chosen date</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Bar chart breakdown strictly scaled from 0 to 18 hours for any chosen date</p>
             </div>
             <div class="flex items-center gap-2">
               <label class="text-xs text-slate-600 dark:text-slate-400 font-medium">Select Date:</label>
@@ -706,12 +705,38 @@
 
   <!-- JavaScript Engine -->
   <script>
+    // 30 Shuffling Daily Motivational Quotes
     const quotes = [
       "Mastering the mindset behind the CA Signature.",
       "Consistency turns averages into chartered excellence.",
       "Don't study until you get it right. Study until you can't get it wrong.",
       "Small daily improvements over time lead to stunning results.",
-      "Focus is a muscle. The more you use it, the stronger it gets."
+      "Focus is a muscle. The more you use it, the stronger it gets.",
+      "The expert in anything was once a beginner.",
+      "Your future self will thank you for the work you do today.",
+      "Productivity isn't about being busy; it's about being effective.",
+      "Hard work beats talent when talent doesn't work hard.",
+      "Action is the foundational key to all success.",
+      "Disciplined execution beats inspiration every single time.",
+      "Success is the sum of small efforts repeated day in and day out.",
+      "You don't have to be extreme, just consistent.",
+      "The best way to predict your future is to create it.",
+      "Focus on the process, and the results will follow naturally.",
+      "Push yourself, because no one else is going to do it for you.",
+      "Dream big, execute daily, remain patient.",
+      "Excellence is not an act, but a habit.",
+      "Energy flows where attention goes.",
+      "Doubt kills more dreams than failure ever will.",
+      "Believe you can and you're halfway there.",
+      "Turn your excuses into your execution.",
+      "One hour of deep focus beats five hours of distracted reading.",
+      "Strive for progress, not perfection.",
+      "Quiet momentum builds undeniable success.",
+      "Your signature will carry weight because of the effort behind it.",
+      "Keep going. Everything you need will come at the perfect time.",
+      "Make today count towards your ultimate goal.",
+      "Clear minds make decisive progress.",
+      "Commitment means staying loyal to what you said long after the mood has left."
     ];
 
     function setDailyQuote() {
@@ -852,12 +877,12 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v13')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v13')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v14')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v14')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v13')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v13')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v14')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v14')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1463,7 +1488,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v13');
+      const savedDate = localStorage.getItem('sp_exam_date_v14');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -1475,14 +1500,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v13', val);
+        localStorage.setItem('sp_exam_date_v14', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v13');
+      const savedDate = localStorage.getItem('sp_exam_date_v14');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -1495,16 +1520,16 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine
+    // Charts Engine (Scaled 0 to 18 Hours)
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
-      // Overview Spline
+      // Overview Spline (Min 0, Max 18 Hours)
       const ctxOverviewSpline = document.getElementById('overviewSplineChart').getContext('2d');
       overviewSplineChart = new Chart(ctxOverviewSpline, {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 24, ticks: { stepSize: 4, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       // Overview Radar
@@ -1515,20 +1540,20 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } }, ticks: { display: false } } } }
       });
 
-      // Analytics Spline
+      // Analytics Spline (Min 0, Max 18 Hours)
       const ctxSpline = document.getElementById('studySplineChart').getContext('2d');
       studySplineChart = new Chart(ctxSpline, {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 24, ticks: { stepSize: 4, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
-      // Date-Wise Fixed 0 - 24 Hours Bar Chart
+      // Date-Wise Bar Chart (Min 0, Max 18 Hours)
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
       dateWiseBarChart = new Chart(ctxDate, {
         type: 'bar',
         data: { labels: ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'], datasets: [{ label: 'Hours Studied', data: [0, 0, 0, 0, 0, 0], backgroundColor: 'rgba(16, 185, 129, 0.6)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1.5, borderRadius: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 24, ticks: { stepSize: 4, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       updateMetricsAndCharts();
@@ -1565,7 +1590,7 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      // Date-Wise Fixed 0 to 24 Bar Chart Data
+      // Date-Wise Fixed 0 to 18 Bar Chart Data
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
         return parseFloat((mins / 60).toFixed(1));
@@ -1670,10 +1695,10 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v13', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v13', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v13', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v13', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v14', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v14', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v14', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_stickies_v14', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
