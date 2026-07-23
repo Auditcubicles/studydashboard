@@ -42,20 +42,22 @@
     .dark body { background-color: #070a12; color: #f8fafc; }
     .dark .glass-card { background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.1); }
     .dark .input-field { background: #1e293b; border-color: #334155; color: #f8fafc; }
+    .dark .sub-box { background: rgba(30, 41, 59, 0.6); border: 1px solid rgba(255, 255, 255, 0.08); }
     .dark .top-nav { background: rgba(15, 23, 42, 0.95); border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
 
     /* High-Contrast Light Mode Surfaces */
     .light body { background-color: #f1f5f9; color: #0f172a; }
     .light .glass-card { background: #ffffff; border: 1px solid #cbd5e1; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); }
-    .light .input-field { background: #f8fafc; border-color: #94a3b8; color: #0f172a; }
+    .light .input-field { background: #ffffff; border-color: #cbd5e1; color: #0f172a; }
+    .light .sub-box { background: #f8fafc; border: 1px solid #e2e8f0; }
     .light .top-nav { background: #ffffff; border-bottom: 1px solid #cbd5e1; }
 
     .timer-mono { font-family: 'JetBrains Mono', monospace; }
 
     /* Strict Fullscreen Container Fix */
-    #pomodoro-card:-webkit-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-center: center; align-items: center; background: #070a12; padding: 2rem; }
-    #pomodoro-card:-moz-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-center: center; align-items: center; background: #070a12; padding: 2rem; }
-    #pomodoro-card:fullscreen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-center: center; align-items: center; background: #070a12; padding: 2rem; }
+    #pomodoro-card:-webkit-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
+    #pomodoro-card:-moz-full-screen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
+    #pomodoro-card:fullscreen { width: 100vw; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; background: #070a12; padding: 2rem; }
 
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
@@ -80,46 +82,61 @@
     </div>
 
     <!-- Center Navigation Tabs -->
-    <nav class="flex flex-wrap justify-center bg-slate-900/60 dark:bg-slate-900/60 light:bg-slate-200 p-1 rounded-2xl border border-slate-800/80 light:border-slate-300">
+    <nav class="flex flex-wrap justify-center bg-slate-200 dark:bg-slate-900/60 light:bg-slate-200 p-1 rounded-2xl border border-slate-300 dark:border-slate-800/80">
       <button id="nav-overview" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-2">
         <i class="fa-solid fa-chart-pie"></i> Holistic Report
       </button>
-      <button id="nav-pomodoro" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+      <button id="nav-pomodoro" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
         <i class="fa-solid fa-stopwatch"></i> Focus Timer
       </button>
-      <button id="nav-scheduler" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+      <button id="nav-scheduler" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
         <i class="fa-solid fa-calendar-days"></i> Scheduler
       </button>
-      <button id="nav-analytics" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+      <button id="nav-analytics" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
         <i class="fa-solid fa-chart-line"></i> Analytics
       </button>
-      <button id="nav-history" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+      <button id="nav-history" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
         <i class="fa-solid fa-clock-rotate-left"></i> Logs
       </button>
-      <button id="nav-tools" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2">
-        <i class="fa-solid fa-bolt"></i> Boosters (10)
+      <button id="nav-tools" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <i class="fa-solid fa-bolt"></i> Boosters (6)
       </button>
     </nav>
 
-    <!-- Top Right Quick Stats & Theme -->
+    <!-- Top Right Quick Stats & Controls -->
     <div class="flex items-center gap-3">
+      <!-- Exam Countdown Badge (Always Visible Header Widget) -->
+      <div onclick="switchPage('tools')" class="glass-card px-3 py-1.5 rounded-xl text-center cursor-pointer hover:border-indigo-500 transition-all">
+        <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-1">
+          <i class="fa-solid fa-hourglass-start text-indigo-500"></i> Exam Countdown
+        </p>
+        <p id="header-exam-countdown" class="text-xs font-extrabold font-mono text-indigo-600 dark:text-indigo-400">Set Date</p>
+      </div>
+
+      <!-- Live Clock -->
       <div class="glass-card px-3 py-1.5 rounded-xl text-center">
         <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Time</p>
         <p id="live-clock" class="text-xs font-extrabold font-mono text-indigo-500">00:00:00 AM</p>
       </div>
 
-      <!-- Interactive Streak Card -->
+      <!-- Streak Card -->
       <div onclick="openStreakModal()" class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-2 cursor-pointer hover:border-amber-500/50 transition-all">
         <i class="fa-solid fa-fire text-amber-500 text-sm"></i>
         <div>
           <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase flex items-center gap-1">
-            Streak <i class="fa-solid fa-circle-question text-[9px] text-indigo-400" title="Streak Calculation Logic"></i>
+            Streak <i class="fa-solid fa-circle-question text-[9px] text-indigo-400"></i>
           </p>
           <p id="streak-counter" class="text-xs font-extrabold text-amber-500">0 Days</p>
         </div>
       </div>
 
-      <button id="theme-toggle-btn" class="glass-card p-2 rounded-xl text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Theme">
+      <!-- Audio Mute Toggle Button -->
+      <button id="sound-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Audio Chimes">
+        <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
+      </button>
+
+      <!-- Theme Switcher -->
+      <button id="theme-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Theme">
         <i id="theme-icon" class="fa-solid fa-moon text-sm"></i>
       </button>
     </div>
@@ -128,7 +145,7 @@
   <!-- Main Container -->
   <main class="flex-1 p-4 md:p-8 max-w-7xl mx-auto w-full">
 
-    <!-- Page Title & Daily Quote -->
+    <!-- Page Title & Quote -->
     <div class="mb-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-2">
       <div>
         <h2 id="page-title" class="text-2xl font-black text-slate-900 dark:text-slate-100">Holistic Performance Report</h2>
@@ -140,49 +157,64 @@
     <div id="page-overview" class="page-view space-y-8">
       
       <!-- Top Metrics Dashboard -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+        <!-- Today's Hours -->
         <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Total Hours Studied</p>
-            <p id="report-total-hours" class="text-2xl font-black text-indigo-500 mt-1">0.0 hrs</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Today's Study Hours</p>
+            <p id="report-today-hours" class="text-2xl font-black text-indigo-500 mt-1">0.0 hrs</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-xl">
+          <div class="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 text-lg">
+            <i class="fa-solid fa-clock"></i>
+          </div>
+        </div>
+
+        <!-- Total Cumulative Hours -->
+        <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
+          <div>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Total Cumulative Hours</p>
+            <p id="report-total-hours" class="text-2xl font-black text-purple-500 mt-1">0.0 hrs</p>
+          </div>
+          <div class="w-10 h-10 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-lg">
             <i class="fa-solid fa-hourglass-half"></i>
           </div>
         </div>
 
+        <!-- Completion Rate -->
         <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Task Completion Rate</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Task Completion Rate</p>
             <p id="report-completion-rate" class="text-2xl font-black text-emerald-500 mt-1">0%</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-xl">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center text-emerald-500 text-lg">
             <i class="fa-solid fa-circle-check"></i>
           </div>
         </div>
 
+        <!-- Avg Session -->
         <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Average Session Length</p>
-            <p id="report-avg-session" class="text-2xl font-black text-purple-500 mt-1">0 min</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Avg Session Length</p>
+            <p id="report-avg-session" class="text-2xl font-black text-teal-500 mt-1">0 min</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-purple-500/10 flex items-center justify-center text-purple-500 text-xl">
+          <div class="w-10 h-10 rounded-xl bg-teal-500/10 flex items-center justify-center text-teal-500 text-lg">
             <i class="fa-solid fa-stopwatch"></i>
           </div>
         </div>
 
+        <!-- Streak -->
         <div class="glass-card p-5 rounded-2xl flex items-center justify-between">
           <div>
-            <p class="text-xs text-slate-500 dark:text-slate-400 font-bold uppercase">Active Study Streak</p>
+            <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Active Study Streak</p>
             <p id="report-streak-days" class="text-2xl font-black text-amber-500 mt-1">0 Days</p>
           </div>
-          <div class="w-12 h-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-xl">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-500 text-lg">
             <i class="fa-solid fa-fire"></i>
           </div>
         </div>
       </div>
 
-      <!-- Holistic Performance Breakdown Charts -->
+      <!-- Charts -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <section class="lg:col-span-8 glass-card p-6 rounded-2xl">
           <h3 class="text-base font-bold mb-1 flex items-center gap-2">
@@ -218,28 +250,28 @@
               <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Pomodoro
             </h3>
             <div class="flex gap-2">
-              <button id="fullscreen-btn" class="text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/40" title="Full Screen">
+              <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
                 <i class="fa-solid fa-expand"></i> Fullscreen
               </button>
-              <button id="open-settings-btn" class="text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-700/50 bg-slate-900/40">
+              <button id="open-settings-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
                 <i class="fa-solid fa-sliders"></i> Adjust
               </button>
             </div>
           </div>
 
           <!-- Modes -->
-          <div class="flex bg-slate-900/60 dark:bg-slate-900/60 light:bg-slate-200 p-1.5 rounded-2xl mb-8 border border-slate-800/60">
+          <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-8 border border-slate-300 dark:border-slate-800/60">
             <button id="mode-work" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
-            <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
-            <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
+            <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
+            <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
           </div>
 
-          <!-- Digital Display (HH:MM:SS) -->
+          <!-- Timer Display (HH:MM:SS) -->
           <div class="text-center my-10">
-            <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-500 dark:text-indigo-400 light:text-indigo-600">
+            <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400">
               01:00:00
             </div>
-            <p id="active-task-label" class="text-xs text-indigo-400 font-bold bg-indigo-950/40 dark:bg-indigo-950/40 light:bg-indigo-100 py-2 px-4 rounded-full inline-block border border-indigo-800/40 mt-6">
+            <p id="active-task-label" class="text-xs text-indigo-600 dark:text-indigo-400 font-bold bg-indigo-100 dark:bg-indigo-950/40 py-2 px-4 rounded-full inline-block border border-indigo-200 dark:border-indigo-800/40 mt-6">
               No Active Task Selected
             </p>
           </div>
@@ -249,10 +281,10 @@
             <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 text-sm">
               <i class="fa-solid fa-play"></i> Start
             </button>
-            <button id="stop-btn" class="bg-rose-600/80 hover:bg-rose-600 text-white font-bold px-6 py-3.5 rounded-2xl transition-all flex items-center gap-2 text-sm">
+            <button id="stop-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3.5 rounded-2xl transition-all flex items-center gap-2 text-sm">
               <i class="fa-solid fa-square"></i> Stop & Log
             </button>
-            <button id="reset-btn" class="bg-slate-800 dark:bg-slate-800 light:bg-slate-200 hover:bg-slate-700 text-slate-300 dark:text-slate-300 light:text-slate-700 font-bold px-5 py-3.5 rounded-2xl transition-all border border-slate-700/60">
+            <button id="reset-btn" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-5 py-3.5 rounded-2xl transition-all border border-slate-300 dark:border-slate-700/60">
               <i class="fa-solid fa-rotate-right"></i>
             </button>
           </div>
@@ -269,12 +301,13 @@
           <section class="glass-card p-6 rounded-2xl">
             <div class="flex justify-between items-center mb-4">
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-list-check text-purple-400"></i> Task Manager
+                <i class="fa-solid fa-list-check text-purple-500"></i> Task Manager
               </h3>
-              <span id="task-completion-stats" class="text-xs text-slate-400 font-medium">0 / 0 Done</span>
+              <span id="task-completion-stats" class="text-xs text-slate-500 dark:text-slate-400 font-medium">0 / 0 Done</span>
             </div>
 
-            <form id="add-task-form" class="space-y-3 mb-6 bg-slate-900/40 dark:bg-slate-900/40 light:bg-slate-100 p-4 rounded-xl border border-slate-800/60 light:border-slate-300">
+            <!-- Context-Aware Task Form -->
+            <form id="add-task-form" class="space-y-3 mb-6 sub-box p-4 rounded-xl">
               <div class="flex gap-2">
                 <input type="text" id="task-input" placeholder="Chapter / Topic name..." required
                   class="flex-1 input-field border rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
@@ -305,11 +338,11 @@
 
               <div class="grid grid-cols-2 gap-2 pt-1">
                 <div>
-                  <label class="block text-[10px] text-slate-400 mb-0.5">Start Date:</label>
+                  <label class="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Start Date:</label>
                   <input type="date" id="task-date-input" required class="w-full input-field border rounded-lg px-2 py-1 text-xs">
                 </div>
                 <div>
-                  <label class="block text-[10px] text-slate-400 mb-0.5">Repeat Task:</label>
+                  <label class="block text-[10px] text-slate-500 dark:text-slate-400 mb-0.5">Repeat Task:</label>
                   <select id="task-repeat-select" class="w-full input-field border rounded-lg px-2 py-1 text-xs">
                     <option value="none">Does not repeat</option>
                     <option value="daily_7">Repeat Daily (7 Days)</option>
@@ -326,11 +359,11 @@
 
             <div class="space-y-4">
               <div>
-                <h4 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Today's To-Do</h4>
+                <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Today's To-Do</h4>
                 <div id="todo-task-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
               </div>
               <div>
-                <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Completed Today</h4>
+                <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Completed Today</h4>
                 <div id="completed-task-list" class="space-y-2 max-h-36 overflow-y-auto custom-scrollbar pr-1"></div>
               </div>
             </div>
@@ -345,19 +378,19 @@
                 <h3 class="text-base font-bold flex items-center gap-2">
                   <i class="fa-solid fa-calendar-days text-amber-500"></i> Calendar Scheduler
                 </h3>
-                <p class="text-xs text-slate-400">Click any date to inspect scheduled tasks or add new ones!</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">Click any date to inspect scheduled tasks or add new ones!</p>
               </div>
               
-              <div class="flex items-center gap-2 bg-slate-900/80 dark:bg-slate-900/80 light:bg-slate-200 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-bold text-indigo-400">
-                <button id="prev-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-left"></i></button>
+              <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                <button id="prev-month-btn" class="hover:text-indigo-500 px-1"><i class="fa-solid fa-chevron-left"></i></button>
                 <span id="calendar-month-year-label">July 2026</span>
-                <button id="next-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-right"></i></button>
+                <button id="next-month-btn" class="hover:text-indigo-500 px-1"><i class="fa-solid fa-chevron-right"></i></button>
                 <button id="today-jump-btn" class="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px]">Today</button>
               </div>
             </div>
 
-            <div class="bg-slate-900/50 dark:bg-slate-900/50 light:bg-slate-100 p-4 rounded-xl border border-slate-800/60">
-              <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 mb-2">
+            <div class="sub-box p-4 rounded-xl">
+              <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-600 dark:text-slate-400 mb-2">
                 <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
               </div>
               <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
@@ -377,13 +410,13 @@
             <h3 class="text-base font-bold flex items-center gap-2">
               <i class="fa-solid fa-chart-area text-indigo-500"></i> Study Trends & Progress
             </h3>
-            <p class="text-xs text-slate-400">Interactive spline curve tracking study hours ($0 - 24$ hours)</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Interactive spline curve tracking study hours ($0 - 24$ hours)</p>
           </div>
 
-          <div class="flex bg-slate-900/60 dark:bg-slate-900/60 light:bg-slate-200 p-1 rounded-xl border border-slate-800">
+          <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
             <button id="view-daily" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all">Daily</button>
-            <button id="view-weekly" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Weekly</button>
-            <button id="view-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Monthly</button>
+            <button id="view-weekly" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Weekly</button>
+            <button id="view-monthly" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Monthly</button>
           </div>
         </div>
 
@@ -399,11 +432,11 @@
             <h3 class="text-base font-bold flex items-center gap-2">
               <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown ($0 - 24$ Hours)
             </h3>
-            <p class="text-xs text-slate-400">Bar chart breakdown strictly scaled from $0$ to $24$ hours for any chosen date</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Bar chart breakdown strictly scaled from $0$ to $24$ hours for any chosen date</p>
           </div>
           <div class="flex items-center gap-2">
-            <label class="text-xs text-slate-400">Select Date:</label>
-            <input type="date" id="graph-date-picker" class="input-field border rounded-xl px-3 py-1.5 text-xs">
+            <label class="text-xs text-slate-600 dark:text-slate-400 font-medium">Select Date:</label>
+            <input type="date" id="graph-date-picker" class="input-field border rounded-xl px-3 py-1.5 text-xs font-medium">
           </div>
         </div>
 
@@ -421,15 +454,15 @@
             <h3 class="text-base font-bold flex items-center gap-2">
               <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Date-Wise Session Logs
             </h3>
-            <p class="text-xs text-slate-400">Complete record of every study session completed</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400">Complete record of every study session completed</p>
           </div>
-          <button id="clear-history-btn" class="text-xs text-rose-400 hover:text-rose-300 font-semibold">Clear Logs</button>
+          <button id="clear-history-btn" class="text-xs text-rose-500 hover:text-rose-600 font-bold">Clear Logs</button>
         </div>
 
         <div class="overflow-x-auto custom-scrollbar">
           <table class="w-full text-left text-xs border-collapse">
             <thead>
-              <tr class="border-b border-slate-800 dark:border-slate-800 light:border-slate-300 text-slate-400">
+              <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
                 <th class="p-3">Date</th>
                 <th class="p-3">Subject</th>
                 <th class="p-3">Study Type</th>
@@ -437,120 +470,86 @@
                 <th class="p-3">Timestamp</th>
               </tr>
             </thead>
-            <tbody id="session-history-table-body" class="divide-y divide-slate-800/60 dark:divide-slate-800/60 light:divide-slate-200"></tbody>
+            <tbody id="session-history-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
           </table>
         </div>
       </section>
     </div>
 
-    <!-- PAGE 6: 10 PRODUCTIVITY BOOSTER TOOLS PAGE -->
+    <!-- PAGE 6: 6 HIGH-UTILITY PRODUCTIVITY BOOSTERS -->
     <div id="page-tools" class="page-view hidden space-y-8">
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         
-        <!-- Tool 1: Exam Countdown Timer -->
+        <!-- Booster 1: Active Focus Distraction Blocker & Logger -->
         <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-hourglass-start"></i> 1. Exam Countdown
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-ban text-rose-500"></i> 1. Distraction Blocker & Logger
           </h4>
-          <input type="date" id="exam-date-input" class="input-field border rounded-xl p-2 text-xs w-full mb-3">
-          <div id="exam-countdown-display" class="text-center p-3 bg-indigo-950/40 rounded-xl border border-indigo-800/40 font-mono font-bold text-sm text-indigo-300">
-            Set Exam Date Above
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Log interruptions to build self-awareness during study hours.</p>
+          <div class="flex gap-2 mb-3">
+            <input type="text" id="distraction-input" placeholder="e.g. Phone Call, Instagram..." class="input-field border rounded-xl px-3 py-1.5 text-xs flex-1">
+            <button onclick="logDistraction()" class="bg-rose-600 hover:bg-rose-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold">Log</button>
+          </div>
+          <div id="distraction-log-list" class="space-y-1 max-h-28 overflow-y-auto custom-scrollbar text-[11px] text-slate-600 dark:text-slate-400"></div>
+        </section>
+
+        <!-- Booster 2: CA Final Core Chapter Checklist -->
+        <section class="glass-card p-5 rounded-2xl">
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-square-check text-emerald-500"></i> 2. CA Final Module Checklist
+          </h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Track completion of high-weightage topics.</p>
+          <div class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300 max-h-36 overflow-y-auto custom-scrollbar">
+            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> FR: Ind AS 115 & 116 (Revenue & Leases)</label>
+            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> AFM: Portfolio Management & Forex</label>
+            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> AUDIT: Professional Ethics & Standards</label>
+            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> DT: International Taxation & Assessment</label>
+            <label class="flex items-center gap-2"><input type="checkbox" class="accent-indigo-600"> IDT: GST Input Tax Credit & Refunds</label>
           </div>
         </section>
 
-        <!-- Tool 2: Ambient Sound Generator -->
+        <!-- Booster 3: Exam Countdown Timer Setup -->
         <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-headphones"></i> 2. Focus Noise Generator
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-hourglass-start text-amber-500"></i> 3. Exam Date Target
           </h4>
-          <div class="flex gap-2">
-            <button onclick="toggleAmbientSound('rain')" id="btn-rain" class="flex-1 py-2 bg-indigo-600 text-white rounded-xl text-xs font-bold">Rain</button>
-            <button onclick="toggleAmbientSound('noise')" id="btn-noise" class="flex-1 py-2 bg-purple-600 text-white rounded-xl text-xs font-bold">White Noise</button>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Set your target exam date to pin urgency to your header.</p>
+          <input type="date" id="exam-date-input" class="input-field border rounded-xl px-3 py-2 text-xs w-full mb-2 font-bold">
+        </section>
+
+        <!-- Booster 4: Target Daily Hours Goal Tracker -->
+        <section class="glass-card p-5 rounded-2xl">
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-bullseye text-purple-500"></i> 4. Daily Study Target (Hours)
+          </h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Set target study hours per day (default 8 hrs):</p>
+          <input type="number" id="target-hours-input" value="8" min="1" max="24" class="input-field border rounded-xl px-3 py-1.5 text-xs w-full mb-3 font-bold">
+          <div class="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2.5 overflow-hidden">
+            <div id="target-progress-bar" class="bg-indigo-600 h-full w-0 transition-all"></div>
           </div>
         </section>
 
-        <!-- Tool 3: Formula & Notes Sticky Board -->
+        <!-- Booster 5: ICAI 3-Step Answer Structuring Guide -->
         <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-sticky-note"></i> 3. Quick Scratchpad
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-pen-to-square text-indigo-500"></i> 5. ICAI Answer Framework
           </h4>
-          <textarea id="sticky-notes-input" placeholder="Type key formulas or notes..." class="input-field border rounded-xl p-2 text-xs w-full h-24 focus:outline-none"></textarea>
-        </section>
-
-        <!-- Tool 4: Target Daily Hours Tracker -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-bullseye"></i> 4. Daily Target Hours
-          </h4>
-          <input type="number" id="target-hours-input" value="8" min="1" max="24" class="input-field border rounded-xl p-2 text-xs w-full mb-2">
-          <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden mt-2">
-            <div id="target-progress-bar" class="bg-indigo-500 h-full w-0 transition-all"></div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Standard formatting for case law & practical questions:</p>
+          <div class="sub-box p-2.5 rounded-xl text-[11px] space-y-1 font-semibold text-slate-700 dark:text-slate-300">
+            <p>1. <span class="text-indigo-500">Provision:</span> Relevant Section / Ind AS / SA</p>
+            <p>2. <span class="text-indigo-500">Analysis:</span> Connect facts of the question</p>
+            <p>3. <span class="text-indigo-500">Conclusion:</span> Direct, concise final answer</p>
           </div>
         </section>
 
-        <!-- Tool 5: Distraction Log Counter -->
+        <!-- Booster 6: Spaced Repetition Revision Date Calculator -->
         <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-ban font-bold"></i> 5. Distraction Tally
+          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-500">
+            <i class="fa-solid fa-brain text-teal-500"></i> 6. Spaced Revision Calculator
           </h4>
-          <div class="flex justify-between items-center bg-slate-900/40 p-2 rounded-xl">
-            <span class="text-xs text-slate-400">Interruption Count Today:</span>
-            <span id="distraction-count" class="text-lg font-black text-rose-500">0</span>
-          </div>
-          <button onclick="addDistraction()" class="w-full mt-2 py-1.5 bg-rose-600/80 hover:bg-rose-600 text-white rounded-xl text-xs font-bold">
-            + Log Distraction
-          </button>
-        </section>
-
-        <!-- Tool 6: Spaced Repetition Planner -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-brain"></i> 6. Spaced Revision Planner
-          </h4>
-          <p class="text-[11px] text-slate-400 mb-2">Next Revision Interval: 1d -> 3d -> 7d -> 15d</p>
-          <button onclick="alert('Spaced Repetition reminder scheduled for active task!')" class="w-full py-1.5 bg-indigo-600 text-white rounded-xl text-xs font-bold">
-            Schedule 1-3-7 Revision
-          </button>
-        </section>
-
-        <!-- Tool 7: Study Energy Monitor -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-battery-half"></i> 7. Focus Energy Level
-          </h4>
-          <select id="energy-select" class="input-field border rounded-xl p-2 text-xs w-full">
-            <option value="High">⚡ High Energy (Complex Subjects)</option>
-            <option value="Medium">🔹 Medium Energy (Practice Questions)</option>
-            <option value="Low">😴 Low Energy (Light Revision / Videos)</option>
-          </select>
-        </section>
-
-        <!-- Tool 8: Quick Citation & Format Generator -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-bookmark"></i> 8. Standard Format Reference
-          </h4>
-          <p class="text-[11px] text-slate-400">CA Final Answer Structure: 1. Provision 2. Analysis 3. Conclusion</p>
-        </section>
-
-        <!-- Tool 9: Milestone Reward Unlocker -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-trophy text-amber-500"></i> 9. Study Rewards
-          </h4>
-          <p id="reward-status-label" class="text-xs text-slate-400">Reach 5 Hours Today to Unlock Reward!</p>
-        </section>
-
-        <!-- Tool 10: Pre-Study Checklist -->
-        <section class="glass-card p-5 rounded-2xl">
-          <h4 class="text-sm font-bold flex items-center gap-2 mb-2 text-indigo-400">
-            <i class="fa-solid fa-square-check"></i> 10. Pre-Study Checklist
-          </h4>
-          <div class="space-y-1 text-xs text-slate-400">
-            <label class="flex items-center gap-2"><input type="checkbox"> Phone Silent & Away</label>
-            <label class="flex items-center gap-2"><input type="checkbox"> Water Bottle Ready</label>
-            <label class="flex items-center gap-2"><input type="checkbox"> Study Target Defined</label>
-          </div>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-2">Enter topic completion date to generate review dates:</p>
+          <input type="date" id="spaced-date-input" class="input-field border rounded-xl px-3 py-1.5 text-xs w-full mb-2">
+          <div id="spaced-output" class="text-[11px] font-mono text-indigo-600 dark:text-indigo-400 space-y-0.5"></div>
         </section>
 
       </div>
@@ -560,21 +559,21 @@
 
   <!-- Dual View / Add Task Calendar Popup Modal -->
   <div id="calendar-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="glass-card bg-slate-900 dark:bg-slate-900 light:bg-white p-6 rounded-2xl max-w-lg w-full border border-slate-700 shadow-2xl">
+    <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-lg w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
-        <h3 id="modal-date-title" class="text-base font-bold text-indigo-500 flex items-center gap-2">
+        <h3 id="modal-date-title" class="text-base font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
           <i class="fa-solid fa-calendar-day"></i> Tasks for Date
         </h3>
-        <button id="close-calendar-modal-btn" class="text-slate-400 hover:text-rose-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button id="close-calendar-modal-btn" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <div class="mb-6">
-        <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Scheduled Tasks on this Date</h4>
+        <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Scheduled Tasks on this Date</h4>
         <div id="modal-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
       </div>
 
-      <form id="modal-add-task-form" class="space-y-3 pt-3 border-t border-slate-800">
-        <h4 class="text-xs font-bold text-indigo-400 uppercase">Add New Task to This Date</h4>
+      <form id="modal-add-task-form" class="space-y-3 pt-3 border-t border-slate-200 dark:border-slate-800">
+        <h4 class="text-xs font-bold text-indigo-500 uppercase">Add New Task to This Date</h4>
         <input type="text" id="modal-task-title" placeholder="Topic name..." required
           class="w-full input-field border rounded-xl px-3 py-2 text-xs focus:outline-none">
         
@@ -608,50 +607,50 @@
 
   <!-- Interactive Streak Breakdown & Explainer Modal -->
   <div id="streak-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="glass-card bg-slate-900 dark:bg-slate-900 light:bg-white p-6 rounded-2xl max-w-md w-full border border-slate-700 shadow-2xl">
+    <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-base font-bold text-amber-500 flex items-center gap-2">
           <i class="fa-solid fa-fire"></i> Study Streak Breakdown
         </h3>
-        <button onclick="closeStreakModal()" class="text-slate-400 hover:text-rose-400"><i class="fa-solid fa-xmark text-lg"></i></button>
+        <button onclick="closeStreakModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
-      <div class="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl mb-4 text-xs text-amber-300">
+      <div class="p-4 bg-amber-500/10 border border-amber-500/30 rounded-xl mb-4 text-xs text-amber-600 dark:text-amber-300">
         <p class="font-bold flex items-center gap-1 mb-1">
           <i class="fa-solid fa-circle-info"></i> How is Streak Calculated?
         </p>
-        <p class="text-[11px] text-slate-300 dark:text-slate-300 light:text-slate-700">
-          A streak increments every consecutive day you log at least 1 completed Pomodoro or partial study session. Missing a day resets the active streak counter to zero!
+        <p class="text-[11px] text-slate-600 dark:text-slate-300">
+          A streak increments every consecutive calendar day you log study time. Skipping a day resets your active streak!
         </p>
       </div>
 
-      <h4 class="text-xs font-bold text-slate-400 uppercase mb-2">Recent Streak Activity Log</h4>
+      <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Recent Study Days</h4>
       <div id="streak-activity-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
     </div>
   </div>
 
   <!-- Timer Preferences Modal -->
   <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="glass-card bg-slate-900 dark:bg-slate-900 light:bg-white p-6 rounded-2xl max-w-sm w-full border border-slate-700 shadow-2xl">
+    <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-sm w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
       <h3 class="text-lg font-bold mb-4 flex items-center gap-2">
         <i class="fa-solid fa-gear text-indigo-500"></i> Timer Preferences
       </h3>
       <div class="space-y-4 text-sm">
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Work Duration (Minutes)</label>
+          <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Work Duration (Minutes)</label>
           <input type="number" id="custom-work-min" min="1" max="300" value="60" class="w-full input-field border rounded-xl px-3 py-2 text-xs">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Short Break Duration (Minutes)</label>
+          <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Short Break Duration (Minutes)</label>
           <input type="number" id="custom-short-min" min="1" max="60" value="5" class="w-full input-field border rounded-xl px-3 py-2 text-xs">
         </div>
         <div>
-          <label class="block text-xs text-slate-400 mb-1">Long Break Duration (Minutes)</label>
+          <label class="block text-xs text-slate-500 dark:text-slate-400 mb-1">Long Break Duration (Minutes)</label>
           <input type="number" id="custom-long-min" min="1" max="120" value="15" class="w-full input-field border rounded-xl px-3 py-2 text-xs">
         </div>
       </div>
       <div class="flex justify-end gap-3 mt-6">
-        <button id="close-settings-btn" class="px-4 py-2 text-xs font-semibold text-slate-400 hover:text-white">Cancel</button>
+        <button id="close-settings-btn" class="px-4 py-2 text-xs font-semibold text-slate-500 hover:text-slate-800 dark:hover:text-white">Cancel</button>
         <button id="save-settings-btn" class="px-5 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 rounded-xl text-white">Save Changes</button>
       </div>
     </div>
@@ -680,6 +679,43 @@
     setInterval(updateClock, 1000);
     updateClock();
 
+    // Sound & Audio Engine (Web Audio API Synthesizer)
+    let audioMuted = false;
+    const soundToggleBtn = document.getElementById('sound-toggle-btn');
+    const soundIcon = document.getElementById('sound-icon');
+
+    soundToggleBtn.onclick = () => {
+      audioMuted = !audioMuted;
+      soundIcon.className = audioMuted ? "fa-solid fa-volume-xmark text-sm text-rose-500" : "fa-solid fa-volume-high text-sm text-indigo-500";
+    };
+
+    function playAudioChime(type) {
+      if (audioMuted) return;
+      try {
+        const ctx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+
+        if (type === 'complete') {
+          osc.frequency.setValueAtTime(523.25, ctx.currentTime); // C5
+          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1); // E5
+          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2); // G5
+          gain.gain.setValueAtTime(0.3, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.5);
+        } else if (type === 'click') {
+          osc.frequency.setValueAtTime(800, ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+          osc.start();
+          osc.stop(ctx.currentTime + 0.05);
+        }
+      } catch (e) {}
+    }
+
     // Navigation Router
     const navButtons = {
       overview: document.getElementById('nav-overview'),
@@ -705,13 +741,14 @@
       scheduler: "Advance Study Scheduler",
       analytics: "Graphical Analytics & Focus Pattern",
       history: "Date-Wise Session Logs",
-      tools: "10x Productivity Booster Tools"
+      tools: "6x Productivity Booster Tools"
     };
 
     function switchPage(pageKey) {
+      playAudioChime('click');
       Object.keys(pages).forEach(key => {
         pages[key].classList.add('hidden');
-        navButtons[key].className = "nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-400 hover:text-indigo-500 flex items-center gap-2";
+        navButtons[key].className = "nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2";
       });
 
       pages[pageKey].classList.remove('hidden');
@@ -726,7 +763,7 @@
       navButtons[key].onclick = () => switchPage(key);
     });
 
-    // Theme Switcher Engine
+    // Theme Switcher
     const themeToggleBtn = document.getElementById('theme-toggle-btn');
     const themeIcon = document.getElementById('theme-icon');
 
@@ -751,11 +788,11 @@
       updateChartColors();
     };
 
-    // State
+    // App State
     let state = {
       timer: {
         mode: 'work',
-        workDuration: 60, // Default 60 mins
+        workDuration: 60,
         shortDuration: 5,
         longDuration: 15,
         timeLeft: 60 * 60,
@@ -764,30 +801,16 @@
         initialTime: 60 * 60
       },
       activeTaskId: null,
-      distractionsToday: 0,
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v7')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v7')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v8')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v8')) || [],
+      distractions: JSON.parse(localStorage.getItem('sp_distractions_v8')) || [],
       currentChartTab: 'daily'
     };
 
     document.getElementById('task-date-input').value = state.selectedCalendarDate;
     document.getElementById('graph-date-picker').value = state.selectedCalendarDate;
-
-    // Fullscreen Mode Fix
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const pomodoroCard = document.getElementById('pomodoro-card');
-
-    fullscreenBtn.onclick = () => {
-      if (!document.fullscreenElement && !document.webkitFullscreenElement) {
-        if (pomodoroCard.requestFullscreen) pomodoroCard.requestFullscreen();
-        else if (pomodoroCard.webkitRequestFullscreen) pomodoroCard.webkitRequestFullscreen();
-      } else {
-        if (document.exitFullscreen) document.exitFullscreen();
-        else if (document.webkitExitFullscreen) document.webkitExitFullscreen();
-      }
-    };
 
     // Timer Engine (HH:MM:SS)
     const timerDisplay = document.getElementById('timer-display');
@@ -813,7 +836,7 @@
       startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start`;
 
       ['mode-work', 'mode-short', 'mode-long'].forEach(id => {
-        document.getElementById(id).className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-400 hover:text-indigo-500 transition-all";
+        document.getElementById(id).className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
       });
 
       if (mode === 'work') {
@@ -831,6 +854,7 @@
     }
 
     function toggleTimer() {
+      playAudioChime('click');
       if (state.timer.isRunning) {
         clearInterval(state.timer.intervalId);
         state.timer.isRunning = false;
@@ -875,6 +899,7 @@
         saveData();
         renderTasks();
         updateMetricsAndCharts();
+        playAudioChime('complete');
         alert(`Logged ${elapsedMinutes} mins of study time!`);
       }
 
@@ -902,6 +927,7 @@
         saveData();
         renderTasks();
         updateMetricsAndCharts();
+        playAudioChime('complete');
         alert('🎉 Session complete! Logged in full.');
       }
 
@@ -929,31 +955,31 @@
         taskEl.className = `p-3 rounded-xl border transition-all ${
           isSelected 
             ? 'bg-indigo-950/40 dark:bg-indigo-950/40 light:bg-indigo-100 border-indigo-500/60' 
-            : 'bg-slate-900/40 dark:bg-slate-900/40 light:bg-slate-100 border-slate-800/60 light:border-slate-300'
+            : 'sub-box'
         }`;
 
         taskEl.innerHTML = `
           <div class="flex items-center justify-between gap-2">
             <div class="flex items-center gap-2 min-w-0">
-              <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-400">
-                <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-400' : 'regular fa-circle'} text-base"></i>
+              <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-500">
+                <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-500' : 'regular fa-circle'} text-base"></i>
               </button>
               <div class="truncate">
-                <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200 dark:text-slate-200 light:text-slate-800'}">${task.title}</p>
-                <p class="text-[10px] text-slate-400"><span class="font-bold text-indigo-400">${task.subject}</span> • ${task.type}</p>
+                <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">${task.title}</p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-500">${task.subject}</span> • ${task.type}</p>
               </div>
             </div>
 
             <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 font-mono"><i class="fa-solid fa-fire text-amber-500/80 mr-0.5"></i>${task.completedPomos}/${task.estPomos}</span>
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-mono"><i class="fa-solid fa-fire text-amber-500/80 mr-0.5"></i>${task.completedPomos}/${task.estPomos}</span>
               ${!task.completed ? `
                 <button onclick="selectActiveTask('${task.id}')" class="text-[10px] px-2 py-1 rounded-md ${
-                  isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-800 dark:bg-slate-800 light:bg-slate-200 text-slate-400 hover:text-indigo-400'
+                  isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-500'
                 }">
                   ${isSelected ? 'Active' : 'Select'}
                 </button>
               ` : ''}
-              <button onclick="deleteTask('${task.id}')" class="text-slate-600 hover:text-rose-400 text-xs">
+              <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs">
                 <i class="fa-solid fa-trash"></i>
               </button>
             </div>
@@ -985,6 +1011,7 @@
     }
 
     function toggleTaskCompletion(id) {
+      playAudioChime('click');
       const task = state.tasks.find(t => t.id === id);
       if (task) {
         task.completed = !task.completed;
@@ -995,6 +1022,7 @@
     }
 
     function selectActiveTask(id) {
+      playAudioChime('click');
       state.activeTaskId = state.activeTaskId === id ? null : id;
       renderTasks();
     }
@@ -1055,7 +1083,7 @@
       renderCalendarGrid();
     });
 
-    // Calendar Popup Modal System
+    // Calendar Popup Modal
     const calendarModal = document.getElementById('calendar-modal');
     const closeCalendarModalBtn = document.getElementById('close-calendar-modal-btn');
     const modalAddTaskForm = document.getElementById('modal-add-task-form');
@@ -1082,18 +1110,18 @@
 
       scheduledTasks.forEach(task => {
         const item = document.createElement('div');
-        item.className = "p-2.5 rounded-xl bg-slate-800/80 dark:bg-slate-800/80 light:bg-slate-100 border border-slate-700 flex justify-between items-center text-xs";
+        item.className = "p-2.5 rounded-xl sub-box flex justify-between items-center text-xs";
         item.innerHTML = `
           <div class="flex items-center gap-2">
-            <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-400">
-              <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-400' : 'regular fa-circle'} text-sm"></i>
+            <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-500">
+              <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-500' : 'regular fa-circle'} text-sm"></i>
             </button>
             <div>
-              <p class="font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200 dark:text-slate-200 light:text-slate-800'}">${task.title}</p>
-              <p class="text-[10px] text-slate-400"><span class="text-indigo-400 font-bold">${task.subject}</span> • ${task.type}</p>
+              <p class="font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">${task.title}</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400"><span class="text-indigo-500 font-bold">${task.subject}</span> • ${task.type}</p>
             </div>
           </div>
-          <button onclick="deleteTask('${task.id}')" class="text-slate-500 hover:text-rose-400"><i class="fa-solid fa-trash"></i></button>
+          <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
         `;
         modalTaskList.appendChild(item);
       });
@@ -1144,10 +1172,10 @@
         const isToday = dateStr === new Date().toISOString().split('T')[0];
 
         const dayEl = document.createElement('button');
-        dayEl.className = `p-2.5 rounded-xl transition-all text-xs font-semibold relative ${
+        dayEl.className = `p-2.5 rounded-xl transition-all text-xs font-bold relative ${
           isToday 
-            ? 'border border-indigo-500 text-indigo-400 bg-indigo-950/20' 
-            : 'hover:bg-slate-800/40 text-slate-300 dark:text-slate-300 light:text-slate-700'
+            ? 'border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30' 
+            : 'hover:bg-slate-200 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
         }`;
         dayEl.textContent = day;
 
@@ -1175,7 +1203,7 @@
       renderCalendarGrid();
     };
 
-    // Streak Modal Explainer System
+    // Streak Modal
     const streakModal = document.getElementById('streak-modal');
     function openStreakModal() {
       const streakList = document.getElementById('streak-activity-list');
@@ -1189,9 +1217,9 @@
         uniqueDates.forEach(date => {
           const dayMins = state.logs.filter(l => l.date === date).reduce((a, c) => a + c.minutes, 0);
           const item = document.createElement('div');
-          item.className = "p-2.5 bg-slate-800/80 rounded-xl flex justify-between items-center text-xs";
+          item.className = "p-2.5 sub-box rounded-xl flex justify-between items-center text-xs";
           item.innerHTML = `
-            <span class="font-mono text-slate-200 dark:text-slate-200 light:text-slate-800">${date}</span>
+            <span class="font-mono text-slate-700 dark:text-slate-300">${date}</span>
             <span class="text-amber-500 font-bold">${dayMins} Mins Studied</span>
           `;
           streakList.appendChild(item);
@@ -1202,7 +1230,7 @@
     }
     function closeStreakModal() { streakModal.classList.add('hidden'); }
 
-    // Session History Table
+    // Session History
     function renderSessionHistory() {
       const tbody = document.getElementById('session-history-table-body');
       tbody.innerHTML = '';
@@ -1214,13 +1242,13 @@
 
       [...state.logs].reverse().forEach(log => {
         const row = document.createElement('tr');
-        row.className = "hover:bg-slate-800/30 transition-colors";
+        row.className = "hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors";
         row.innerHTML = `
           <td class="p-3 font-mono font-semibold">${log.date}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
-          <td class="p-3 text-slate-300 dark:text-slate-300 light:text-slate-700">${log.type || 'Study'}</td>
-          <td class="p-3 font-bold text-emerald-400">${log.minutes} mins</td>
-          <td class="p-3 text-slate-400">${log.timestamp || 'Recorded'}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
+          <td class="p-3 text-slate-700 dark:text-slate-300">${log.type || 'Study'}</td>
+          <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">${log.minutes} mins</td>
+          <td class="p-3 text-slate-500 dark:text-slate-400">${log.timestamp || 'Recorded'}</td>
         `;
         tbody.appendChild(row);
       });
@@ -1235,60 +1263,74 @@
       }
     };
 
-    // Tools Sub-Features (Countdown, Distractions, Ambient)
-    function addDistraction() {
-      state.distractionsToday++;
-      document.getElementById('distraction-count').textContent = state.distractionsToday;
+    // 6 Booster Tools Mechanics
+    function logDistraction() {
+      const input = document.getElementById('distraction-input');
+      const val = input.value.trim();
+      if (!val) return;
+
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      state.distractions.push({ text: val, time });
+      input.value = '';
+      saveData();
+      renderDistractions();
+    }
+
+    function renderDistractions() {
+      const list = document.getElementById('distraction-log-list');
+      list.innerHTML = '';
+      if (state.distractions.length === 0) {
+        list.innerHTML = `<p class="italic text-slate-400">No distractions logged today!</p>`;
+        return;
+      }
+      state.distractions.slice(-4).reverse().forEach(d => {
+        const item = document.createElement('div');
+        item.className = "p-1.5 sub-box rounded-lg flex justify-between";
+        item.innerHTML = `<span>${d.text}</span><span class="font-mono text-slate-400">${d.time}</span>`;
+        list.appendChild(item);
+      });
     }
 
     document.getElementById('exam-date-input').onchange = (e) => {
       const date = new Date(e.target.value);
       const today = new Date();
-      const diffTime = date - today;
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-      document.getElementById('exam-countdown-display').textContent = diffDays > 0 ? `${diffDays} Days Remaining` : 'Exam Day!';
+      const diffDays = Math.ceil((date - today) / (1000 * 60 * 60 * 24));
+      const label = diffDays > 0 ? `${diffDays} Days Left` : 'Exam Day!';
+      document.getElementById('header-exam-countdown').textContent = label;
+      localStorage.setItem('sp_exam_date', e.target.value);
     };
 
-    let currentAudio = null;
-    let activeSoundType = null;
-    function toggleAmbientSound(type) {
-      if (activeSoundType === type && currentAudio) {
-        currentAudio.pause();
-        currentAudio = null;
-        activeSoundType = null;
-        document.getElementById(`btn-${type}`).textContent = type === 'rain' ? 'Rain' : 'White Noise';
-        return;
-      }
-
-      if (currentAudio) currentAudio.pause();
-
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const bufferSize = ctx.sampleRate * 2;
-      const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const output = noiseBuffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) output[i] = Math.random() * 2 - 1;
-
-      const whiteNoise = ctx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-
-      const filter = ctx.createBiquadFilter();
-      filter.type = type === 'rain' ? 'lowpass' : 'bandpass';
-      filter.frequency.value = type === 'rain' ? 800 : 1000;
-
-      whiteNoise.connect(filter);
-      filter.connect(ctx.destination);
-      whiteNoise.start();
-
-      currentAudio = { pause: () => ctx.close() };
-      activeSoundType = type;
-
-      document.getElementById('btn-rain').textContent = "Rain";
-      document.getElementById('btn-noise').textContent = "White Noise";
-      document.getElementById(`btn-${type}`).textContent = "Stop";
+    const savedExamDate = localStorage.getItem('sp_exam_date');
+    if (savedExamDate) {
+      document.getElementById('exam-date-input').value = savedExamDate;
+      const date = new Date(savedExamDate);
+      const diffDays = Math.ceil((date - new Date()) / (1000 * 60 * 60 * 24));
+      document.getElementById('header-exam-countdown').textContent = diffDays > 0 ? `${diffDays} Days Left` : 'Exam Day!';
     }
 
-    // Charts Engine (Spline + Fixed 0-24 Bar + Radar)
+    document.getElementById('spaced-date-input').onchange = (e) => {
+      const base = new Date(e.target.value);
+      if (isNaN(base)) return;
+      const addDays = (d, n) => { const r = new Date(d); r.setDate(r.getDate() + n); return r.toISOString().split('T')[0]; };
+      document.getElementById('spaced-output').innerHTML = `
+        <p>1st Review: ${addDays(base, 1)}</p>
+        <p>2nd Review: ${addDays(base, 3)}</p>
+        <p>3rd Review: ${addDays(base, 7)}</p>
+        <p>Final Review: ${addDays(base, 15)}</p>
+      `;
+    };
+
+    function updateGoalTracker() {
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todayMins = state.logs.filter(l => l.date === todayStr).reduce((a, c) => a + c.minutes, 0);
+      const todayHours = parseFloat((todayMins / 60).toFixed(1));
+      const targetHours = parseInt(document.getElementById('target-hours-input').value) || 8;
+      const pct = Math.min(100, Math.round((todayHours / targetHours) * 100));
+      document.getElementById('target-progress-bar').style.width = `${pct}%`;
+    }
+    document.getElementById('target-hours-input').onchange = updateGoalTracker;
+
+    // Charts Engine
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
@@ -1329,9 +1371,14 @@
 
     function updateMetricsAndCharts() {
       const selectedDate = document.getElementById('graph-date-picker').value;
+      const todayStr = new Date().toISOString().split('T')[0];
       const subjects = ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'];
 
-      // Total Hours Logged
+      // Today's Hours
+      const todayMins = state.logs.filter(l => l.date === todayStr).reduce((a, c) => a + c.minutes, 0);
+      document.getElementById('report-today-hours').textContent = `${(todayMins / 60).toFixed(1)} hrs`;
+
+      // Cumulative Total Hours
       const totalMins = state.logs.reduce((a, c) => a + c.minutes, 0);
       document.getElementById('report-total-hours').textContent = `${(totalMins / 60).toFixed(1)} hrs`;
 
@@ -1341,7 +1388,7 @@
       const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
       document.getElementById('report-completion-rate').textContent = `${completionRate}%`;
 
-      // Avg Session
+      // Avg Session Length
       const avgSession = state.logs.length > 0 ? Math.round(totalMins / state.logs.length) : 0;
       document.getElementById('report-avg-session').textContent = `${avgSession} mins`;
 
@@ -1363,6 +1410,7 @@
 
       calculateStreak();
       updateSplineChartData();
+      updateGoalTracker();
     }
 
     document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
@@ -1459,8 +1507,9 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v7', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v7', JSON.stringify(state.logs));
+      localStorage.setItem('sp_tasks_v8', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v8', JSON.stringify(state.logs));
+      localStorage.setItem('sp_distractions_v8', JSON.stringify(state.distractions));
     }
 
     // Modal Preferences
@@ -1494,7 +1543,7 @@
     function setChartTab(tab) {
       state.currentChartTab = tab;
       ['view-daily', 'view-weekly', 'view-monthly'].forEach(id => {
-        document.getElementById(id).className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
+        document.getElementById(id).className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
       });
       document.getElementById(`view-${tab}`).className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all";
       updateSplineChartData();
@@ -1505,6 +1554,7 @@
     setMode('work');
     renderTasks();
     renderCalendarGrid();
+    renderDistractions();
     initCharts();
   </script>
 </body>
