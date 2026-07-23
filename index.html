@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>StudyPulse - Advanced Study Dashboard</title>
+  <title>StudyPulse - CA Final Advanced Dashboard</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- FontAwesome CDN -->
@@ -11,18 +11,21 @@
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap');
+    
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background: #0f172a;
       color: #f8fafc;
     }
+
     .glass-card {
       background: rgba(30, 41, 59, 0.7);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.08);
     }
+
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
@@ -33,6 +36,59 @@
       background: rgba(51, 65, 85, 0.8);
       border-radius: 4px;
     }
+
+    /* --- Flip Clock Styles --- */
+    .flip-clock {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      font-family: 'Share Tech Mono', monospace;
+    }
+    .flip-unit {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .flip-card {
+      position: relative;
+      background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+      color: #6366f1;
+      font-size: 3.5rem;
+      font-weight: 800;
+      padding: 10px 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+      min-width: 90px;
+      text-align: center;
+    }
+    .flip-card::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: rgba(15, 23, 42, 0.8);
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.1);
+      z-index: 10;
+    }
+    .fullscreen-mode {
+      position: fixed !important;
+      inset: 0 !important;
+      z-index: 9999 !important;
+      background: #090d16 !important;
+      display: flex !important;
+      flex-direction: column !important;
+      justify-content: center !important;
+      align-items: center !important;
+      padding: 2rem !important;
+    }
+    .fullscreen-mode .flip-card {
+      font-size: 7rem !important;
+      min-width: 170px !important;
+      padding: 20px 30px !important;
+    }
   </style>
 </head>
 <body class="min-h-screen p-4 md:p-8 custom-scrollbar">
@@ -41,20 +97,17 @@
   <header class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
       <h1 class="text-3xl font-extrabold bg-gradient-to-r from-blue-400 via-indigo-400 to-purple-400 bg-clip-text text-transparent">
-        StudyPulse <span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30 font-medium">v2.0</span>
+        StudyPulse <span class="text-xs px-2 py-1 bg-indigo-500/20 text-indigo-300 rounded-full border border-indigo-500/30 font-medium">v3.0</span>
       </h1>
-      <!-- Daily Quote -->
       <p id="daily-quote" class="text-slate-400 text-sm mt-1 italic max-w-xl">"Loading daily motivation..."</p>
     </div>
 
     <div class="flex items-center gap-4">
-      <!-- Live Clock -->
       <div class="glass-card px-4 py-2 rounded-xl text-center border border-slate-700/50">
         <p class="text-xs text-slate-400 font-medium">Current Time</p>
         <p id="live-clock" class="text-sm font-extrabold font-mono text-indigo-300">00:00:00 AM</p>
       </div>
 
-      <!-- Streak Counter -->
       <div class="glass-card px-4 py-2 rounded-xl flex items-center gap-3 border border-slate-700/50">
         <i class="fa-solid fa-fire text-amber-500 text-lg"></i>
         <div>
@@ -68,49 +121,64 @@
   <!-- Main Grid -->
   <main class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-    <!-- Left Column: Pomodoro & Daily Tasks -->
+    <!-- Left Column: Flip Pomodoro & Daily Tasks -->
     <div class="lg:col-span-5 space-y-8">
       
-      <!-- Pomodoro Card -->
-      <section class="glass-card p-6 rounded-2xl shadow-xl relative">
+      <!-- Flip Pomodoro Card -->
+      <section id="pomodoro-card" class="glass-card p-6 rounded-2xl shadow-xl relative transition-all">
         <div class="flex justify-between items-center mb-6">
           <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-stopwatch text-indigo-400"></i> Pomodoro Timer
+            <i class="fa-solid fa-stopwatch text-indigo-400"></i> Flip Pomodoro
           </h2>
-          <button id="open-settings-btn" class="text-slate-400 hover:text-white transition-colors text-sm flex items-center gap-1 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
-            <i class="fa-solid fa-sliders"></i> Adjust
-          </button>
+          <div class="flex gap-2">
+            <!-- Fullscreen Mode Button -->
+            <button id="fullscreen-btn" class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700" title="Focus Mode">
+              <i class="fa-solid fa-expand"></i> Fullscreen
+            </button>
+            <button id="open-settings-btn" class="text-slate-400 hover:text-white transition-colors text-xs flex items-center gap-1 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700">
+              <i class="fa-solid fa-sliders"></i>
+            </button>
+          </div>
         </div>
 
-        <!-- Timer Modes -->
+        <!-- Modes -->
         <div class="flex bg-slate-900/60 p-1 rounded-xl mb-6 border border-slate-800">
           <button id="mode-work" class="flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all">Work</button>
           <button id="mode-short" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Short Break</button>
           <button id="mode-long" class="flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Long Break</button>
         </div>
 
-        <!-- Timer Display -->
-        <div class="text-center my-6">
-          <div id="timer-display" class="text-6xl font-black tracking-tight text-slate-100 font-mono">25:00</div>
-          
-          <!-- Active Task Metadata Tag -->
-          <div id="active-task-label-container" class="mt-3">
-            <p id="active-task-label" class="text-xs text-indigo-300 font-medium bg-indigo-950/40 py-1.5 px-3 rounded-full inline-block border border-indigo-800/40">
-              No Active Task Selected
-            </p>
+        <!-- 3D Flip Watch Display -->
+        <div class="my-8 flex justify-center">
+          <div class="flip-clock">
+            <div class="flip-unit">
+              <div id="flip-min" class="flip-card">25</div>
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">Minutes</span>
+            </div>
+            <div class="text-4xl font-extrabold text-slate-600 self-center -mt-6">:</div>
+            <div class="flip-unit">
+              <div id="flip-sec" class="flip-card">00</div>
+              <span class="text-[10px] text-slate-400 font-bold uppercase mt-2 tracking-widest">Seconds</span>
+            </div>
           </div>
         </div>
 
+        <!-- Active Task Label -->
+        <div class="text-center mb-6">
+          <p id="active-task-label" class="text-xs text-indigo-300 font-medium bg-indigo-950/60 py-1.5 px-3 rounded-full inline-block border border-indigo-500/40">
+            No Active Task Selected
+          </p>
+        </div>
+
         <!-- Controls -->
-        <div class="flex justify-center gap-3 mt-6">
+        <div class="flex justify-center gap-3">
           <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-6 py-3 rounded-xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2">
             <i class="fa-solid fa-play"></i> Start
           </button>
-          <!-- Stop & Partial Log Button -->
-          <button id="stop-btn" class="bg-rose-600/80 hover:bg-rose-600 text-white font-bold px-5 py-3 rounded-xl transition-all flex items-center gap-2" title="Stop & Log Elapsed Time">
+          <button id="stop-btn" class="bg-rose-600/80 hover:bg-rose-600 text-white font-bold px-4 py-3 rounded-xl transition-all flex items-center gap-2" title="Stop & Log Elapsed Time">
             <i class="fa-solid fa-square"></i> Stop & Log
           </button>
-          <button id="reset-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-3 rounded-xl transition-all border border-slate-700" title="Reset Timer">
+          <button id="reset-btn" class="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-3 rounded-xl transition-all border border-slate-700">
             <i class="fa-solid fa-rotate-right"></i>
           </button>
         </div>
@@ -120,12 +188,12 @@
       <section class="glass-card p-6 rounded-2xl shadow-xl">
         <div class="flex justify-between items-center mb-4">
           <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-list-check text-purple-400"></i> Today's Tasks
+            <i class="fa-solid fa-list-check text-purple-400"></i> Task Manager
           </h2>
           <span id="task-completion-stats" class="text-xs text-slate-400 font-medium">0 / 0 Done</span>
         </div>
 
-        <!-- Advanced Add Task Form -->
+        <!-- Form for Adding Tasks -->
         <form id="add-task-form" class="space-y-3 mb-6 bg-slate-900/50 p-4 rounded-xl border border-slate-800">
           <div class="flex gap-2">
             <input type="text" id="task-input" placeholder="Chapter / Topic name..." required
@@ -135,10 +203,19 @@
           </div>
 
           <div class="grid grid-cols-2 gap-2">
-            <!-- Subject Name -->
-            <input type="text" id="task-subject-input" placeholder="Subject (e.g. Audit, Tax)" required
-              class="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
-            
+            <!-- Subject Dropdown List -->
+            <select id="task-subject-select" required class="bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500 text-slate-200">
+              <option value="" disabled selected>Select Subject</option>
+              <option value="FR">FR (Financial Reporting)</option>
+              <option value="AFM">AFM (Advanced Financial Mgmt)</option>
+              <option value="AUDIT">AUDIT (Advanced Auditing)</option>
+              <option value="DT">DT (Direct Tax)</option>
+              <option value="IDT">IDT (Indirect Tax)</option>
+              <option value="IBS">IBS (Integrated Business Sol)</option>
+              <option value="CUSTOM">Custom Subject...</option>
+            </select>
+            <input type="text" id="custom-subject-input" placeholder="Enter Subject Name" class="hidden bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none text-slate-200">
+
             <!-- Type of Study -->
             <input type="text" id="task-type-input" list="study-types" placeholder="Type (e.g. Revision)" required
               class="bg-slate-800/80 border border-slate-700 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-indigo-500">
@@ -150,27 +227,34 @@
             </datalist>
           </div>
 
-          <!-- Schedule Date (Defaults to Today) -->
-          <div class="flex justify-between items-center pt-1">
-            <label class="text-xs text-slate-400">Schedule Date:</label>
-            <input type="date" id="task-date-input" required
-              class="bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300 focus:outline-none">
+          <!-- Date & Recurring Repeat Option -->
+          <div class="grid grid-cols-2 gap-2 pt-1">
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-0.5">Start Date:</label>
+              <input type="date" id="task-date-input" required class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300">
+            </div>
+            <div>
+              <label class="block text-[10px] text-slate-400 mb-0.5">Repeat Task:</label>
+              <select id="task-repeat-select" class="w-full bg-slate-800 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-300">
+                <option value="none">Does not repeat</option>
+                <option value="daily_7">Repeat Daily (7 Days)</option>
+                <option value="daily_30">Repeat Daily (30 Days)</option>
+                <option value="weekly_4">Weekly (Next 4 Weeks)</option>
+              </select>
+            </div>
           </div>
 
           <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
-            <i class="fa-solid fa-plus"></i> Add Task to Schedule
+            <i class="fa-solid fa-plus"></i> Schedule Task
           </button>
         </form>
 
         <!-- Segregated Tasks Lists -->
         <div class="space-y-4">
-          <!-- Active To-Do List -->
           <div>
-            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">To-Do</h3>
+            <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-2">Today's To-Do</h3>
             <div id="todo-task-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
           </div>
-
-          <!-- Completed Tasks List -->
           <div>
             <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Completed Today</h3>
             <div id="completed-task-list" class="space-y-2 max-h-36 overflow-y-auto custom-scrollbar pr-1"></div>
@@ -179,7 +263,7 @@
       </section>
     </div>
 
-    <!-- Right Column: Analytics & Calendar Scheduler -->
+    <!-- Right Column: Analytics & Advanced Calendar Scheduler -->
     <div class="lg:col-span-7 space-y-8">
       
       <!-- Graphical Analytics Section -->
@@ -189,10 +273,9 @@
             <h2 class="text-lg font-bold flex items-center gap-2">
               <i class="fa-solid fa-chart-column text-emerald-400"></i> Study Analytics
             </h2>
-            <p class="text-xs text-slate-400 mt-0.5">Real-time study duration tracking across timelines</p>
+            <p class="text-xs text-slate-400 mt-0.5">Real-time study duration logs</p>
           </div>
 
-          <!-- Timeframe Selector -->
           <div class="flex bg-slate-900/60 p-1 rounded-xl border border-slate-800">
             <button id="view-daily" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all">Daily</button>
             <button id="view-weekly" class="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all">Weekly</button>
@@ -200,7 +283,6 @@
           </div>
         </div>
 
-        <!-- Summary Metric Cards -->
         <div class="grid grid-cols-3 gap-4 mb-6">
           <div class="bg-slate-900/40 p-3.5 rounded-xl border border-slate-800">
             <p class="text-xs text-slate-400 font-medium">Today's Focus</p>
@@ -216,39 +298,48 @@
           </div>
         </div>
 
-        <!-- Chart Canvas -->
         <div class="relative h-64 w-full">
           <canvas id="studyChart"></canvas>
         </div>
       </section>
 
-      <!-- Calendar & Advance Scheduler -->
+      <!-- Calendar Scheduler with Month/Year Navigation -->
       <section class="glass-card p-6 rounded-2xl shadow-xl">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
           <h2 class="text-lg font-bold flex items-center gap-2">
-            <i class="fa-solid fa-calendar-days text-amber-400"></i> Advance Scheduler
+            <i class="fa-solid fa-calendar-days text-amber-400"></i> Calendar Scheduler
           </h2>
-          <span id="calendar-month-label" class="text-sm font-semibold text-indigo-300"></span>
+          
+          <!-- Month & Year Controls -->
+          <div class="flex items-center gap-2 bg-slate-900/80 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-bold text-indigo-300">
+            <button id="prev-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-left"></i></button>
+            <span id="calendar-month-year-label">July 2026</span>
+            <button id="next-month-btn" class="hover:text-white px-1"><i class="fa-solid fa-chevron-right"></i></button>
+            <button id="today-jump-btn" class="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px]">Today</button>
+          </div>
         </div>
 
-        <!-- Simple Mini-Calendar View -->
+        <p class="text-xs text-slate-400 mb-3"><i class="fa-solid fa-circle-info text-indigo-400"></i> Click on any calendar date to add or inspect tasks for that day!</p>
+
+        <!-- Calendar Grid -->
         <div class="bg-slate-900/50 p-4 rounded-xl border border-slate-800 mb-4">
           <div class="grid grid-cols-7 gap-1 text-center text-xs font-semibold text-slate-400 mb-2">
             <div>Su</div><div>Mo</div><div>Tu</div><div>We</div><div>Th</div><div>Fr</div><div>Sa</div>
           </div>
-          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs">
-            <!-- Calendar Grid via JS -->
-          </div>
+          <div id="calendar-days-grid" class="grid grid-cols-7 gap-1 text-center text-xs"></div>
         </div>
 
-        <!-- Scheduled Tasks for Selected Calendar Date -->
+        <!-- Tasks for Selected Date -->
         <div>
-          <h3 id="selected-date-label" class="text-xs font-bold text-indigo-300 uppercase tracking-wider mb-2">
-            Tasks for Selected Date
-          </h3>
-          <div id="calendar-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1">
-            <!-- Tasks for selected date in calendar -->
+          <div class="flex justify-between items-center mb-2">
+            <h3 id="selected-date-label" class="text-xs font-bold text-indigo-300 uppercase tracking-wider">
+              Tasks for Selected Date
+            </h3>
+            <button id="quick-add-date-btn" class="text-xs bg-indigo-600/80 hover:bg-indigo-600 text-white px-2.5 py-1 rounded-lg">
+              <i class="fa-solid fa-plus"></i> Add Task for Date
+            </button>
           </div>
+          <div id="calendar-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
         </div>
       </section>
 
@@ -264,18 +355,15 @@
       <div class="space-y-4 text-sm">
         <div>
           <label class="block text-xs text-slate-400 mb-1">Work Duration (Minutes)</label>
-          <input type="number" id="custom-work-min" min="1" max="120" value="25"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          <input type="number" id="custom-work-min" min="1" max="120" value="25" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none">
         </div>
         <div>
           <label class="block text-xs text-slate-400 mb-1">Short Break Duration (Minutes)</label>
-          <input type="number" id="custom-short-min" min="1" max="60" value="5"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          <input type="number" id="custom-short-min" min="1" max="60" value="5" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none">
         </div>
         <div>
           <label class="block text-xs text-slate-400 mb-1">Long Break Duration (Minutes)</label>
-          <input type="number" id="custom-long-min" min="1" max="60" value="15"
-            class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none focus:border-indigo-500">
+          <input type="number" id="custom-long-min" min="1" max="60" value="15" class="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-slate-100 focus:outline-none">
         </div>
       </div>
       <div class="flex justify-end gap-3 mt-6">
@@ -289,8 +377,8 @@
   <script>
     // --- 30 Shuffling Motivational Quotes ---
     const quotes = [
-      "Mastering the mindset behind the signature.",
-      "Consistency turns averages into excellence.",
+      "Mastering the mindset behind the CA Signature.",
+      "Consistency turns averages into chartered excellence.",
       "Don't study until you get it right. Study until you can't get it wrong.",
       "Small daily improvements over time lead to stunning results.",
       "Focus is a muscle. The more you use it, the stronger it gets.",
@@ -321,24 +409,20 @@
       "Clear minds make decisive progress."
     ];
 
-    // Select daily quote based on date seed
     function setDailyQuote() {
       const today = new Date().toDateString();
       let seed = 0;
       for (let i = 0; i < today.length; i++) seed += today.charCodeAt(i);
-      const index = seed % quotes.length;
-      document.getElementById('daily-quote').textContent = `"${quotes[index]}"`;
+      document.getElementById('daily-quote').textContent = `"${quotes[seed % quotes.length]}"`;
     }
 
-    // --- Live Clock ---
     function updateClock() {
-      const now = new Date();
-      document.getElementById('live-clock').textContent = now.toLocaleTimeString();
+      document.getElementById('live-clock').textContent = new Date().toLocaleTimeString();
     }
     setInterval(updateClock, 1000);
     updateClock();
 
-    // --- App State ---
+    // --- State ---
     let state = {
       timer: {
         mode: 'work',
@@ -351,17 +435,18 @@
         initialTime: 25 * 60
       },
       activeTaskId: null,
+      calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v2')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v2')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v3')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v3')) || [],
       currentChartTab: 'daily'
     };
 
-    // --- Set default date input to today ---
-    document.getElementById('task-date-input').value = new Date().toISOString().split('T')[0];
+    document.getElementById('task-date-input').value = state.selectedCalendarDate;
 
-    // --- DOM Elements ---
-    const timerDisplay = document.getElementById('timer-display');
+    // --- DOM Reference ---
+    const flipMinEl = document.getElementById('flip-min');
+    const flipSecEl = document.getElementById('flip-sec');
     const startBtn = document.getElementById('start-btn');
     const stopBtn = document.getElementById('stop-btn');
     const resetBtn = document.getElementById('reset-btn');
@@ -369,67 +454,49 @@
     const todoTaskListEl = document.getElementById('todo-task-list');
     const completedTaskListEl = document.getElementById('completed-task-list');
     const addTaskForm = document.getElementById('add-task-form');
-    const taskStatsEl = document.getElementById('task-completion-stats');
-    const streakCounterEl = document.getElementById('streak-counter');
+    const taskSubjectSelect = document.getElementById('task-subject-select');
+    const customSubjectInput = document.getElementById('custom-subject-input');
+    const pomodoroCard = document.getElementById('pomodoro-card');
+    const fullscreenBtn = document.getElementById('fullscreen-btn');
 
-    const modeWorkBtn = document.getElementById('mode-work');
-    const modeShortBtn = document.getElementById('mode-short');
-    const modeLongBtn = document.getElementById('mode-long');
+    // Handle Custom Subject Toggle
+    taskSubjectSelect.addEventListener('change', (e) => {
+      if (e.target.value === 'CUSTOM') {
+        customSubjectInput.classList.remove('hidden');
+        customSubjectInput.required = true;
+      } else {
+        customSubjectInput.classList.add('hidden');
+        customSubjectInput.required = false;
+      }
+    });
 
-    const settingsModal = document.getElementById('settings-modal');
-    const openSettingsBtn = document.getElementById('open-settings-btn');
-    const closeSettingsBtn = document.getElementById('close-settings-btn');
-    const saveSettingsBtn = document.getElementById('save-settings-btn');
+    // Toggle Fullscreen Mode
+    fullscreenBtn.addEventListener('click', () => {
+      if (!document.fullscreenElement) {
+        pomodoroCard.classList.add('fullscreen-mode');
+        fullscreenBtn.innerHTML = `<i class="fa-solid fa-compress"></i> Exit Fullscreen`;
+        if (pomodoroCard.requestFullscreen) pomodoroCard.requestFullscreen();
+      } else {
+        document.exitFullscreen();
+      }
+    });
 
-    const viewDailyBtn = document.getElementById('view-daily');
-    const viewWeeklyBtn = document.getElementById('view-weekly');
-    const viewMonthlyBtn = document.getElementById('view-monthly');
+    document.addEventListener('fullscreenchange', () => {
+      if (!document.fullscreenElement) {
+        pomodoroCard.classList.remove('fullscreen-mode');
+        fullscreenBtn.innerHTML = `<i class="fa-solid fa-expand"></i> Fullscreen`;
+      }
+    });
 
-    // --- Chart Initialization ---
-    let studyChart;
-    function initChart() {
-      const ctx = document.getElementById('studyChart').getContext('2d');
-      studyChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: [],
-          datasets: [{
-            label: 'Study Minutes',
-            data: [],
-            backgroundColor: 'rgba(99, 102, 241, 0.5)',
-            borderColor: 'rgba(129, 140, 248, 1)',
-            borderWidth: 1.5,
-            borderRadius: 6
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false },
-            tooltip: { callbacks: { label: (c) => ` ${c.raw} mins` } }
-          },
-          scales: {
-            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8', font: { size: 11 } } },
-            x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 11 } } }
-          }
-        }
-      });
-      updateChartData();
-    }
-
-    // --- LocalStorage Persistence ---
-    function saveData() {
-      localStorage.setItem('sp_tasks_v2', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v2', JSON.stringify(state.logs));
-    }
-
-    // --- Timer Engine ---
+    // --- Flip Watch Timer ---
     function updateTimerDisplay() {
       const mins = Math.floor(state.timer.timeLeft / 60);
       const secs = state.timer.timeLeft % 60;
-      timerDisplay.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-      document.title = `${timerDisplay.textContent} - StudyPulse`;
+      
+      flipMinEl.textContent = mins.toString().padStart(2, '0');
+      flipSecEl.textContent = secs.toString().padStart(2, '0');
+      
+      document.title = `${flipMinEl.textContent}:${flipSecEl.textContent} - StudyPulse`;
     }
 
     function setMode(mode) {
@@ -438,19 +505,19 @@
       clearInterval(state.timer.intervalId);
       startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start`;
 
-      [modeWorkBtn, modeShortBtn, modeLongBtn].forEach(b => {
-        b.className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
+      ['mode-work', 'mode-short', 'mode-long'].forEach(id => {
+        document.getElementById(id).className = "flex-1 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
       });
 
       if (mode === 'work') {
         state.timer.timeLeft = state.timer.workDuration * 60;
-        modeWorkBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all";
+        document.getElementById('mode-work').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-indigo-600 text-white transition-all";
       } else if (mode === 'short') {
         state.timer.timeLeft = state.timer.shortDuration * 60;
-        modeShortBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
+        document.getElementById('mode-short').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
       } else {
         state.timer.timeLeft = state.timer.longDuration * 60;
-        modeLongBtn.className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-purple-600 text-white transition-all";
+        document.getElementById('mode-long').className = "flex-1 py-2 text-xs font-semibold rounded-lg bg-purple-600 text-white transition-all";
       }
       state.timer.initialTime = state.timer.timeLeft;
       updateTimerDisplay();
@@ -486,11 +553,7 @@
 
       if (state.timer.mode === 'work' && elapsedMinutes > 0) {
         const today = new Date().toISOString().split('T')[0];
-        state.logs.push({
-          date: today,
-          minutes: elapsedMinutes,
-          timestamp: Date.now()
-        });
+        state.logs.push({ date: today, minutes: elapsedMinutes, timestamp: Date.now() });
 
         if (state.activeTaskId) {
           const task = state.tasks.find(t => t.id === state.activeTaskId);
@@ -512,11 +575,7 @@
 
       if (state.timer.mode === 'work') {
         const today = new Date().toISOString().split('T')[0];
-        state.logs.push({
-          date: today,
-          minutes: state.timer.workDuration,
-          timestamp: Date.now()
-        });
+        state.logs.push({ date: today, minutes: state.timer.workDuration, timestamp: Date.now() });
 
         if (state.activeTaskId) {
           const task = state.tasks.find(t => t.id === state.activeTaskId);
@@ -527,7 +586,7 @@
         updateMetricsAndChart();
         alert('🎉 Session complete! Logged in full.');
       } else {
-        alert('⏰ Break time finished! Ready to resume?');
+        alert('⏰ Break time finished! Ready to lock in?');
       }
 
       setMode('work');
@@ -540,7 +599,6 @@
 
       const todayStr = new Date().toISOString().split('T')[0];
       const todaysTasks = state.tasks.filter(t => t.date === todayStr);
-
       let completedCount = 0;
 
       todaysTasks.forEach(task => {
@@ -549,9 +607,7 @@
         const isSelected = state.activeTaskId === task.id;
         const taskEl = document.createElement('div');
         taskEl.className = `p-3 rounded-xl border transition-all ${
-          isSelected 
-            ? 'bg-indigo-950/40 border-indigo-500/60' 
-            : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+          isSelected ? 'bg-indigo-950/40 border-indigo-500/60' : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
         }`;
 
         taskEl.innerHTML = `
@@ -562,7 +618,7 @@
               </button>
               <div class="truncate">
                 <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
-                <p class="text-[10px] text-slate-400">${task.subject} • <span class="text-indigo-300">${task.type}</span></p>
+                <p class="text-[10px] text-slate-400"><span class="font-bold text-indigo-400">${task.subject}</span> • ${task.type}</p>
               </div>
             </div>
 
@@ -582,11 +638,8 @@
           </div>
         `;
 
-        if (task.completed) {
-          completedTaskListEl.appendChild(taskEl);
-        } else {
-          todoTaskListEl.appendChild(taskEl);
-        }
+        if (task.completed) completedTaskListEl.appendChild(taskEl);
+        else todoTaskListEl.appendChild(taskEl);
       });
 
       if (todaysTasks.filter(t => !t.completed).length === 0) {
@@ -596,7 +649,7 @@
         completedTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No completed tasks yet.</p>`;
       }
 
-      taskStatsEl.textContent = `${completedCount} / ${todaysTasks.length} Done`;
+      document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updateActiveTaskLabel();
       renderCalendarTasks();
     }
@@ -604,7 +657,7 @@
     function updateActiveTaskLabel() {
       const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
       if (activeTask) {
-        activeTaskLabel.innerHTML = `<span class="font-bold">${activeTask.subject}</span> - ${activeTask.title} (${activeTask.type})`;
+        activeTaskLabel.innerHTML = `<span class="font-bold text-white">[${activeTask.subject}]</span> ${activeTask.title} (${activeTask.type})`;
         activeTaskLabel.className = "text-xs text-indigo-300 font-medium bg-indigo-950/60 py-1.5 px-3 rounded-full inline-block border border-indigo-500/40";
       } else {
         activeTaskLabel.textContent = "No Active Task Selected";
@@ -632,66 +685,84 @@
       if (state.activeTaskId === id) state.activeTaskId = null;
       saveData();
       renderTasks();
+      renderCalendarGrid();
     }
 
+    // Add Task with Recurring Repeat Options
     addTaskForm.addEventListener('submit', (e) => {
       e.preventDefault();
       const title = document.getElementById('task-input').value.trim();
-      const subject = document.getElementById('task-subject-input').value.trim();
+      let subject = taskSubjectSelect.value;
+      if (subject === 'CUSTOM') subject = customSubjectInput.value.trim();
+      
       const type = document.getElementById('task-type-input').value.trim();
-      const date = document.getElementById('task-date-input').value;
+      const startDateStr = document.getElementById('task-date-input').value;
+      const repeatOpt = document.getElementById('task-repeat-select').value;
       const estPomos = parseInt(document.getElementById('task-est-input').value) || 1;
 
-      if (!title || !subject || !type || !date) return;
+      if (!title || !subject || !type || !startDateStr) return;
 
-      const newTask = {
-        id: Date.now().toString(),
-        title,
-        subject,
-        type,
-        date,
-        estPomos,
-        completedPomos: 0,
-        completed: false
-      };
+      let datesToSchedule = [startDateStr];
+      let startDate = new Date(startDateStr);
 
-      state.tasks.push(newTask);
-      
-      const todayStr = new Date().toISOString().split('T')[0];
-      if (date === todayStr && !state.activeTaskId) {
-        state.activeTaskId = newTask.id;
+      if (repeatOpt === 'daily_7') {
+        for (let i = 1; i < 7; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + i);
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
+      } else if (repeatOpt === 'daily_30') {
+        for (let i = 1; i < 30; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + i);
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
+      } else if (repeatOpt === 'weekly_4') {
+        for (let i = 1; i < 4; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + (i * 7));
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
       }
 
+      datesToSchedule.forEach(dateStr => {
+        state.tasks.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          title,
+          subject,
+          type,
+          date: dateStr,
+          estPomos,
+          completedPomos: 0,
+          completed: false
+        });
+      });
+
       document.getElementById('task-input').value = '';
-      document.getElementById('task-subject-input').value = '';
-      document.getElementById('task-type-input').value = '';
       saveData();
       renderTasks();
       renderCalendarGrid();
     });
 
-    // --- Calendar Scheduler Functions ---
+    // --- Calendar Engine with Navigation ---
     function renderCalendarGrid() {
       const calendarGridEl = document.getElementById('calendar-days-grid');
-      const monthLabelEl = document.getElementById('calendar-month-label');
+      const monthYearLabelEl = document.getElementById('calendar-month-year-label');
       calendarGridEl.innerHTML = '';
 
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
+      const viewDate = state.calendarViewDate;
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
 
-      monthLabelEl.textContent = now.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+      monthYearLabelEl.textContent = viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 
       const firstDay = new Date(year, month, 1).getDay();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-      // Blank padded days
       for (let i = 0; i < firstDay; i++) {
-        const blank = document.createElement('div');
-        calendarGridEl.appendChild(blank);
+        calendarGridEl.appendChild(document.createElement('div'));
       }
 
-      // Actual month days
       for (let day = 1; day <= daysInMonth; day++) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const hasTasks = state.tasks.some(t => t.date === dateStr);
@@ -699,23 +770,24 @@
         const isToday = dateStr === new Date().toISOString().split('T')[0];
 
         const dayEl = document.createElement('button');
-        dayEl.className = `p-1.5 rounded-lg transition-all text-xs font-semibold relative ${
+        dayEl.className = `p-2 rounded-lg transition-all text-xs font-semibold relative ${
           isSelected 
             ? 'bg-indigo-600 text-white' 
             : isToday 
-            ? 'border border-indigo-500 text-indigo-300' 
+            ? 'border border-indigo-500 text-indigo-300 bg-indigo-950/20' 
             : 'hover:bg-slate-800 text-slate-300'
         }`;
         dayEl.textContent = day;
 
         if (hasTasks) {
           const dot = document.createElement('span');
-          dot.className = "absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-amber-400 rounded-full";
+          dot.className = "absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-amber-400 rounded-full";
           dayEl.appendChild(dot);
         }
 
         dayEl.onclick = () => {
           state.selectedCalendarDate = dateStr;
+          document.getElementById('task-date-input').value = dateStr;
           renderCalendarGrid();
           renderCalendarTasks();
         };
@@ -729,12 +801,12 @@
       const label = document.getElementById('selected-date-label');
       container.innerHTML = '';
 
-      label.textContent = `Tasks Scheduled for ${state.selectedCalendarDate}`;
+      label.textContent = `Tasks for ${state.selectedCalendarDate}`;
 
       const scheduledTasks = state.tasks.filter(t => t.date === state.selectedCalendarDate);
 
       if (scheduledTasks.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No tasks scheduled for this date.</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No tasks scheduled for this date. Click 'Add Task for Date' to schedule!</p>`;
         return;
       }
 
@@ -744,7 +816,7 @@
         item.innerHTML = `
           <div>
             <p class="font-semibold ${task.completed ? 'line-through text-slate-500' : 'text-slate-200'}">${task.title}</p>
-            <p class="text-[10px] text-slate-400">${task.subject} • ${task.type}</p>
+            <p class="text-[10px] text-slate-400"><span class="text-indigo-400 font-bold">${task.subject}</span> • ${task.type}</p>
           </div>
           <span class="text-[10px] px-2 py-0.5 rounded ${task.completed ? 'bg-emerald-950 text-emerald-400' : 'bg-amber-950 text-amber-300'}">
             ${task.completed ? 'Completed' : 'Scheduled'}
@@ -754,26 +826,75 @@
       });
     }
 
-    // --- Analytics Engine ---
+    // Calendar Controls
+    document.getElementById('prev-month-btn').onclick = () => {
+      state.calendarViewDate.setMonth(state.calendarViewDate.getMonth() - 1);
+      renderCalendarGrid();
+    };
+    document.getElementById('next-month-btn').onclick = () => {
+      state.calendarViewDate.setMonth(state.calendarViewDate.getMonth() + 1);
+      renderCalendarGrid();
+    };
+    document.getElementById('today-jump-btn').onclick = () => {
+      state.calendarViewDate = new Date();
+      state.selectedCalendarDate = new Date().toISOString().split('T')[0];
+      document.getElementById('task-date-input').value = state.selectedCalendarDate;
+      renderCalendarGrid();
+      renderCalendarTasks();
+    };
+    document.getElementById('quick-add-date-btn').onclick = () => {
+      document.getElementById('task-date-input').value = state.selectedCalendarDate;
+      document.getElementById('task-input').focus();
+    };
+
+    // --- LocalStorage ---
+    function saveData() {
+      localStorage.setItem('sp_tasks_v3', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v3', JSON.stringify(state.logs));
+    }
+
+    // --- Analytics ---
+    let studyChart;
+    function initChart() {
+      const ctx = document.getElementById('studyChart').getContext('2d');
+      studyChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: [],
+          datasets: [{
+            label: 'Study Minutes',
+            data: [],
+            backgroundColor: 'rgba(99, 102, 241, 0.5)',
+            borderColor: 'rgba(129, 140, 248, 1)',
+            borderWidth: 1.5,
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#94a3b8' } },
+            x: { grid: { display: false }, ticks: { color: '#94a3b8' } }
+          }
+        }
+      });
+      updateChartData();
+    }
+
     function updateMetricsAndChart() {
       const now = new Date();
       const todayStr = now.toISOString().split('T')[0];
 
-      const todayMins = state.logs
-        .filter(l => l.date === todayStr)
-        .reduce((acc, curr) => acc + curr.minutes, 0);
-
+      const todayMins = state.logs.filter(l => l.date === todayStr).reduce((acc, curr) => acc + curr.minutes, 0);
       document.getElementById('metric-today').textContent = `${todayMins}m`;
 
       const sevenDaysAgo = new Date(now);
       sevenDaysAgo.setDate(now.getDate() - 6);
-      const weekMins = state.logs
-        .filter(l => new Date(l.date) >= sevenDaysAgo)
-        .reduce((acc, curr) => acc + curr.minutes, 0);
+      const weekMins = state.logs.filter(l => new Date(l.date) >= sevenDaysAgo).reduce((acc, curr) => acc + curr.minutes, 0);
 
-      const weekHours = Math.floor(weekMins / 60);
-      const remainingWeekMins = weekMins % 60;
-      document.getElementById('metric-week').textContent = `${weekHours}h ${remainingWeekMins}m`;
+      document.getElementById('metric-week').textContent = `${Math.floor(weekMins / 60)}h ${weekMins % 60}m`;
       document.getElementById('metric-total-sessions').textContent = state.logs.length;
 
       calculateStreak();
@@ -782,30 +903,27 @@
 
     function calculateStreak() {
       if (state.logs.length === 0) {
-        streakCounterEl.textContent = '0 Days';
+        document.getElementById('streak-counter').textContent = '0 Days';
         return;
       }
-
       const uniqueDates = [...new Set(state.logs.map(l => l.date))].sort().reverse();
       let streak = 0;
       let checkDate = new Date();
 
       for (let i = 0; i < uniqueDates.length; i++) {
-        const logDate = uniqueDates[i];
         const formattedCheck = checkDate.toISOString().split('T')[0];
-        
-        if (logDate === formattedCheck) {
+        if (uniqueDates[i] === formattedCheck) {
           streak++;
           checkDate.setDate(checkDate.getDate() - 1);
         } else if (i === 0) {
           checkDate.setDate(checkDate.getDate() - 1);
-          if (logDate === checkDate.toISOString().split('T')[0]) {
+          if (uniqueDates[i] === checkDate.toISOString().split('T')[0]) {
             streak++;
             checkDate.setDate(checkDate.getDate() - 1);
           } else break;
         } else break;
       }
-      streakCounterEl.textContent = `${streak} Day${streak === 1 ? '' : 's'}`;
+      document.getElementById('streak-counter').textContent = `${streak} Day${streak === 1 ? '' : 's'}`;
     }
 
     function updateChartData() {
@@ -819,8 +937,7 @@
           d.setDate(now.getDate() - i);
           const dateStr = d.toISOString().split('T')[0];
           labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
-          const mins = state.logs.filter(l => l.date === dateStr).reduce((acc, curr) => acc + curr.minutes, 0);
-          data.push(mins);
+          data.push(state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0));
         }
       } else if (state.currentChartTab === 'weekly') {
         for (let i = 3; i >= 0; i--) {
@@ -829,21 +946,19 @@
           const endOfWeek = new Date(now);
           endOfWeek.setDate(now.getDate() - (i * 7));
           labels.push(`Wk ${4 - i}`);
-          const mins = state.logs.filter(l => {
+          data.push(state.logs.filter(l => {
             const d = new Date(l.date);
             return d >= startOfWeek && d <= endOfWeek;
-          }).reduce((acc, curr) => acc + curr.minutes, 0);
-          data.push(mins);
+          }).reduce((a, c) => a + c.minutes, 0));
         }
       } else if (state.currentChartTab === 'monthly') {
         for (let i = 5; i >= 0; i--) {
           const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
           labels.push(d.toLocaleDateString('en-US', { month: 'short' }));
-          const mins = state.logs.filter(l => {
+          data.push(state.logs.filter(l => {
             const logD = new Date(l.date);
             return logD.getMonth() === d.getMonth() && logD.getFullYear() === d.getFullYear();
-          }).reduce((acc, curr) => acc + curr.minutes, 0);
-          data.push(mins);
+          }).reduce((a, c) => a + c.minutes, 0));
         }
       }
 
@@ -852,50 +967,44 @@
       studyChart.update();
     }
 
-    function setChartTab(tab) {
-      state.currentChartTab = tab;
-      [viewDailyBtn, viewWeeklyBtn, viewMonthlyBtn].forEach(b => {
-        b.className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
-      });
-
-      if (tab === 'daily') viewDailyBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
-      if (tab === 'weekly') viewWeeklyBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
-      if (tab === 'monthly') viewMonthlyBtn.className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
-
-      updateChartData();
-    }
-
-    // --- Modal Handlers ---
-    openSettingsBtn.addEventListener('click', () => {
+    // Modal
+    document.getElementById('open-settings-btn').onclick = () => {
       document.getElementById('custom-work-min').value = state.timer.workDuration;
       document.getElementById('custom-short-min').value = state.timer.shortDuration;
       document.getElementById('custom-long-min').value = state.timer.longDuration;
-      settingsModal.classList.remove('hidden');
-    });
-
-    closeSettingsBtn.addEventListener('click', () => settingsModal.classList.add('hidden'));
-
-    saveSettingsBtn.addEventListener('click', () => {
+      document.getElementById('settings-modal').classList.remove('hidden');
+    };
+    document.getElementById('close-settings-btn').onclick = () => document.getElementById('settings-modal').classList.add('hidden');
+    document.getElementById('save-settings-btn').onclick = () => {
       state.timer.workDuration = parseInt(document.getElementById('custom-work-min').value) || 25;
       state.timer.shortDuration = parseInt(document.getElementById('custom-short-min').value) || 5;
       state.timer.longDuration = parseInt(document.getElementById('custom-long-min').value) || 15;
-      settingsModal.classList.add('hidden');
+      document.getElementById('settings-modal').classList.add('hidden');
       setMode(state.timer.mode);
-    });
+    };
 
-    // --- Event Listeners ---
-    startBtn.addEventListener('click', toggleTimer);
-    stopBtn.addEventListener('click', stopAndLogPartial);
-    resetBtn.addEventListener('click', () => setMode(state.timer.mode));
-    modeWorkBtn.addEventListener('click', () => setMode('work'));
-    modeShortBtn.addEventListener('click', () => setMode('short'));
-    modeLongBtn.addEventListener('click', () => setMode('long'));
+    // Event Listeners
+    startBtn.onclick = toggleTimer;
+    stopBtn.onclick = stopAndLogPartial;
+    resetBtn.onclick = () => setMode(state.timer.mode);
+    document.getElementById('mode-work').onclick = () => setMode('work');
+    document.getElementById('mode-short').onclick = () => setMode('short');
+    document.getElementById('mode-long').onclick = () => setMode('long');
 
-    viewDailyBtn.addEventListener('click', () => setChartTab('daily'));
-    viewWeeklyBtn.addEventListener('click', () => setChartTab('weekly'));
-    viewMonthlyBtn.addEventListener('click', () => setChartTab('monthly'));
+    document.getElementById('view-daily').onclick = () => setChartTab('daily');
+    document.getElementById('view-weekly').onclick = () => setChartTab('weekly');
+    document.getElementById('view-monthly').onclick = () => setChartTab('monthly');
 
-    // --- Initialization ---
+    function setChartTab(tab) {
+      state.currentChartTab = tab;
+      ['view-daily', 'view-weekly', 'view-monthly'].forEach(id => {
+        document.getElementById(id).className = "px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-400 hover:text-white transition-all";
+      });
+      document.getElementById(`view-${tab}`).className = "px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 text-white transition-all";
+      updateChartData();
+    }
+
+    // Init
     setDailyQuote();
     setMode('work');
     renderTasks();
