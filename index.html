@@ -121,15 +121,13 @@
         <button id="nav-wall" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
           <i class="fa-solid fa-note-sticky"></i> Memory Wall
         </button>
+        <button id="nav-backup" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+          <i class="fa-solid fa-floppy-disk"></i> Data Backup
+        </button>
       </nav>
 
       <!-- Controls -->
       <div class="flex items-center gap-3">
-        <!-- Cloud Sync Trigger -->
-        <button onclick="openCloudModal()" class="glass-card px-3 py-1.5 rounded-xl flex items-center gap-1.5 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:border-indigo-500 transition-all">
-          <i class="fa-solid fa-cloud-arrow-up text-sm"></i> Cloud Sync
-        </button>
-
         <div class="glass-card px-3 py-1.5 rounded-xl text-center">
           <p class="text-[9px] text-slate-500 dark:text-slate-400 font-bold uppercase">Time</p>
           <p id="live-clock" class="text-xs font-extrabold font-mono text-indigo-500">00:00:00 AM</p>
@@ -541,6 +539,60 @@
         </section>
       </div>
 
+      <!-- PAGE 7: DEDICATED 1-CLICK OFFLINE BACKUP & RESTORE PAGE -->
+      <div id="page-backup" class="page-view hidden space-y-8">
+        <section class="glass-card p-6 md:p-8 rounded-2xl max-w-3xl mx-auto shadow-xl">
+          <div class="text-center mb-8">
+            <div class="w-12 h-12 bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-500 text-2xl mx-auto mb-3">
+              <i class="fa-solid fa-floppy-disk"></i>
+            </div>
+            <h3 class="text-xl font-extrabold text-slate-900 dark:text-slate-100">1-Click Offline Data Backup & Transfer</h3>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
+              Easily export your study logs, scheduled tasks, and sticky notes to transfer between your laptop and mobile phone.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Export Box -->
+            <div class="sub-box p-6 rounded-2xl flex flex-col justify-between text-center space-y-4">
+              <div>
+                <i class="fa-solid fa-file-arrow-down text-3xl text-indigo-500 mb-2"></i>
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Export Backup File</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  Downloads a single <code class="font-mono text-indigo-500">CA_Study_Notion_Backup.json</code> file to your device.
+                </p>
+              </div>
+              <button onclick="exportDataFile()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
+                <i class="fa-solid fa-download"></i> Download Backup File
+              </button>
+            </div>
+
+            <!-- Import Box -->
+            <div class="sub-box p-6 rounded-2xl flex flex-col justify-between text-center space-y-4">
+              <div>
+                <i class="fa-solid fa-file-arrow-up text-3xl text-purple-500 mb-2"></i>
+                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Restore / Import File</h4>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  Select a previously downloaded backup file to restore all your study progress instantly.
+                </p>
+              </div>
+              <label class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3 rounded-xl text-xs font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-2">
+                <i class="fa-solid fa-upload"></i> Upload & Restore File
+                <input type="file" id="import-file-input" accept=".json" onchange="importDataFile(event)" class="hidden">
+              </label>
+            </div>
+          </div>
+
+          <!-- Reset All Data -->
+          <div class="border-t border-slate-200 dark:border-slate-800/80 pt-6 mt-8 flex justify-between items-center text-xs">
+            <span class="text-slate-500 dark:text-slate-400">Need a completely fresh start?</span>
+            <button onclick="resetAllAppLocalData()" class="text-rose-500 hover:text-rose-600 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-trash-can"></i> Reset All Local Data
+            </button>
+          </div>
+        </section>
+      </div>
+
     </main>
   </div>
 
@@ -548,53 +600,6 @@
   <footer class="text-center py-6 text-xs text-slate-500 dark:text-slate-400 font-medium border-t border-slate-200 dark:border-slate-800/80 mt-8">
     Copyright 2026 | Made with love by Niket Talwar
   </footer>
-
-  <!-- Secret Sync Code Cloud Modal -->
-  <div id="cloud-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
-    <div class="glass-card bg-white dark:bg-slate-900 p-6 rounded-2xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-base font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-          <i class="fa-solid fa-cloud-arrow-up"></i> Secret Code Cloud Sync
-        </h3>
-        <button onclick="closeCloudModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
-      </div>
-
-      <div class="space-y-4 text-xs">
-        <p class="text-slate-600 dark:text-slate-300">
-          Sync your study logs, tasks, and memory wall across mobile and laptop using a personal secret code.
-        </p>
-
-        <div>
-          <label class="block font-bold text-slate-500 dark:text-slate-400 mb-1">Your Secret Sync Code:</label>
-          <input type="text" id="sync-code-input" placeholder="e.g. niket-ca-2026" class="input-field border rounded-xl px-3 py-2 text-xs w-full font-mono font-bold focus:outline-none focus:border-indigo-500">
-        </div>
-
-        <div id="sync-status-msg" class="hidden p-3 rounded-xl text-center font-bold"></div>
-
-        <div class="grid grid-cols-2 gap-3 pt-2">
-          <button onclick="uploadToCloud()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Push to Cloud
-          </button>
-          <button onclick="fetchFromCloud()" class="bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-cloud-arrow-down"></i> Pull from Cloud
-          </button>
-        </div>
-
-        <!-- Fail-Safe Direct Code Copy/Paste Option -->
-        <div class="border-t border-slate-200 dark:border-slate-800 pt-3 mt-3">
-          <p class="text-[10px] text-slate-400 mb-2 font-bold uppercase tracking-wider text-center">Instant 1-Click Code Backup (Offline Backup)</p>
-          <div class="grid grid-cols-2 gap-2">
-            <button onclick="copyDataString()" class="sub-box hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 rounded-xl font-bold transition-all flex items-center justify-center gap-1">
-              <i class="fa-solid fa-copy"></i> Copy Sync Code
-            </button>
-            <button onclick="pasteDataString()" class="sub-box hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300 py-1.5 rounded-xl font-bold transition-all flex items-center justify-center gap-1">
-              <i class="fa-solid fa-paste"></i> Paste Sync Code
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
   <!-- Target Exam Date Modal Picker -->
   <div id="exam-date-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
@@ -848,7 +853,8 @@
       scheduler: document.getElementById('nav-scheduler'),
       analytics: document.getElementById('nav-analytics'),
       history: document.getElementById('nav-history'),
-      wall: document.getElementById('nav-wall')
+      wall: document.getElementById('nav-wall'),
+      backup: document.getElementById('nav-backup')
     };
 
     const pages = {
@@ -857,7 +863,8 @@
       scheduler: document.getElementById('page-scheduler'),
       analytics: document.getElementById('page-analytics'),
       history: document.getElementById('page-history'),
-      wall: document.getElementById('page-wall')
+      wall: document.getElementById('page-wall'),
+      backup: document.getElementById('page-backup')
     };
 
     const pageTitles = {
@@ -866,7 +873,8 @@
       scheduler: "Advance Study Scheduler",
       analytics: "Graphical Analytics & Focus Pattern",
       history: "Date-Wise Session Logs",
-      wall: "Subject Memory Wall & Formula Board"
+      wall: "Subject Memory Wall & Formula Board",
+      backup: "Data Backup & 1-Click File Transfer"
     };
 
     function switchPage(pageKey) {
@@ -929,12 +937,12 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v16')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v16')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v17')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v17')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v16')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v16')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v17')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v17')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1355,142 +1363,62 @@
       renderStickyNotes();
     }
 
-    // Secret Sync Code Cloud Engine (CORS-Fixed Engine)
-    const cloudModal = document.getElementById('cloud-modal');
-    const syncCodeInput = document.getElementById('sync-code-input');
-    const syncStatusMsg = document.getElementById('sync-status-msg');
-
-    function openCloudModal() {
-      const savedCode = localStorage.getItem('sp_sync_code_v16');
-      if (savedCode) syncCodeInput.value = savedCode;
-      syncStatusMsg.classList.add('hidden');
-      cloudModal.classList.remove('hidden');
-    }
-
-    function closeCloudModal() {
-      cloudModal.classList.add('hidden');
-    }
-
-    function showSyncStatus(msg, isSuccess = true) {
-      syncStatusMsg.textContent = msg;
-      syncStatusMsg.className = `p-3 rounded-xl text-center font-bold text-xs ${
-        isSuccess 
-          ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30' 
-          : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border border-rose-500/30'
-      }`;
-      syncStatusMsg.classList.remove('hidden');
-    }
-
-    function getExportDataObject() {
-      return {
+    // Offline 1-Click File Export & Import Engine
+    function exportDataFile() {
+      const backupData = {
         tasks: state.tasks,
         logs: state.logs,
         subjects: state.subjects,
         stickyNotes: state.stickyNotes,
         examDate: localStorage.getItem('sp_exam_date_v14'),
-        updatedAt: new Date().toISOString()
+        exportedAt: new Date().toISOString()
       };
+
+      const jsonString = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(backupData, null, 2));
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.setAttribute("href", jsonString);
+      downloadAnchor.setAttribute("download", `CA_Study_Notion_Backup_${new Date().toISOString().split('T')[0]}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      playAudioChime('complete');
     }
 
-    function applyImportDataObject(data) {
-      if (data.tasks) state.tasks = data.tasks;
-      if (data.logs) state.logs = data.logs;
-      if (data.subjects) state.subjects = data.subjects;
-      if (data.stickyNotes) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v14', data.examDate);
+    function importDataFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
 
-      saveData();
-      renderTasks();
-      renderCalendarGrid();
-      initCharts();
-      renderMemoryWall();
-      updateExamCountdown();
-    }
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          if (data.tasks) state.tasks = data.tasks;
+          if (data.logs) state.logs = data.logs;
+          if (data.subjects) state.subjects = data.subjects;
+          if (data.stickyNotes) state.stickyNotes = data.stickyNotes;
+          if (data.examDate) localStorage.setItem('sp_exam_date_v14', data.examDate);
 
-    async function uploadToCloud() {
-      const code = syncCodeInput.value.trim().toLowerCase();
-      if (!code) {
-        showSyncStatus("Please enter a secret sync code!", false);
-        return;
-      }
+          saveData();
+          renderTasks();
+          renderCalendarGrid();
+          initCharts();
+          renderMemoryWall();
+          updateExamCountdown();
 
-      localStorage.setItem('sp_sync_code_v16', code);
-      showSyncStatus("Syncing to cloud...");
-
-      const payload = getExportDataObject();
-
-      try {
-        const response = await fetch(`https://keyvalue.imsky.org/set/${code}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-          body: `value=${encodeURIComponent(JSON.stringify(payload))}`
-        });
-
-        if (response.ok) {
-          showSyncStatus("☁️ Successfully backed up to Cloud!");
           playAudioChime('complete');
-        } else {
-          showSyncStatus("Sync failed. Try copying code string below.", false);
+          alert("📥 Data backup successfully imported and restored!");
+        } catch (err) {
+          alert("❌ Invalid backup file format!");
         }
-      } catch (err) {
-        showSyncStatus("Network error. Use 'Copy Sync Code' fallback.", false);
-      }
+      };
+      reader.readAsText(file);
     }
 
-    async function fetchFromCloud() {
-      const code = syncCodeInput.value.trim().toLowerCase();
-      if (!code) {
-        showSyncStatus("Please enter your secret sync code!", false);
-        return;
-      }
-
-      localStorage.setItem('sp_sync_code_v16', code);
-      showSyncStatus("Fetching from cloud...");
-
-      try {
-        const response = await fetch(`https://keyvalue.imsky.org/get/${code}`);
-        if (response.ok) {
-          const rawText = await response.text();
-          if (rawText && rawText !== 'null') {
-            const data = JSON.parse(rawText);
-            applyImportDataObject(data);
-            showSyncStatus("📥 Data successfully restored from Cloud!");
-            playAudioChime('complete');
-          } else {
-            showSyncStatus("No backup found for this code!", false);
-          }
-        } else {
-          showSyncStatus("Unable to reach cloud server. Use Paste Code.", false);
-        }
-      } catch (err) {
-        showSyncStatus("Network error fetching data.", false);
-      }
-    }
-
-    // Direct String Copy/Paste Fallback Engine
-    function copyDataString() {
-      const payload = getExportDataObject();
-      const b64 = btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
-      navigator.clipboard.writeText(b64).then(() => {
-        showSyncStatus("📋 Sync Code copied to clipboard! Paste it on your phone.");
-        playAudioChime('complete');
-      }).catch(() => {
-        prompt("Copy this Sync Code string:", b64);
-      });
-    }
-
-    function pasteDataString() {
-      const b64 = prompt("Paste your Sync Code string here:");
-      if (!b64) return;
-
-      try {
-        const jsonStr = decodeURIComponent(escape(atob(b64.trim())));
-        const data = JSON.parse(jsonStr);
-        applyImportDataObject(data);
-        showSyncStatus("📥 Restored successfully from pasted code!");
-        playAudioChime('complete');
-      } catch (err) {
-        showSyncStatus("Invalid sync string pasted!", false);
+    function resetAllAppLocalData() {
+      if (confirm("⚠️ Are you sure you want to clear all tasks, study logs, and notes? This cannot be undone.")) {
+        localStorage.clear();
+        location.reload();
       }
     }
 
@@ -1886,10 +1814,10 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v16', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v16', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v16', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v16', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v17', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v17', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v17', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_stickies_v17', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
