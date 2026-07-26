@@ -381,7 +381,7 @@
       <!-- PAGE 3: ADVANCED SCHEDULER & TASKS PAGE -->
       <div id="page-scheduler" class="page-view hidden space-y-8">
         
-        <!-- Repositioned Uncluttered Overdue / Pending Tasks Section -->
+        <!-- Overdue / Pending Tasks Section -->
         <section class="glass-card p-6 rounded-2xl border-l-4 border-l-rose-500 shadow-xl">
           <div class="flex justify-between items-center mb-4">
             <div>
@@ -593,18 +593,18 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Proportional Time-of-Day Grid Ref: Screenshot 2) -->
+        <!-- Pomodoro Records (Proportional Time-of-Day Grid Ref: Screenshot 2 & Image 1) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Visual Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Proportional fill blocks showing actual study duration in 2-hour slots</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Clean transparent slots with proportional fill showing actual study duration in 2-hour slots</p>
             </div>
           </div>
 
-          <!-- Proportional Fill HTML Matrix Grid -->
+          <!-- Proportional Fill Transparent Block HTML Matrix Grid -->
           <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl overflow-x-auto custom-scrollbar"></div>
         </section>
 
@@ -658,7 +658,7 @@
         </section>
       </div>
 
-      <!-- PAGE 6: SESSION LOGS PAGE (WITH DATE/MONTH SEGREGATION & INDIVIDUAL DELETION) -->
+      <!-- PAGE 6: SESSION LOGS PAGE (LIGHT MODE TEXT CONTRAST FIX & DELETION) -->
       <div id="page-history" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -671,7 +671,7 @@
 
             <!-- Month Filter Select -->
             <div class="flex items-center gap-3">
-              <label class="text-xs text-slate-500 dark:text-slate-400 font-bold">Filter Month:</label>
+              <label class="text-xs text-slate-700 dark:text-slate-300 font-bold">Filter Month:</label>
               <select id="log-month-filter" onchange="renderSessionHistory()" class="input-field border rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none">
                 <option value="all">All Months</option>
               </select>
@@ -1127,6 +1127,7 @@
         themeIcon.className = "fa-solid fa-moon text-sm";
       }
       updateChartColors();
+      renderPomodoroMatrixGrid();
     };
 
     // Full CA Final Chapter Index Data Loaded Directly from PDF Source
@@ -1262,13 +1263,13 @@
       activeChapterSubject: 'FR',
       focusGoalViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v22')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v22')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v22')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v23')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v23')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v23')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v22')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v22')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v23')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v23')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1805,7 +1806,7 @@
       }
     }
 
-    // Proportional Fill Pomodoro Records Matrix Renderer (Ref Screenshot 2)
+    // Transparent Empty Blocks Pomodoro Records Matrix Renderer (Ref Screenshot 1 / Image 5771bd)
     function renderPomodoroMatrixGrid() {
       const container = document.getElementById('pomo-matrix-container');
       if (!container) return;
@@ -1818,7 +1819,7 @@
       table.className = "w-full border-collapse text-xs";
 
       // Header Row (X-Axis: 2-Hour Slots)
-      let theadHtml = `<thead><tr class="border-b border-slate-700/60 text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
+      let theadHtml = `<thead><tr class="border-b border-slate-300 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
       slots.forEach(slot => {
         theadHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
       });
@@ -1826,7 +1827,7 @@
       table.innerHTML = theadHtml;
 
       const tbody = document.createElement('tbody');
-      tbody.className = "divide-y divide-slate-800/40 font-mono";
+      tbody.className = "divide-y divide-slate-200 dark:divide-slate-800/40 font-mono";
 
       // Last 15 Days Y-Axis (Today, Yesterday, 24 Jul, 23 Jul...)
       for (let i = 0; i < 15; i++) {
@@ -1840,7 +1841,7 @@
 
         const dayLogs = state.logs.filter(l => l.date === dateStr);
 
-        let rowHtml = `<tr><td class="p-2 text-slate-400 font-bold font-sans">${label}</td>`;
+        let rowHtml = `<tr><td class="p-2 text-slate-600 dark:text-slate-400 font-bold font-sans">${label}</td>`;
 
         slots.forEach((slot, slotIdx) => {
           const slotStartHour = slotIdx * 2;
@@ -1855,8 +1856,8 @@
 
           rowHtml += `
             <td class="p-1 text-center align-middle">
-              <div class="w-full bg-slate-800/50 rounded-md h-5 border border-slate-700/40 overflow-hidden relative" title="${slotMins} mins studied">
-                <div class="bg-purple-600 h-full transition-all duration-500" style="width: ${fillPct}%;"></div>
+              <div class="w-full bg-slate-400/40 dark:bg-slate-700/50 rounded-xl h-6 overflow-hidden relative" title="${slotMins} mins studied">
+                <div class="bg-purple-600 h-full rounded-xl transition-all duration-500" style="width: ${fillPct}%;"></div>
               </div>
             </td>
           `;
@@ -2078,7 +2079,7 @@
         subjects: state.subjects,
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v22'),
+        examDate: localStorage.getItem('sp_exam_date_v23'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2170,7 +2171,7 @@
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v22', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v23', data.examDate);
 
       saveData();
       renderTasks();
@@ -2335,7 +2336,7 @@
     }
     function closeStreakModal() { streakModal.classList.add('hidden'); }
 
-    // Session History Engine with Date/Month Segregation & Individual Delete
+    // Session History Engine with Date/Month Segregation, Deletion, and High Light-Mode Contrast
     function deleteSingleLog(logId) {
       if (confirm('Delete this specific study session entry?')) {
         state.logs = state.logs.filter(l => l.id !== logId);
@@ -2411,14 +2412,14 @@
         else if (dateStr === yesterdayStr) dateLabel = "Yesterday (" + dateStr + ")";
 
         const dateGroupBlock = document.createElement('div');
-        dateGroupBlock.className = "sub-box p-4 rounded-2xl border border-slate-700/50 shadow-sm space-y-3";
+        dateGroupBlock.className = "sub-box p-4 rounded-2xl border border-slate-300 dark:border-slate-700/50 shadow-sm space-y-3";
 
         let blockHtml = `
-          <div class="flex justify-between items-center border-b border-slate-700/40 pb-2">
-            <h4 class="font-bold text-xs text-indigo-400 flex items-center gap-2">
+          <div class="flex justify-between items-center border-b border-slate-300 dark:border-slate-700/40 pb-2">
+            <h4 class="font-bold text-xs text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
               <i class="fa-solid fa-calendar-day"></i> ${dateLabel}
             </h4>
-            <span class="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 font-extrabold text-[10px] rounded-lg">
+            <span class="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-700 dark:text-indigo-300 font-extrabold text-[10px] rounded-lg">
               Day Total: ${(dayTotalMins / 60).toFixed(1)} hrs (${dayTotalMins} mins)
             </span>
           </div>
@@ -2426,7 +2427,7 @@
           <div class="overflow-x-auto custom-scrollbar">
             <table class="w-full text-left text-xs border-collapse">
               <thead>
-                <tr class="text-slate-500 dark:text-slate-400 font-bold border-b border-slate-800/40">
+                <tr class="text-slate-600 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800/40">
                   <th class="p-2">Subject</th>
                   <th class="p-2">Study Type</th>
                   <th class="p-2">Duration</th>
@@ -2434,18 +2435,18 @@
                   <th class="p-2 text-right">Action</th>
                 </tr>
               </thead>
-              <tbody class="divide-y divide-slate-800/30">
+              <tbody class="divide-y divide-slate-200 dark:divide-slate-800/30">
         `;
 
         dateLogs.reverse().forEach(log => {
           blockHtml += `
-            <tr class="hover:bg-slate-800/20 transition-colors">
-              <td class="p-2"><span class="px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
-              <td class="p-2 text-slate-300">${log.type || 'Study'}</td>
-              <td class="p-2 font-bold text-emerald-400">${log.minutes} mins</td>
-              <td class="p-2 text-slate-400 font-mono text-[10px]">${log.timestamp || 'Recorded'}</td>
+            <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/20 transition-colors">
+              <td class="p-2"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-extrabold">${log.subject || 'General'}</span></td>
+              <td class="p-2 text-slate-800 dark:text-slate-200 font-semibold">${log.type || 'Study'}</td>
+              <td class="p-2 font-bold text-emerald-600 dark:text-emerald-400">${log.minutes} mins</td>
+              <td class="p-2 text-slate-600 dark:text-slate-400 font-mono text-[10px] font-bold">${log.timestamp || 'Recorded'}</td>
               <td class="p-2 text-right">
-                <button onclick="deleteSingleLog('${log.id}')" class="text-slate-400 hover:text-rose-500 text-xs px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-all">
+                <button onclick="deleteSingleLog('${log.id}')" class="text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 text-xs px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-all font-bold">
                   <i class="fa-solid fa-trash-can"></i> Delete
                 </button>
               </td>
@@ -2473,7 +2474,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v22');
+      const savedDate = localStorage.getItem('sp_exam_date_v23');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2485,14 +2486,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v22', val);
+        localStorage.setItem('sp_exam_date_v23', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v22');
+      const savedDate = localStorage.getItem('sp_exam_date_v23');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2684,11 +2685,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v22', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v22', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v22', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v22', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v22', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v23', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v23', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v23', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v23', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v23', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
