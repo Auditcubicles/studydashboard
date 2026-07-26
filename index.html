@@ -258,68 +258,149 @@
 
       </div>
 
-      <!-- PAGE 2: FOCUS POMODORO TIMER PAGE -->
+      <!-- PAGE 2: FOCUS POMODORO TIMER PAGE & MANUAL LOGGER -->
       <div id="page-pomodoro" class="page-view hidden space-y-8">
-        <div class="max-w-2xl mx-auto">
-          <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl transition-all">
-            <div class="flex justify-between items-center mb-6">
-              <h3 class="text-lg font-bold flex items-center gap-2">
-                <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Pomodoro
-              </h3>
-              <div class="flex gap-2">
-                <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
-                  <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Fullscreen
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Main Pomodoro Card -->
+          <div class="lg:col-span-8">
+            <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl transition-all">
+              <div class="flex justify-between items-center mb-6">
+                <h3 class="text-lg font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Pomodoro
+                </h3>
+                <div class="flex gap-2">
+                  <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
+                    <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Fullscreen
+                  </button>
+                  <button id="open-settings-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
+                    <i class="fa-solid fa-sliders"></i> Adjust
+                  </button>
+                </div>
+              </div>
+
+              <!-- Modes -->
+              <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60">
+                <button id="mode-work" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
+                <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
+                <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
+              </div>
+
+              <!-- Active Task Dropdown Selector -->
+              <div class="mb-6">
+                <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1.5 text-center tracking-wider">
+                  Active Task for this Session:
+                </label>
+                <select id="pomo-active-task-select" class="input-field border rounded-xl px-4 py-2.5 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500 shadow-sm">
+                  <option value="">-- Select Active Scheduled Task for Today --</option>
+                </select>
+              </div>
+
+              <!-- Timer Display with Small Seconds (:SS) -->
+              <div class="text-center my-8">
+                <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center">
+                  <span id="timer-main">01:00</span><span id="timer-sec" class="text-3xl opacity-60 ml-1 font-bold">:00</span>
+                </div>
+              </div>
+
+              <!-- Controls -->
+              <div class="flex justify-center gap-4">
+                <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 text-sm">
+                  <i class="fa-solid fa-play"></i> Start
                 </button>
-                <button id="open-settings-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
-                  <i class="fa-solid fa-sliders"></i> Adjust
+                <button id="stop-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3.5 rounded-2xl transition-all flex items-center gap-2 text-sm">
+                  <i class="fa-solid fa-square"></i> Stop & Log
+                </button>
+                <button id="reset-btn" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-5 py-3.5 rounded-2xl transition-all border border-slate-300 dark:border-slate-700/60">
+                  <i class="fa-solid fa-rotate-right"></i>
                 </button>
               </div>
-            </div>
+            </section>
+          </div>
 
-            <!-- Modes -->
-            <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60">
-              <button id="mode-work" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
-              <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
-              <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
-            </div>
+          <!-- Manual Study Time Logger Box -->
+          <div class="lg:col-span-4">
+            <section class="glass-card p-6 rounded-3xl shadow-xl h-full flex flex-col justify-between">
+              <div>
+                <h3 class="text-base font-bold text-amber-500 mb-1 flex items-center gap-2">
+                  <i class="fa-solid fa-pen-to-square"></i> Manual Session Logger
+                </h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Log study sessions completed offline or outside the timer</p>
 
-            <!-- Active Task Dropdown Selector -->
-            <div class="mb-6">
-              <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1.5 text-center tracking-wider">
-                Active Task for this Session:
-              </label>
-              <select id="pomo-active-task-select" class="input-field border rounded-xl px-4 py-2.5 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500 shadow-sm">
-                <option value="">-- Select Active Scheduled Task for Today --</option>
-              </select>
-            </div>
+                <form id="manual-log-form" class="space-y-3">
+                  <div>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Study Duration (Minutes)</label>
+                    <input type="number" id="manual-mins-input" min="1" max="600" value="60" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                  </div>
 
-            <!-- Timer Display with Small Seconds (:SS) -->
-            <div class="text-center my-8">
-              <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center">
-                <span id="timer-main">01:00</span><span id="timer-sec" class="text-3xl opacity-60 ml-1 font-bold">:00</span>
+                  <div>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Select Subject</label>
+                    <select id="manual-subject-select" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                      <option value="FR">FR</option>
+                      <option value="AFM">AFM</option>
+                      <option value="AUDIT">AUDIT</option>
+                      <option value="DT">DT</option>
+                      <option value="IDT">IDT</option>
+                      <option value="IBS">IBS</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Study Type</label>
+                    <select id="manual-type-select" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                      <option value="Self Revision">Self Revision</option>
+                      <option value="Lecture">Lecture</option>
+                      <option value="Youtube Revision">Youtube Revision</option>
+                      <option value="Mock Test">Mock Test</option>
+                      <option value="Question Practice">Question Practice</option>
+                    </select>
+                  </div>
+
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Date</label>
+                      <input type="date" id="manual-date-input" required class="w-full input-field border rounded-xl px-2 py-1.5 text-xs">
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Time Slot (Hour)</label>
+                      <select id="manual-hour-select" required class="w-full input-field border rounded-xl px-2 py-1.5 text-xs font-bold">
+                        <!-- Populated by JS -->
+                      </select>
+                    </div>
+                  </div>
+
+                  <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold py-2.5 rounded-xl text-xs transition-all shadow-md mt-2">
+                    <i class="fa-solid fa-plus-circle"></i> Log Manual Time
+                  </button>
+                </form>
               </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex justify-center gap-4">
-              <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-3.5 rounded-2xl transition-all shadow-lg shadow-indigo-600/30 flex items-center gap-2 text-sm">
-                <i class="fa-solid fa-play"></i> Start
-              </button>
-              <button id="stop-btn" class="bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3.5 rounded-2xl transition-all flex items-center gap-2 text-sm">
-                <i class="fa-solid fa-square"></i> Stop & Log
-              </button>
-              <button id="reset-btn" class="bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold px-5 py-3.5 rounded-2xl transition-all border border-slate-300 dark:border-slate-700/60">
-                <i class="fa-solid fa-rotate-right"></i>
-              </button>
-            </div>
-          </section>
+            </section>
+          </div>
         </div>
       </div>
 
       <!-- PAGE 3: ADVANCED SCHEDULER & TASKS PAGE -->
       <div id="page-scheduler" class="page-view hidden space-y-8">
+        
+        <!-- Repositioned Uncluttered Overdue / Pending Tasks Section -->
+        <section class="glass-card p-6 rounded-2xl border-l-4 border-l-rose-500 shadow-xl">
+          <div class="flex justify-between items-center mb-4">
+            <div>
+              <h3 class="text-base font-extrabold text-rose-500 flex items-center gap-2">
+                <i class="fa-solid fa-circle-exclamation text-lg"></i> Overdue & Pending Tasks
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Review uncompleted topics from previous days and reschedule them to any future date</p>
+            </div>
+            <span id="pending-task-count-badge" class="px-3 py-1 bg-rose-500/10 text-rose-500 border border-rose-500/30 rounded-xl text-xs font-extrabold">
+              0 Overdue
+            </span>
+          </div>
+
+          <div id="pending-task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-1">
+            <!-- Rendered by JS -->
+          </div>
+        </section>
+
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          
           <!-- Task Creation & Daily List -->
           <div class="lg:col-span-5 space-y-6">
             <section class="glass-card p-6 rounded-2xl">
@@ -382,18 +463,10 @@
 
               <!-- Segregated Task Lists -->
               <div class="space-y-4">
-                <!-- Overdue & Uncompleted Tasks Section -->
-                <div>
-                  <h4 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                    <i class="fa-solid fa-clock-rotate-left"></i> Overdue / Pending Tasks
-                  </h4>
-                  <div id="pending-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
-                </div>
-
                 <!-- Today's Active Tasks -->
                 <div>
                   <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Today's To-Do</h4>
-                  <div id="todo-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
+                  <div id="todo-task-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
 
                 <!-- Completed Tasks -->
@@ -435,7 +508,7 @@
         </div>
       </div>
 
-      <!-- PAGE 4: CHAPTER INDEX & REVISION TRACKER TAB (LOADED FROM PDF) -->
+      <!-- PAGE 4: CHAPTER INDEX & REVISION TRACKER TAB (LOADED FROM PDF + CUSTOM SUBJECT ADDITION) -->
       <div id="page-chapters" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -443,15 +516,20 @@
               <h3 class="text-lg font-bold flex items-center gap-2">
                 <i class="fa-solid fa-book-open text-indigo-500"></i> CA Final Chapter Index & Revision Tracker
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Track chapter-wise revision ticks (R1, R2, R3, R4) for each core subject</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Track chapter-wise revision ticks (R1, R2, R3, R4) for each subject</p>
             </div>
 
-            <button onclick="addNewChapterToSubject()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md">
-              <i class="fa-solid fa-plus"></i> + Add Custom Chapter
-            </button>
+            <div class="flex flex-wrap gap-2">
+              <button onclick="addNewSubjectFolder()" class="bg-purple-600 hover:bg-purple-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+                <i class="fa-solid fa-folder-plus"></i> + Add Subject Folder
+              </button>
+              <button onclick="addNewChapterToSubject()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
+                <i class="fa-solid fa-plus"></i> + Add Chapter
+              </button>
+            </div>
           </div>
 
-          <!-- Subject Tabs -->
+          <!-- Subject Folder Tabs -->
           <div id="chapter-subject-tabs" class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 dark:border-slate-800/80 pb-4"></div>
 
           <!-- Active Subject Chapters Card -->
@@ -515,30 +593,22 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Time of Day 2-Hour Slot Chart Ref: Screenshot 2) -->
+        <!-- Pomodoro Records (Time-of-Day 2-Hour Matrix Records Ref: Screenshot 2) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Study Distribution)
+                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Logs study time distribution across 2-hour slots (0:00 to 22:00)</p>
-            </div>
-
-            <!-- Timeframe Filter Switcher -->
-            <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-300 dark:border-slate-800">
-              <button id="pomo-filter-daily" onclick="setPomoRecordFilter('daily')" class="px-3 py-1 text-xs font-bold rounded-lg bg-purple-600 text-white transition-all">Daily Date-Wise</button>
-              <button id="pomo-filter-weekly" onclick="setPomoRecordFilter('weekly')" class="px-3 py-1 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-purple-500 transition-all">Weekly Date-Wise</button>
-              <button id="pomo-filter-yearly" onclick="setPomoRecordFilter('yearly')" class="px-3 py-1 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-purple-500 transition-all">Yearly Month Select</button>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Visual matrix displaying study focus across 2-hour slots for recent days</p>
             </div>
           </div>
 
-          <div class="relative h-64 w-full">
-            <canvas id="pomodoroRecordsChart"></canvas>
-          </div>
+          <!-- HTML Matrix Grid for Image 2 exact visual format -->
+          <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl overflow-x-auto custom-scrollbar"></div>
         </section>
 
-        <!-- Focus Time Goal Calendar & Activity Tracker (Ref: Screenshot 1) -->
+        <!-- Focus Time Goal Monthly Calendar (Ref: Screenshot 1) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
             <div>
@@ -555,15 +625,15 @@
               </p>
             </div>
 
-            <!-- View Switcher Tabs -->
-            <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1 rounded-xl border border-slate-300 dark:border-slate-800 text-xs">
-              <button id="focus-view-monthly" onclick="setFocusGoalView('monthly')" class="px-3 py-1 font-bold rounded-lg bg-amber-500 text-slate-900">Monthly Calendar</button>
-              <button id="focus-view-weekly" onclick="setFocusGoalView('weekly')" class="px-3 py-1 font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-amber-500">Weekly</button>
-              <button id="focus-view-yearly" onclick="setFocusGoalView('yearly')" class="px-3 py-1 font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-amber-500">Yearly</button>
+            <!-- Month & Year Navigation Controls -->
+            <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-amber-500">
+              <button onclick="prevFocusGoalMonth()" class="hover:text-amber-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
+              <span id="focus-calendar-month-year-label">July 2026</span>
+              <button onclick="nextFocusGoalMonth()" class="hover:text-amber-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
 
-          <!-- Calendar Heatmap Grid Display -->
+          <!-- Monthly Calendar Grid Display -->
           <div id="focus-goal-container" class="sub-box p-4 rounded-2xl"></div>
         </section>
 
@@ -1194,21 +1264,58 @@
       activeTaskId: null,
       activeWallSubject: 'FR',
       activeChapterSubject: 'FR',
-      pomoRecordFilter: 'daily',
-      focusGoalView: 'monthly',
+      focusGoalViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v20')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v20')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v20')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v21')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v21')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v21')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v20')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v20')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v21')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v21')) || [],
       currentChartTab: 'daily'
     };
 
     document.getElementById('task-date-input').value = state.selectedCalendarDate;
     document.getElementById('graph-date-picker').value = state.selectedCalendarDate;
+    document.getElementById('manual-date-input').value = state.selectedCalendarDate;
+
+    // Populate Manual Logger Hours Dropdown (0 to 23)
+    const manualHourSelect = document.getElementById('manual-hour-select');
+    for (let h = 0; h < 24; h++) {
+      const opt = document.createElement('option');
+      opt.value = h;
+      opt.textContent = `${h.toString().padStart(2, '0')}:00 - ${(h+1).toString().padStart(2, '0')}:00`;
+      if (h === new Date().getHours()) opt.selected = true;
+      manualHourSelect.appendChild(opt);
+    }
+
+    // Manual Study Time Logger Form Submit Handler
+    document.getElementById('manual-log-form').onsubmit = (e) => {
+      e.preventDefault();
+      const mins = parseInt(document.getElementById('manual-mins-input').value) || 0;
+      const sub = document.getElementById('manual-subject-select').value;
+      const type = document.getElementById('manual-type-select').value;
+      const date = document.getElementById('manual-date-input').value;
+      const hour = parseInt(document.getElementById('manual-hour-select').value) || 0;
+
+      if (mins <= 0 || !date) return;
+
+      state.logs.push({
+        date,
+        minutes: mins,
+        hour: hour,
+        subject: sub,
+        type: type,
+        timestamp: `${hour.toString().padStart(2, '0')}:00 (Manual)`
+      });
+
+      saveData();
+      updateMetricsAndCharts();
+      renderSessionHistory();
+      playAudioChime('complete');
+      alert(`🎉 Successfully manually logged ${mins} mins of ${sub} study!`);
+    };
 
     // Fullscreen Toggle
     const fullscreenBtn = document.getElementById('fullscreen-btn');
@@ -1375,7 +1482,7 @@
       setMode('work');
     }
 
-    // Task Management
+    // Task Management with Repositioned Uncongested Overdue Section & Flexible Date Picker Rescheduling
     const todoTaskListEl = document.getElementById('todo-task-list');
     const pendingTaskListEl = document.getElementById('pending-task-list');
     const completedTaskListEl = document.getElementById('completed-task-list');
@@ -1392,28 +1499,38 @@
 
       let completedCount = 0;
 
-      // Render Pending/Overdue Tasks
+      // Update Overdue Badge Count
+      document.getElementById('pending-task-count-badge').textContent = `${pendingTasks.length} Overdue`;
+
+      // Render Repositioned Spacious Overdue/Pending Tasks
       pendingTasks.forEach(task => {
         const taskEl = document.createElement('div');
-        taskEl.className = "p-3 rounded-xl border border-rose-500/40 bg-rose-500/10 dark:bg-rose-950/20 flex items-center justify-between gap-2";
+        taskEl.className = "sub-box p-3.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex flex-col justify-between gap-3 shadow-sm";
         taskEl.innerHTML = `
-          <div class="flex items-center gap-2 min-w-0">
-            <button onclick="toggleTaskCompletion('${task.id}')" class="text-rose-500 hover:text-emerald-500">
-              <i class="fa-regular fa-circle text-base"></i>
-            </button>
-            <div class="truncate">
-              <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${task.title}</p>
-              <p class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
-                Due: ${task.date} • <span class="font-bold">${task.subject}</span>
-              </p>
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <button onclick="toggleTaskCompletion('${task.id}')" class="text-rose-500 hover:text-emerald-500">
+                <i class="fa-regular fa-circle text-base"></i>
+              </button>
+              <div class="truncate">
+                <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${task.title}</p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                  <span class="text-indigo-500 font-bold">${task.subject}</span> • ${task.type}
+                </p>
+              </div>
             </div>
+            <span class="px-2 py-0.5 bg-rose-500/20 text-rose-500 text-[9px] font-bold rounded-md whitespace-nowrap">
+              Due: ${task.date}
+            </span>
           </div>
 
-          <div class="flex items-center gap-1.5">
-            <button onclick="rescheduleTaskToTomorrow('${task.id}')" title="Reschedule to Tomorrow" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg shadow-sm">
-              ⏩ Tomorrow
+          <div class="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-800/60">
+            <label class="text-[10px] text-slate-400 font-bold">Reschedule:</label>
+            <input type="date" id="reschedule-date-${task.id}" value="${todayStr}" class="input-field border rounded-lg px-2 py-1 text-[10px] flex-1">
+            <button onclick="reassignTaskCustomDate('${task.id}')" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold transition-all flex items-center gap-1 shadow-sm">
+              <i class="fa-solid fa-arrow-right"></i> Shift
             </button>
-            <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs p-1">
+            <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs px-1">
               <i class="fa-solid fa-trash"></i>
             </button>
           </div>
@@ -1466,29 +1583,32 @@
       });
 
       if (pendingTasks.length === 0) {
-        pendingTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-1">No overdue tasks!</p>`;
+        pendingTaskListEl.innerHTML = `<p class="col-span-full text-xs text-slate-500 italic p-2 text-center">🎉 No overdue or uncompleted tasks pending!</p>`;
       }
       if (todaysTasks.filter(t => !t.completed).length === 0) {
-        todoTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No active tasks for today!</p>`;
+        todoTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No active tasks scheduled for today!</p>`;
       }
       if (completedCount === 0) {
-        completedTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No completed tasks yet.</p>`;
+        completedTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No completed tasks today yet.</p>`;
       }
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updatePomoTaskDropdown();
     }
 
-    function rescheduleTaskToTomorrow(id) {
+    function reassignTaskCustomDate(id) {
+      const inputEl = document.getElementById(`reschedule-date-${id}`);
+      if (!inputEl) return;
+      const newDate = inputEl.value;
+
       const task = state.tasks.find(t => t.id === id);
-      if (task) {
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-        task.date = tomorrow.toISOString().split('T')[0];
+      if (task && newDate) {
+        task.date = newDate;
         saveData();
         renderTasks();
         renderCalendarGrid();
-        alert(`Rescheduled "${task.title}" to tomorrow (${task.date})!`);
+        playAudioChime('click');
+        alert(`Rescheduled "${task.title}" to ${newDate}!`);
       }
     }
 
@@ -1565,7 +1685,21 @@
       renderCalendarGrid();
     });
 
-    // Chapter Index Engine
+    // Chapter Index Engine with Custom Subject Folder Addition
+    function addNewSubjectFolder() {
+      const name = prompt("Enter New Subject Name (e.g. LAW, GST, SPM):");
+      if (name && name.trim()) {
+        const cleanName = name.trim().toUpperCase();
+        if (!state.subjects.includes(cleanName)) {
+          state.subjects.push(cleanName);
+          state.chapters[cleanName] = [];
+          state.activeChapterSubject = cleanName;
+          saveData();
+          renderChapterTracker();
+        }
+      }
+    }
+
     function renderChapterTracker() {
       const subjectTabsContainer = document.getElementById('chapter-subject-tabs');
       subjectTabsContainer.innerHTML = '';
@@ -1602,7 +1736,7 @@
       let completedChapters = 0;
 
       if (chapterList.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">No chapters in ${state.activeChapterSubject} index yet. Click "+ Add Custom Chapter" above to start building your index!</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">No chapters in ${state.activeChapterSubject} index yet. Click "+ Add Chapter" above to start building your index!</td></tr>`;
       } else {
         chapterList.forEach((ch, idx) => {
           if (ch.r1 && ch.r2) completedChapters++;
@@ -1672,34 +1806,67 @@
       }
     }
 
-    // Pomodoro Records Filter Switcher
-    function setPomoRecordFilter(mode) {
-      state.pomoRecordFilter = mode;
-      ['daily', 'weekly', 'yearly'].forEach(m => {
-        const btn = document.getElementById(`pomo-filter-${m}`);
-        if (btn) {
-          btn.className = mode === m 
-            ? "px-3 py-1 text-xs font-bold rounded-lg bg-purple-600 text-white transition-all"
-            : "px-3 py-1 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-purple-500 transition-all";
-        }
+    // Pomodoro Records Matrix Renderer (Ref Screenshot 2 - Descending Dates Y-Axis, 2-Hour Slots X-Axis)
+    function renderPomodoroMatrixGrid() {
+      const container = document.getElementById('pomo-matrix-container');
+      if (!container) return;
+      container.innerHTML = '';
+
+      const now = new Date();
+      const slots = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+
+      const table = document.createElement('table');
+      table.className = "w-full border-collapse text-xs";
+
+      // Header Row (X-Axis: 2-Hour Slots)
+      let theadHtml = `<thead><tr class="border-b border-slate-700/60 text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
+      slots.forEach(slot => {
+        theadHtml += `<th class="p-2 text-center font-mono">${slot}</th>`;
       });
-      updateMetricsAndCharts();
+      theadHtml += `</tr></thead>`;
+      table.innerHTML = theadHtml;
+
+      const tbody = document.createElement('tbody');
+      tbody.className = "divide-y divide-slate-800/40 font-mono";
+
+      // Last 15 Days Y-Axis (Today, Yesterday, 24 Jul, 23 Jul...)
+      for (let i = 0; i < 15; i++) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+
+        let label = `${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}`;
+        if (i === 0) label = "Today";
+        if (i === 1) label = "Yesterday";
+
+        const dayLogs = state.logs.filter(l => l.date === dateStr);
+
+        let rowHtml = `<tr><td class="p-2 text-slate-400 font-bold font-sans">${label}</td>`;
+
+        slots.forEach((slot, slotIdx) => {
+          const slotStartHour = slotIdx * 2;
+          const slotEndHour = slotStartHour + 1;
+
+          // Minutes logged in this 2-hour slot
+          const slotMins = dayLogs.filter(l => l.hour !== undefined && (l.hour === slotStartHour || l.hour === slotEndHour))
+                                  .reduce((a, c) => a + c.minutes, 0);
+
+          let bgStyle = "bg-slate-800/20";
+          if (slotMins >= 60) bgStyle = "bg-purple-600 text-white font-black shadow-sm";
+          else if (slotMins > 0) bgStyle = "bg-purple-500/40 text-purple-300 font-bold";
+
+          rowHtml += `<td class="p-2 text-center text-[10px] ${bgStyle} rounded-md border border-slate-900/60">${slotMins > 0 ? slotMins + 'm' : ''}</td>`;
+        });
+
+        rowHtml += `</tr>`;
+        tbody.innerHTML += rowHtml;
+      }
+
+      table.appendChild(tbody);
+      container.appendChild(table);
     }
 
-    // Focus Time Goal View Switcher
-    function setFocusGoalView(view) {
-      state.focusGoalView = view;
-      ['monthly', 'weekly', 'yearly'].forEach(v => {
-        const btn = document.getElementById(`focus-view-${v}`);
-        if (btn) {
-          btn.className = view === v
-            ? "px-3 py-1 font-bold rounded-lg bg-amber-500 text-slate-900"
-            : "px-3 py-1 font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-amber-500";
-        }
-      });
-      renderFocusGoalCalendar();
-    }
-
+    // Focus Time Goal Calendar (Ref Screenshot 1 - Monthly Calendar Grid with Month Nav)
     function setCustomFocusGoal() {
       const val = prompt("Enter Daily Study Focus Goal (in Hours):", state.dailyGoalHours);
       if (val && !isNaN(val) && parseFloat(val) > 0) {
@@ -1710,6 +1877,16 @@
       }
     }
 
+    function prevFocusGoalMonth() {
+      state.focusGoalViewDate.setMonth(state.focusGoalViewDate.getMonth() - 1);
+      renderFocusGoalCalendar();
+    }
+
+    function nextFocusGoalMonth() {
+      state.focusGoalViewDate.setMonth(state.focusGoalViewDate.getMonth() + 1);
+      renderFocusGoalCalendar();
+    }
+
     function renderFocusGoalCalendar() {
       const container = document.getElementById('focus-goal-container');
       if (!container) return;
@@ -1717,26 +1894,38 @@
 
       document.getElementById('focus-goal-badge').textContent = `Goal: ${state.dailyGoalHours}H`;
 
-      const now = new Date();
-      let daysCount = 30;
-      if (state.focusGoalView === 'weekly') daysCount = 7;
-      if (state.focusGoalView === 'yearly') daysCount = 365;
+      const viewDate = state.focusGoalViewDate;
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
+
+      document.getElementById('focus-calendar-month-year-label').textContent = 
+        viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
 
       let focusDays = 0;
       let completedGoalDays = 0;
 
       const grid = document.createElement('div');
-      grid.className = state.focusGoalView === 'weekly' 
-        ? "grid grid-cols-7 gap-3 text-center" 
-        : state.focusGoalView === 'monthly'
-        ? "grid grid-cols-5 sm:grid-cols-10 gap-2 text-center"
-        : "grid grid-cols-12 gap-1.5 text-center";
+      grid.className = "grid grid-cols-7 gap-2 text-center text-xs";
 
-      for (let i = daysCount - 1; i >= 0; i--) {
-        const d = new Date(now);
-        d.setDate(now.getDate() - i);
-        const dateStr = d.toISOString().split('T')[0];
+      // Days Headers
+      ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(dayName => {
+        const h = document.createElement('div');
+        h.className = "font-bold text-slate-500 dark:text-slate-400 py-1";
+        h.textContent = dayName;
+        grid.appendChild(h);
+      });
 
+      // Offset padding cells
+      const padOffset = (firstDay + 6) % 7; // Convert Sun-first to Mon-first
+      for (let p = 0; p < padOffset; p++) {
+        grid.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         const dayMins = state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0);
         const hrs = dayMins / 60;
 
@@ -1746,17 +1935,17 @@
         const isGoalMet = hrs >= state.dailyGoalHours;
 
         const cell = document.createElement('div');
-        cell.className = `p-2 rounded-xl flex flex-col justify-between h-14 text-[10px] font-bold ${
+        cell.className = `p-2 rounded-xl flex flex-col justify-between h-14 font-bold border transition-all ${
           isGoalMet 
-            ? 'bg-amber-500 text-slate-900 shadow-md' 
+            ? 'bg-amber-500 text-slate-900 border-amber-400 shadow-md' 
             : hrs > 0 
-            ? 'bg-amber-500/20 text-amber-500 border border-amber-500/30' 
-            : 'bg-slate-200 dark:bg-slate-800/60 text-slate-400'
+            ? 'bg-amber-500/20 text-amber-500 border-amber-500/30' 
+            : 'sub-box text-slate-400'
         }`;
 
         cell.innerHTML = `
-          <span class="opacity-80">${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}</span>
-          <span class="text-xs font-black">${hrs.toFixed(1)}h</span>
+          <span class="text-[10px] text-right">${day}</span>
+          <span class="text-xs font-black">${hrs > 0 ? hrs.toFixed(1) + 'h' : '-'}</span>
         `;
         grid.appendChild(cell);
       }
@@ -1885,7 +2074,7 @@
         subjects: state.subjects,
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v20'),
+        examDate: localStorage.getItem('sp_exam_date_v21'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -1977,7 +2166,7 @@
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v20', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v21', data.examDate);
 
       saveData();
       renderTasks();
@@ -2180,7 +2369,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v20');
+      const savedDate = localStorage.getItem('sp_exam_date_v21');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2192,14 +2381,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v20', val);
+        localStorage.setItem('sp_exam_date_v21', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v20');
+      const savedDate = localStorage.getItem('sp_exam_date_v21');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2213,7 +2402,7 @@
     }
 
     // Charts Engine
-    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart, pomodoroRecordsChart;
+    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
       // Overview Spline
@@ -2238,15 +2427,6 @@
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
-      });
-
-      // Pomodoro Time-of-Day 2-Hour Slots Chart (0:00 to 22:00)
-      const ctxPomoRec = document.getElementById('pomodoroRecordsChart').getContext('2d');
-      const timeSlots = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-      pomodoroRecordsChart = new Chart(ctxPomoRec, {
-        type: 'bar',
-        data: { labels: timeSlots, datasets: [{ label: 'Mins Logged', data: Array(12).fill(0), backgroundColor: 'rgba(168, 85, 247, 0.6)', borderColor: 'rgba(168, 85, 247, 1)', borderWidth: 1, borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       // Date-Wise Bar Chart
@@ -2291,16 +2471,8 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      // Pomodoro Time-of-Day 2-Hour Slot Records Data
-      const slotMins = Array(12).fill(0);
-      state.logs.forEach(l => {
-        if (l.hour !== undefined && l.hour >= 0 && l.hour < 24) {
-          const slotIndex = Math.floor(l.hour / 2);
-          slotMins[slotIndex] += l.minutes;
-        }
-      });
-      pomodoroRecordsChart.data.datasets[0].data = slotMins;
-      pomodoroRecordsChart.update();
+      // Render Pomodoro Matrix Grid
+      renderPomodoroMatrixGrid();
 
       // Date-Wise Fixed 0 to 18 Bar Chart Data
       const dateMins = subjects.map(sub => {
@@ -2395,7 +2567,7 @@
       const textColor = isDark ? '#94a3b8' : '#334155';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)';
 
-      [overviewSplineChart, studySplineChart, dateWiseBarChart, pomodoroRecordsChart].forEach(chart => {
+      [overviewSplineChart, studySplineChart, dateWiseBarChart].forEach(chart => {
         chart.options.scales.y.ticks.color = textColor;
         chart.options.scales.y.grid.color = gridColor;
         chart.options.scales.x.ticks.color = textColor;
@@ -2408,11 +2580,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v20', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v20', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v20', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v20', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v20', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v21', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v21', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v21', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v21', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v21', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
