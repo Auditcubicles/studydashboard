@@ -593,7 +593,7 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Proportional Time-of-Day Grid Ref: Screenshot 2 & Image 1) -->
+        <!-- Pomodoro Records (Proportional Time-of-Day Grid Ref: Screenshot 2) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
@@ -658,7 +658,7 @@
         </section>
       </div>
 
-      <!-- PAGE 6: SESSION LOGS PAGE (LIGHT MODE TEXT CONTRAST FIX & DELETION) -->
+      <!-- PAGE 6: SESSION LOGS PAGE (ROBUST DELETION FIX & LIGHT MODE CONTRAST) -->
       <div id="page-history" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -1130,7 +1130,7 @@
       renderPomodoroMatrixGrid();
     };
 
-    // Full CA Final Chapter Index Data Loaded Directly from PDF Source
+    // Default Chapter Data
     const defaultChaptersData = {
       "FR": [
         { id: 'fr_1', name: 'Ind AS 115 - Revenue from Contracts with Customers', r1: false, r2: false, r3: false, r4: false },
@@ -1246,7 +1246,8 @@
       ]
     };
 
-    // App State
+    // Load State with Auto ID Generation for Legacy Log Deletion
+    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v24')) || [];
     let state = {
       timer: {
         mode: 'work',
@@ -1263,13 +1264,16 @@
       activeChapterSubject: 'FR',
       focusGoalViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v23')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v23')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v23')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v24')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v24')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v24')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v23')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v23')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v24')) || [],
+      logs: rawLogs.map(l => {
+        if (!l.id) l.id = Date.now().toString() + Math.random().toString(36).substr(2, 4);
+        return l;
+      }),
       currentChartTab: 'daily'
     };
 
@@ -1287,7 +1291,7 @@
       manualHourSelect.appendChild(opt);
     }
 
-    // Manual Study Time Logger Form Submit Handler
+    // Manual Form Submit
     document.getElementById('manual-log-form').onsubmit = (e) => {
       e.preventDefault();
       const mins = parseInt(document.getElementById('manual-mins-input').value) || 0;
@@ -1312,7 +1316,7 @@
       updateMetricsAndCharts();
       renderSessionHistory();
       playAudioChime('complete');
-      alert(`🎉 Successfully manually logged ${mins} mins of ${sub} study!`);
+      alert(`🎉 Successfully logged ${mins} mins of ${sub} study!`);
     };
 
     // Fullscreen Toggle
@@ -1499,10 +1503,8 @@
 
       let completedCount = 0;
 
-      // Update Overdue Badge Count
       document.getElementById('pending-task-count-badge').textContent = `${pendingTasks.length} Overdue`;
 
-      // Render Repositioned Spacious Overdue/Pending Tasks
       pendingTasks.forEach(task => {
         const taskEl = document.createElement('div');
         taskEl.className = "sub-box p-3.5 rounded-2xl border border-rose-500/30 bg-rose-500/10 flex flex-col justify-between gap-3 shadow-sm";
@@ -1538,7 +1540,6 @@
         pendingTaskListEl.appendChild(taskEl);
       });
 
-      // Render Today's Tasks
       todaysTasks.forEach(task => {
         if (task.completed) completedCount++;
 
@@ -1806,7 +1807,7 @@
       }
     }
 
-    // Transparent Empty Blocks Pomodoro Records Matrix Renderer (Ref Screenshot 1 / Image 5771bd)
+    // Transparent Block Pomodoro Records Matrix Renderer
     function renderPomodoroMatrixGrid() {
       const container = document.getElementById('pomo-matrix-container');
       if (!container) return;
@@ -1818,7 +1819,6 @@
       const table = document.createElement('table');
       table.className = "w-full border-collapse text-xs";
 
-      // Header Row (X-Axis: 2-Hour Slots)
       let theadHtml = `<thead><tr class="border-b border-slate-300 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
       slots.forEach(slot => {
         theadHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
@@ -1829,7 +1829,6 @@
       const tbody = document.createElement('tbody');
       tbody.className = "divide-y divide-slate-200 dark:divide-slate-800/40 font-mono";
 
-      // Last 15 Days Y-Axis (Today, Yesterday, 24 Jul, 23 Jul...)
       for (let i = 0; i < 15; i++) {
         const d = new Date(now);
         d.setDate(now.getDate() - i);
@@ -1847,11 +1846,9 @@
           const slotStartHour = slotIdx * 2;
           const slotEndHour = slotStartHour + 1;
 
-          // Minutes logged in this 2-hour slot (max 120 mins = 100%)
           const slotMins = dayLogs.filter(l => l.hour !== undefined && (l.hour === slotStartHour || l.hour === slotEndHour))
                                   .reduce((a, c) => a + c.minutes, 0);
 
-          // Proportional width percentage (0% to 100%)
           const fillPct = Math.min(100, Math.round((slotMins / 120) * 100));
 
           rowHtml += `
@@ -1871,7 +1868,7 @@
       container.appendChild(table);
     }
 
-    // Focus Time Goal Calendar (Ref Screenshot 1 - Monthly Calendar Grid with Month Nav)
+    // Focus Goal Calendar
     function setCustomFocusGoal() {
       const val = prompt("Enter Daily Study Focus Goal (in Hours):", state.dailyGoalHours);
       if (val && !isNaN(val) && parseFloat(val) > 0) {
@@ -1915,7 +1912,6 @@
       const grid = document.createElement('div');
       grid.className = "grid grid-cols-7 gap-2 text-center text-xs";
 
-      // Days Headers
       ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'].forEach(dayName => {
         const h = document.createElement('div');
         h.className = "font-bold text-slate-500 dark:text-slate-400 py-1";
@@ -1923,8 +1919,7 @@
         grid.appendChild(h);
       });
 
-      // Offset padding cells
-      const padOffset = (firstDay + 6) % 7; // Convert Sun-first to Mon-first
+      const padOffset = (firstDay + 6) % 7;
       for (let p = 0; p < padOffset; p++) {
         grid.appendChild(document.createElement('div'));
       }
@@ -2079,7 +2074,7 @@
         subjects: state.subjects,
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v23'),
+        examDate: localStorage.getItem('sp_exam_date_v24'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2167,11 +2162,16 @@
 
     function applyImportData(data) {
       if (data.tasks && Array.isArray(data.tasks)) state.tasks = data.tasks;
-      if (data.logs && Array.isArray(data.logs)) state.logs = data.logs;
+      if (data.logs && Array.isArray(data.logs)) {
+        state.logs = data.logs.map(l => {
+          if (!l.id) l.id = Date.now().toString() + Math.random().toString(36).substr(2, 4);
+          return l;
+        });
+      }
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v23', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v24', data.examDate);
 
       saveData();
       renderTasks();
@@ -2336,13 +2336,20 @@
     }
     function closeStreakModal() { streakModal.classList.add('hidden'); }
 
-    // Session History Engine with Date/Month Segregation, Deletion, and High Light-Mode Contrast
-    function deleteSingleLog(logId) {
+    // Session History Engine with Robust Fallback Matcher Deletion
+    function deleteSingleLog(targetId, date, timestamp, minutes, subject) {
       if (confirm('Delete this specific study session entry?')) {
-        state.logs = state.logs.filter(l => l.id !== logId);
+        // Dual matcher: Match by ID or by exact attributes if legacy log
+        state.logs = state.logs.filter(l => {
+          if (l.id && targetId && l.id === targetId) return false;
+          if (l.date === date && l.timestamp === timestamp && l.minutes === minutes && l.subject === subject) return false;
+          return true;
+        });
+
         saveData();
         renderSessionHistory();
         updateMetricsAndCharts();
+        playAudioChime('click');
       }
     }
 
@@ -2356,7 +2363,6 @@
         return;
       }
 
-      // Populate Month Filter Dropdown Options
       const monthSet = new Set();
       state.logs.forEach(l => {
         const logDate = new Date(l.date);
@@ -2377,7 +2383,6 @@
         monthFilterSelect.appendChild(opt);
       });
 
-      // Filter Logs by Selected Month
       const activeFilter = monthFilterSelect.value;
       let filteredLogs = [...state.logs];
 
@@ -2390,7 +2395,6 @@
         return;
       }
 
-      // Group Logs Date-Wise
       const groupedByDate = {};
       filteredLogs.forEach(log => {
         if (!groupedByDate[log.date]) groupedByDate[log.date] = [];
@@ -2438,15 +2442,19 @@
               <tbody class="divide-y divide-slate-200 dark:divide-slate-800/30">
         `;
 
-        dateLogs.reverse().forEach(log => {
+        [...dateLogs].reverse().forEach(log => {
+          const safeId = log.id || '';
+          const safeTimestamp = log.timestamp || 'Recorded';
+          const safeSub = log.subject || 'General';
+
           blockHtml += `
             <tr class="hover:bg-slate-100 dark:hover:bg-slate-800/20 transition-colors">
-              <td class="p-2"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-extrabold">${log.subject || 'General'}</span></td>
+              <td class="p-2"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-400 font-extrabold">${safeSub}</span></td>
               <td class="p-2 text-slate-800 dark:text-slate-200 font-semibold">${log.type || 'Study'}</td>
               <td class="p-2 font-bold text-emerald-600 dark:text-emerald-400">${log.minutes} mins</td>
-              <td class="p-2 text-slate-600 dark:text-slate-400 font-mono text-[10px] font-bold">${log.timestamp || 'Recorded'}</td>
+              <td class="p-2 text-slate-600 dark:text-slate-400 font-mono text-[10px] font-bold">${safeTimestamp}</td>
               <td class="p-2 text-right">
-                <button onclick="deleteSingleLog('${log.id}')" class="text-slate-500 hover:text-rose-600 dark:text-slate-400 dark:hover:text-rose-400 text-xs px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-all font-bold">
+                <button onclick="deleteSingleLog('${safeId}', '${log.date}', '${safeTimestamp}', ${log.minutes}, '${safeSub}')" class="text-rose-500 hover:text-rose-700 dark:text-rose-400 dark:hover:text-rose-300 text-xs px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-all font-bold">
                   <i class="fa-solid fa-trash-can"></i> Delete
                 </button>
               </td>
@@ -2474,7 +2482,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v23');
+      const savedDate = localStorage.getItem('sp_exam_date_v24');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2486,14 +2494,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v23', val);
+        localStorage.setItem('sp_exam_date_v24', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v23');
+      const savedDate = localStorage.getItem('sp_exam_date_v24');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2685,11 +2693,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v23', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v23', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v23', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v23', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v23', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v24', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v24', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v24', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v24', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v24', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
