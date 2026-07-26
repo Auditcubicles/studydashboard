@@ -508,7 +508,7 @@
         </div>
       </div>
 
-      <!-- PAGE 4: CHAPTER INDEX & REVISION TRACKER TAB (LOADED FROM PDF + CUSTOM SUBJECT ADDITION) -->
+      <!-- PAGE 4: CHAPTER INDEX & REVISION TRACKER TAB -->
       <div id="page-chapters" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -593,18 +593,18 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Time-of-Day 2-Hour Matrix Records Ref: Screenshot 2) -->
+        <!-- Pomodoro Records (Proportional Time-of-Day Grid Ref: Screenshot 2) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Grid)
+                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Visual Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Visual matrix displaying study focus across 2-hour slots for recent days</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Proportional fill blocks showing actual study duration in 2-hour slots</p>
             </div>
           </div>
 
-          <!-- HTML Matrix Grid for Image 2 exact visual format -->
+          <!-- Proportional Fill HTML Matrix Grid -->
           <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl overflow-x-auto custom-scrollbar"></div>
         </section>
 
@@ -658,33 +658,29 @@
         </section>
       </div>
 
-      <!-- PAGE 6: SESSION LOGS PAGE -->
+      <!-- PAGE 6: SESSION LOGS PAGE (WITH DATE/MONTH SEGREGATION & INDIVIDUAL DELETION) -->
       <div id="page-history" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
-          <div class="flex justify-between items-center mb-6">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Date-Wise Session Logs
+                <i class="fa-solid fa-clock-rotate-left text-indigo-500"></i> Date-Wise & Month-Wise Session Logs
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Complete record of every study session completed</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Filter, inspect, and manually manage individual study logs</p>
             </div>
-            <button id="clear-history-btn" class="text-xs text-rose-500 hover:text-rose-600 font-bold">Clear Logs</button>
+
+            <!-- Month Filter Select -->
+            <div class="flex items-center gap-3">
+              <label class="text-xs text-slate-500 dark:text-slate-400 font-bold">Filter Month:</label>
+              <select id="log-month-filter" onchange="renderSessionHistory()" class="input-field border rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none">
+                <option value="all">All Months</option>
+              </select>
+              <button id="clear-history-btn" class="text-xs text-rose-500 hover:text-rose-600 font-bold ml-2">Clear All</button>
+            </div>
           </div>
 
-          <div class="overflow-x-auto custom-scrollbar">
-            <table class="w-full text-left text-xs border-collapse">
-              <thead>
-                <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
-                  <th class="p-3">Date</th>
-                  <th class="p-3">Subject</th>
-                  <th class="p-3">Study Type</th>
-                  <th class="p-3">Duration</th>
-                  <th class="p-3">Timestamp</th>
-                </tr>
-              </thead>
-              <tbody id="session-history-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
-            </table>
-          </div>
+          <!-- Segregated Grouped Table Container -->
+          <div id="segregated-logs-container" class="space-y-6"></div>
         </section>
       </div>
 
@@ -1081,7 +1077,7 @@
       scheduler: "Advance Study Scheduler",
       chapters: "CA Final Chapter Index & Revision Tracker",
       analytics: "Graphical Analytics & Focus Pattern",
-      history: "Date-Wise Session Logs",
+      history: "Date-Wise & Month-Wise Session Logs",
       wall: "Subject Memory Wall & Formula Board",
       backup: "Data Backup & 1-Click File Transfer"
     };
@@ -1266,13 +1262,13 @@
       activeChapterSubject: 'FR',
       focusGoalViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v21')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v21')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v21')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v22')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v22')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v22')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v21')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v21')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v22')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v22')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1302,6 +1298,7 @@
       if (mins <= 0 || !date) return;
 
       state.logs.push({
+        id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
         date,
         minutes: mins,
         hour: hour,
@@ -1433,6 +1430,7 @@
         const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
 
         state.logs.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
           date: today,
           minutes: elapsedMinutes,
           hour: new Date().getHours(),
@@ -1462,6 +1460,7 @@
         const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
 
         state.logs.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
           date: today,
           minutes: state.timer.workDuration,
           hour: new Date().getHours(),
@@ -1482,7 +1481,7 @@
       setMode('work');
     }
 
-    // Task Management with Repositioned Uncongested Overdue Section & Flexible Date Picker Rescheduling
+    // Task Management
     const todoTaskListEl = document.getElementById('todo-task-list');
     const pendingTaskListEl = document.getElementById('pending-task-list');
     const completedTaskListEl = document.getElementById('completed-task-list');
@@ -1685,7 +1684,7 @@
       renderCalendarGrid();
     });
 
-    // Chapter Index Engine with Custom Subject Folder Addition
+    // Chapter Index Engine
     function addNewSubjectFolder() {
       const name = prompt("Enter New Subject Name (e.g. LAW, GST, SPM):");
       if (name && name.trim()) {
@@ -1806,7 +1805,7 @@
       }
     }
 
-    // Pomodoro Records Matrix Renderer (Ref Screenshot 2 - Descending Dates Y-Axis, 2-Hour Slots X-Axis)
+    // Proportional Fill Pomodoro Records Matrix Renderer (Ref Screenshot 2)
     function renderPomodoroMatrixGrid() {
       const container = document.getElementById('pomo-matrix-container');
       if (!container) return;
@@ -1821,7 +1820,7 @@
       // Header Row (X-Axis: 2-Hour Slots)
       let theadHtml = `<thead><tr class="border-b border-slate-700/60 text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
       slots.forEach(slot => {
-        theadHtml += `<th class="p-2 text-center font-mono">${slot}</th>`;
+        theadHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
       });
       theadHtml += `</tr></thead>`;
       table.innerHTML = theadHtml;
@@ -1847,15 +1846,20 @@
           const slotStartHour = slotIdx * 2;
           const slotEndHour = slotStartHour + 1;
 
-          // Minutes logged in this 2-hour slot
+          // Minutes logged in this 2-hour slot (max 120 mins = 100%)
           const slotMins = dayLogs.filter(l => l.hour !== undefined && (l.hour === slotStartHour || l.hour === slotEndHour))
                                   .reduce((a, c) => a + c.minutes, 0);
 
-          let bgStyle = "bg-slate-800/20";
-          if (slotMins >= 60) bgStyle = "bg-purple-600 text-white font-black shadow-sm";
-          else if (slotMins > 0) bgStyle = "bg-purple-500/40 text-purple-300 font-bold";
+          // Proportional width percentage (0% to 100%)
+          const fillPct = Math.min(100, Math.round((slotMins / 120) * 100));
 
-          rowHtml += `<td class="p-2 text-center text-[10px] ${bgStyle} rounded-md border border-slate-900/60">${slotMins > 0 ? slotMins + 'm' : ''}</td>`;
+          rowHtml += `
+            <td class="p-1 text-center align-middle">
+              <div class="w-full bg-slate-800/50 rounded-md h-5 border border-slate-700/40 overflow-hidden relative" title="${slotMins} mins studied">
+                <div class="bg-purple-600 h-full transition-all duration-500" style="width: ${fillPct}%;"></div>
+              </div>
+            </td>
+          `;
         });
 
         rowHtml += `</tr>`;
@@ -2074,7 +2078,7 @@
         subjects: state.subjects,
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v21'),
+        examDate: localStorage.getItem('sp_exam_date_v22'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2166,7 +2170,7 @@
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v21', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v22', data.examDate);
 
       saveData();
       renderTasks();
@@ -2331,32 +2335,132 @@
     }
     function closeStreakModal() { streakModal.classList.add('hidden'); }
 
-    // Session History
+    // Session History Engine with Date/Month Segregation & Individual Delete
+    function deleteSingleLog(logId) {
+      if (confirm('Delete this specific study session entry?')) {
+        state.logs = state.logs.filter(l => l.id !== logId);
+        saveData();
+        renderSessionHistory();
+        updateMetricsAndCharts();
+      }
+    }
+
     function renderSessionHistory() {
-      const tbody = document.getElementById('session-history-table-body');
-      tbody.innerHTML = '';
+      const container = document.getElementById('segregated-logs-container');
+      const monthFilterSelect = document.getElementById('log-month-filter');
+      container.innerHTML = '';
 
       if (state.logs.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">No study sessions logged yet.</td></tr>`;
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 italic sub-box rounded-2xl">No study sessions recorded yet.</div>`;
         return;
       }
 
-      [...state.logs].reverse().forEach(log => {
-        const row = document.createElement('tr');
-        row.className = "hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors";
-        row.innerHTML = `
-          <td class="p-3 font-mono font-semibold">${log.date}</td>
-          <td class="p-3"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
-          <td class="p-3 text-slate-700 dark:text-slate-300">${log.type || 'Study'}</td>
-          <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">${log.minutes} mins</td>
-          <td class="p-3 text-slate-500 dark:text-slate-400">${log.timestamp || 'Recorded'}</td>
+      // Populate Month Filter Dropdown Options
+      const monthSet = new Set();
+      state.logs.forEach(l => {
+        const logDate = new Date(l.date);
+        const mKey = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+        monthSet.add(mKey);
+      });
+
+      const currentSelectedMonth = monthFilterSelect.value;
+      monthFilterSelect.innerHTML = `<option value="all">All Months</option>`;
+      Array.from(monthSet).sort().reverse().forEach(mKey => {
+        const [y, m] = mKey.split('-');
+        const dateObj = new Date(y, m - 1, 1);
+        const label = dateObj.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+        const opt = document.createElement('option');
+        opt.value = mKey;
+        opt.textContent = label;
+        if (currentSelectedMonth === mKey) opt.selected = true;
+        monthFilterSelect.appendChild(opt);
+      });
+
+      // Filter Logs by Selected Month
+      const activeFilter = monthFilterSelect.value;
+      let filteredLogs = [...state.logs];
+
+      if (activeFilter !== 'all') {
+        filteredLogs = filteredLogs.filter(l => l.date.startsWith(activeFilter));
+      }
+
+      if (filteredLogs.length === 0) {
+        container.innerHTML = `<div class="p-8 text-center text-slate-500 italic sub-box rounded-2xl">No study logs found for the selected month filter.</div>`;
+        return;
+      }
+
+      // Group Logs Date-Wise
+      const groupedByDate = {};
+      filteredLogs.forEach(log => {
+        if (!groupedByDate[log.date]) groupedByDate[log.date] = [];
+        groupedByDate[log.date].push(log);
+      });
+
+      const sortedDates = Object.keys(groupedByDate).sort().reverse();
+      const todayStr = new Date().toISOString().split('T')[0];
+      const yesterdayObj = new Date();
+      yesterdayObj.setDate(yesterdayObj.getDate() - 1);
+      const yesterdayStr = yesterdayObj.toISOString().split('T')[0];
+
+      sortedDates.forEach(dateStr => {
+        const dateLogs = groupedByDate[dateStr];
+        const dayTotalMins = dateLogs.reduce((a, c) => a + c.minutes, 0);
+
+        let dateLabel = dateStr;
+        if (dateStr === todayStr) dateLabel = "Today (" + dateStr + ")";
+        else if (dateStr === yesterdayStr) dateLabel = "Yesterday (" + dateStr + ")";
+
+        const dateGroupBlock = document.createElement('div');
+        dateGroupBlock.className = "sub-box p-4 rounded-2xl border border-slate-700/50 shadow-sm space-y-3";
+
+        let blockHtml = `
+          <div class="flex justify-between items-center border-b border-slate-700/40 pb-2">
+            <h4 class="font-bold text-xs text-indigo-400 flex items-center gap-2">
+              <i class="fa-solid fa-calendar-day"></i> ${dateLabel}
+            </h4>
+            <span class="px-2.5 py-0.5 bg-indigo-500/20 text-indigo-300 font-extrabold text-[10px] rounded-lg">
+              Day Total: ${(dayTotalMins / 60).toFixed(1)} hrs (${dayTotalMins} mins)
+            </span>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="text-slate-500 dark:text-slate-400 font-bold border-b border-slate-800/40">
+                  <th class="p-2">Subject</th>
+                  <th class="p-2">Study Type</th>
+                  <th class="p-2">Duration</th>
+                  <th class="p-2">Logged Time</th>
+                  <th class="p-2 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-800/30">
         `;
-        tbody.appendChild(row);
+
+        dateLogs.reverse().forEach(log => {
+          blockHtml += `
+            <tr class="hover:bg-slate-800/20 transition-colors">
+              <td class="p-2"><span class="px-2 py-0.5 rounded bg-indigo-950/60 text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
+              <td class="p-2 text-slate-300">${log.type || 'Study'}</td>
+              <td class="p-2 font-bold text-emerald-400">${log.minutes} mins</td>
+              <td class="p-2 text-slate-400 font-mono text-[10px]">${log.timestamp || 'Recorded'}</td>
+              <td class="p-2 text-right">
+                <button onclick="deleteSingleLog('${log.id}')" class="text-slate-400 hover:text-rose-500 text-xs px-2 py-1 rounded-lg hover:bg-rose-500/10 transition-all">
+                  <i class="fa-solid fa-trash-can"></i> Delete
+                </button>
+              </td>
+            </tr>
+          `;
+        });
+
+        blockHtml += `</tbody></table></div>`;
+        dateGroupBlock.innerHTML = blockHtml;
+        container.appendChild(dateGroupBlock);
       });
     }
 
     document.getElementById('clear-history-btn').onclick = () => {
-      if (confirm('Clear all historical session logs?')) {
+      if (confirm('Clear all historical session logs completely?')) {
         state.logs = [];
         saveData();
         renderSessionHistory();
@@ -2369,7 +2473,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v21');
+      const savedDate = localStorage.getItem('sp_exam_date_v22');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2381,14 +2485,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v21', val);
+        localStorage.setItem('sp_exam_date_v22', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v21');
+      const savedDate = localStorage.getItem('sp_exam_date_v22');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2580,11 +2684,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v21', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v21', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v21', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v21', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v21', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v22', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v22', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v22', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v22', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v22', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
