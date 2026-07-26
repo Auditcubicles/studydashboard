@@ -103,25 +103,28 @@
 
       <!-- Navigation Tabs -->
       <nav class="flex flex-wrap justify-center bg-slate-200 dark:bg-slate-900/60 p-1 rounded-2xl border border-slate-300 dark:border-slate-800/80">
-        <button id="nav-overview" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-2">
+        <button id="nav-overview" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-1.5">
           <i class="fa-solid fa-chart-pie"></i> Holistic Report
         </button>
-        <button id="nav-pomodoro" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-pomodoro" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-stopwatch"></i> Focus Timer
         </button>
-        <button id="nav-scheduler" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-scheduler" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-calendar-days"></i> Scheduler
         </button>
-        <button id="nav-analytics" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-chapters" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
+          <i class="fa-solid fa-book-open"></i> Chapter Index
+        </button>
+        <button id="nav-analytics" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-chart-line"></i> Analytics
         </button>
-        <button id="nav-history" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-history" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-clock-rotate-left"></i> Logs
         </button>
-        <button id="nav-wall" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-wall" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-note-sticky"></i> Memory Wall
         </button>
-        <button id="nav-backup" class="nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2">
+        <button id="nav-backup" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-floppy-disk"></i> Data Backup
         </button>
       </nav>
@@ -382,14 +385,26 @@
                 </button>
               </form>
 
+              <!-- Segregated Task Lists -->
               <div class="space-y-4">
+                <!-- Overdue & Uncompleted Tasks Section -->
+                <div>
+                  <h4 class="text-xs font-bold text-rose-500 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-clock-rotate-left"></i> Overdue / Pending Tasks
+                  </h4>
+                  <div id="pending-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
+                </div>
+
+                <!-- Today's Active Tasks -->
                 <div>
                   <h4 class="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-2">Today's To-Do</h4>
-                  <div id="todo-task-list" class="space-y-2 max-h-48 overflow-y-auto custom-scrollbar pr-1"></div>
+                  <div id="todo-task-list" class="space-y-2 max-h-40 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
+
+                <!-- Completed Tasks -->
                 <div>
                   <h4 class="text-xs font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider mb-2">Completed Today</h4>
-                  <div id="completed-task-list" class="space-y-2 max-h-36 overflow-y-auto custom-scrollbar pr-1"></div>
+                  <div id="completed-task-list" class="space-y-2 max-h-32 overflow-y-auto custom-scrollbar pr-1"></div>
                 </div>
               </div>
             </section>
@@ -425,7 +440,62 @@
         </div>
       </div>
 
-      <!-- PAGE 4: DETAILED ANALYTICS PAGE -->
+      <!-- PAGE 4: CHAPTER INDEX & REVISION TRACKER TAB -->
+      <div id="page-chapters" class="page-view hidden space-y-8">
+        <section class="glass-card p-6 rounded-2xl">
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div>
+              <h3 class="text-lg font-bold flex items-center gap-2">
+                <i class="fa-solid fa-book-open text-indigo-500"></i> CA Final Chapter Index & Revision Tracker
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Track chapter-wise revision ticks (R1, R2, R3, R4) for each core subject</p>
+            </div>
+
+            <button onclick="addNewChapterToSubject()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 shadow-md">
+              <i class="fa-solid fa-plus"></i> + Add Custom Chapter
+            </button>
+          </div>
+
+          <!-- Subject Tabs -->
+          <div id="chapter-subject-tabs" class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 dark:border-slate-800/80 pb-4"></div>
+
+          <!-- Active Subject Chapters Card -->
+          <div class="sub-box p-5 rounded-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
+              <div>
+                <h4 id="active-chapter-subject-title" class="text-base font-black text-indigo-600 dark:text-indigo-400">
+                  Financial Reporting (FR) Index
+                </h4>
+                <p id="active-subject-progress-text" class="text-xs text-slate-500 dark:text-slate-400">Progress: 0 / 0 Chapters Completed</p>
+              </div>
+
+              <!-- Subject Completion Bar -->
+              <div class="w-full sm:w-48 bg-slate-200 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
+                <div id="subject-revision-progress-bar" class="bg-emerald-500 h-full w-0 transition-all"></div>
+              </div>
+            </div>
+
+            <!-- Chapter Table / List -->
+            <div class="overflow-x-auto custom-scrollbar">
+              <table class="w-full text-left text-xs">
+                <thead>
+                  <tr class="border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold">
+                    <th class="p-3">Chapter / Topic Name</th>
+                    <th class="p-3 text-center">1st Rev (R1)</th>
+                    <th class="p-3 text-center">2nd Rev (R2)</th>
+                    <th class="p-3 text-center">3rd Rev (R3)</th>
+                    <th class="p-3 text-center">4th Rev (R4)</th>
+                    <th class="p-3 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="chapter-index-table-body" class="divide-y divide-slate-200 dark:divide-slate-800/60"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <!-- PAGE 5: DETAILED ANALYTICS PAGE -->
       <div id="page-analytics" class="page-view hidden space-y-8">
         
         <!-- Spline Progress Graph -->
@@ -450,6 +520,26 @@
           </div>
         </section>
 
+        <!-- Hourly Focus Distribution Chart (At what time of day you study) -->
+        <section class="glass-card p-6 rounded-2xl">
+          <h3 class="text-base font-bold mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-business-time text-purple-500"></i> Hourly Study Pattern Record (Time of Day Breakdown)
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Total study minutes logged per hour of the day (00:00 to 23:00)</p>
+          <div class="relative h-60 w-full">
+            <canvas id="hourlyDistributionChart"></canvas>
+          </div>
+        </section>
+
+        <!-- Focus Time Goal Calendar Activity Heatmap Grid -->
+        <section class="glass-card p-6 rounded-2xl">
+          <h3 class="text-base font-bold mb-1 flex items-center gap-2">
+            <i class="fa-solid fa-grip text-amber-500"></i> Focus Activity & Daily Goal Calendar Grid
+          </h3>
+          <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Visual breakdown of daily study goals completed over the last 30 days</p>
+          <div id="activity-heatmap-grid" class="grid grid-cols-5 sm:grid-cols-10 md:grid-cols-15 gap-2"></div>
+        </section>
+
         <!-- Date-Wise Specific Day Analysis Graph -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
@@ -471,7 +561,7 @@
         </section>
       </div>
 
-      <!-- PAGE 5: SESSION LOGS PAGE -->
+      <!-- PAGE 6: SESSION LOGS PAGE -->
       <div id="page-history" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex justify-between items-center mb-6">
@@ -501,7 +591,7 @@
         </section>
       </div>
 
-      <!-- PAGE 6: SUBJECT MEMORY WALL & FORMULA PINBOARD -->
+      <!-- PAGE 7: SUBJECT MEMORY WALL & FORMULA PINBOARD -->
       <div id="page-wall" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -543,7 +633,7 @@
         </section>
       </div>
 
-      <!-- PAGE 7: DEDICATED 1-CLICK OFFLINE BACKUP & RESTORE PAGE -->
+      <!-- PAGE 8: DEDICATED 1-CLICK OFFLINE BACKUP & RESTORE PAGE -->
       <div id="page-backup" class="page-view hidden space-y-8">
         <section class="glass-card p-6 md:p-8 rounded-2xl max-w-3xl mx-auto shadow-xl">
           <div class="text-center mb-8">
@@ -870,6 +960,7 @@
       overview: document.getElementById('nav-overview'),
       pomodoro: document.getElementById('nav-pomodoro'),
       scheduler: document.getElementById('nav-scheduler'),
+      chapters: document.getElementById('nav-chapters'),
       analytics: document.getElementById('nav-analytics'),
       history: document.getElementById('nav-history'),
       wall: document.getElementById('nav-wall'),
@@ -880,6 +971,7 @@
       overview: document.getElementById('page-overview'),
       pomodoro: document.getElementById('page-pomodoro'),
       scheduler: document.getElementById('page-scheduler'),
+      chapters: document.getElementById('page-chapters'),
       analytics: document.getElementById('page-analytics'),
       history: document.getElementById('page-history'),
       wall: document.getElementById('page-wall'),
@@ -890,6 +982,7 @@
       overview: "Holistic Performance Report",
       pomodoro: "Deep Focus Pomodoro Timer",
       scheduler: "Advance Study Scheduler",
+      chapters: "Chapter Index & Revision Tracker",
       analytics: "Graphical Analytics & Focus Pattern",
       history: "Date-Wise Session Logs",
       wall: "Subject Memory Wall & Formula Board",
@@ -900,17 +993,18 @@
       playAudioChime('click');
       Object.keys(pages).forEach(key => {
         pages[key].classList.add('hidden');
-        navButtons[key].className = "nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-2";
+        navButtons[key].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5";
       });
 
       pages[pageKey].classList.remove('hidden');
-      navButtons[pageKey].className = "nav-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-2";
+      navButtons[pageKey].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-1.5";
       document.getElementById('page-title').textContent = pageTitles[pageKey];
 
       if (pageKey === 'pomodoro') updatePomoTaskDropdown();
       if (pageKey === 'overview' || pageKey === 'analytics') updateMetricsAndCharts();
       if (pageKey === 'history') renderSessionHistory();
       if (pageKey === 'wall') renderMemoryWall();
+      if (pageKey === 'chapters') renderChapterTracker();
     }
 
     Object.keys(navButtons).forEach(key => {
@@ -942,6 +1036,42 @@
       updateChartColors();
     };
 
+    // Initial CA Final Chapter Index Data
+    const defaultChaptersData = {
+      "FR": [
+        { id: 'fr_1', name: 'Ind AS 115 - Revenue from Contracts with Customers', r1: false, r2: false, r3: false, r4: false },
+        { id: 'fr_2', name: 'Ind AS 116 - Leases', r1: false, r2: false, r3: false, r4: false },
+        { id: 'fr_3', name: 'Business Combinations & Corporate Restructuring (Ind AS 103)', r1: false, r2: false, r3: false, r4: false },
+        { id: 'fr_4', name: 'Consolidated Financial Statements (Ind AS 110)', r1: false, r2: false, r3: false, r4: false },
+        { id: 'fr_5', name: 'Financial Instruments (Ind AS 32, 107, 109)', r1: false, r2: false, r3: false, r4: false }
+      ],
+      "AFM": [
+        { id: 'afm_1', name: 'Advanced Portfolio Management', r1: false, r2: false, r3: false, r4: false },
+        { id: 'afm_2', name: 'Foreign Exchange Exposure and Risk Management', r1: false, r2: false, r3: false, r4: false },
+        { id: 'afm_3', name: 'International Financial Management', r1: false, r2: false, r3: false, r4: false },
+        { id: 'afm_4', name: 'Corporate Valuation & Mergers', r1: false, r2: false, r3: false, r4: false }
+      ],
+      "AUDIT": [
+        { id: 'aud_1', name: 'Quality Control (SQC 1 & SA 220)', r1: false, r2: false, r3: false, r4: false },
+        { id: 'aud_2', name: 'Audit Planning, Risk Assessment & Internal Control (SA 300, 315, 330)', r1: false, r2: false, r3: false, r4: false },
+        { id: 'aud_3', name: 'Audit Reports & SA 700 Series', r1: false, r2: false, r3: false, r4: false },
+        { id: 'aud_4', name: 'Professional Ethics & Code of Conduct', r1: false, r2: false, r3: false, r4: false }
+      ],
+      "DT": [
+        { id: 'dt_1', name: 'Assessment of Various Entities & Taxation', r1: false, r2: false, r3: false, r4: false },
+        { id: 'dt_2', name: 'Transfer Pricing & International Taxation', r1: false, r2: false, r3: false, r4: false },
+        { id: 'dt_3', name: 'Non-Resident Taxation & Double Taxation Relief', r1: false, r2: false, r3: false, r4: false }
+      ],
+      "IDT": [
+        { id: 'idt_1', name: 'GST Levy, Supply & Exemptions', r1: false, r2: false, r3: false, r4: false },
+        { id: 'idt_2', name: 'Input Tax Credit (ITC) & Matching', r1: false, r2: false, r3: false, r4: false },
+        { id: 'idt_3', name: 'Customs Duty & Import / Export Procedures', r1: false, r2: false, r3: false, r4: false }
+      ],
+      "IBS": [
+        { id: 'ibs_1', name: 'Integrated Case Studies & Multidisciplinary Analysis', r1: false, r2: false, r3: false, r4: false }
+      ]
+    };
+
     // App State
     let state = {
       timer: {
@@ -956,12 +1086,14 @@
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v17')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v17')) || [],
+      activeChapterSubject: 'FR',
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v18')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v18')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v18')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v17')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v17')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v18')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v18')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1086,6 +1218,7 @@
         state.logs.push({
           date: today,
           minutes: elapsedMinutes,
+          hour: new Date().getHours(),
           subject: activeTask ? activeTask.subject : 'General',
           type: activeTask ? activeTask.type : 'Study',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1114,6 +1247,7 @@
         state.logs.push({
           date: today,
           minutes: state.timer.workDuration,
+          hour: new Date().getHours(),
           subject: activeTask ? activeTask.subject : 'General',
           type: activeTask ? activeTask.type : 'Study',
           timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -1131,19 +1265,53 @@
       setMode('work');
     }
 
-    // Task Management
+    // Task Management with Overdue & Reschedule Controls
     const todoTaskListEl = document.getElementById('todo-task-list');
+    const pendingTaskListEl = document.getElementById('pending-task-list');
     const completedTaskListEl = document.getElementById('completed-task-list');
     const addTaskForm = document.getElementById('add-task-form');
 
     function renderTasks() {
       todoTaskListEl.innerHTML = '';
+      pendingTaskListEl.innerHTML = '';
       completedTaskListEl.innerHTML = '';
 
       const todayStr = new Date().toISOString().split('T')[0];
       const todaysTasks = state.tasks.filter(t => t.date === todayStr);
+      const pendingTasks = state.tasks.filter(t => !t.completed && t.date < todayStr);
+
       let completedCount = 0;
 
+      // Render Pending/Overdue Tasks
+      pendingTasks.forEach(task => {
+        const taskEl = document.createElement('div');
+        taskEl.className = "p-3 rounded-xl border border-rose-500/40 bg-rose-500/10 dark:bg-rose-950/20 flex items-center justify-between gap-2";
+        taskEl.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0">
+            <button onclick="toggleTaskCompletion('${task.id}')" class="text-rose-500 hover:text-emerald-500">
+              <i class="fa-regular fa-circle text-base"></i>
+            </button>
+            <div class="truncate">
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${task.title}</p>
+              <p class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
+                Due: ${task.date} • <span class="font-bold">${task.subject}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="rescheduleTaskToTomorrow('${task.id}')" title="Reschedule to Tomorrow" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg shadow-sm">
+              ⏩ Tomorrow
+            </button>
+            <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs p-1">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+        pendingTaskListEl.appendChild(taskEl);
+      });
+
+      // Render Today's Tasks
       todaysTasks.forEach(task => {
         if (task.completed) completedCount++;
 
@@ -1187,6 +1355,9 @@
         else todoTaskListEl.appendChild(taskEl);
       });
 
+      if (pendingTasks.length === 0) {
+        pendingTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-1">No overdue tasks!</p>`;
+      }
       if (todaysTasks.filter(t => !t.completed).length === 0) {
         todoTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No active tasks for today!</p>`;
       }
@@ -1196,6 +1367,19 @@
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updatePomoTaskDropdown();
+    }
+
+    function rescheduleTaskToTomorrow(id) {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        task.date = tomorrow.toISOString().split('T')[0];
+        saveData();
+        renderTasks();
+        renderCalendarGrid();
+        alert(`Rescheduled "${task.title}" to tomorrow (${task.date})!`);
+      }
     }
 
     function toggleTaskCompletion(id) {
@@ -1270,6 +1454,114 @@
       renderTasks();
       renderCalendarGrid();
     });
+
+    // Chapter Index & Revision Tracker Engine
+    function renderChapterTracker() {
+      const subjectTabsContainer = document.getElementById('chapter-subject-tabs');
+      subjectTabsContainer.innerHTML = '';
+
+      state.subjects.forEach(sub => {
+        const btn = document.createElement('button');
+        const isActive = state.activeChapterSubject === sub;
+        btn.className = `px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-md' 
+            : 'sub-box text-slate-600 dark:text-slate-300 hover:text-indigo-500'
+        }`;
+        btn.innerHTML = `<i class="fa-solid fa-book"></i> ${sub}`;
+        btn.onclick = () => {
+          state.activeChapterSubject = sub;
+          renderChapterTracker();
+        };
+        subjectTabsContainer.appendChild(btn);
+      });
+
+      document.getElementById('active-chapter-subject-title').textContent = `${state.activeChapterSubject} Chapter Index`;
+      renderChapterRows();
+    }
+
+    function renderChapterRows() {
+      const tbody = document.getElementById('chapter-index-table-body');
+      tbody.innerHTML = '';
+
+      if (!state.chapters[state.activeChapterSubject]) {
+        state.chapters[state.activeChapterSubject] = [];
+      }
+
+      const chapterList = state.chapters[state.activeChapterSubject];
+      let completedChapters = 0;
+
+      if (chapterList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">No chapters in ${state.activeChapterSubject} index yet. Click "+ Add Custom Chapter" above to start building your index!</td></tr>`;
+      } else {
+        chapterList.forEach((ch, idx) => {
+          if (ch.r1 && ch.r2) completedChapters++;
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors";
+          row.innerHTML = `
+            <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">
+              <span class="text-indigo-500 font-bold mr-1.5">${idx + 1}.</span> ${ch.name}
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r1 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r1')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r2 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r2')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r3 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r3')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r4 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r4')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-right">
+              <button onclick="deleteChapterRow('${ch.id}')" class="text-slate-400 hover:text-rose-500 text-xs">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // Update Progress
+      const total = chapterList.length;
+      document.getElementById('active-subject-progress-text').textContent = `Progress: ${completedChapters} / ${total} Chapters Revised (2+ Rounds)`;
+      const pct = total > 0 ? Math.round((completedChapters / total) * 100) : 0;
+      document.getElementById('subject-revision-progress-bar').style.width = `${pct}%`;
+    }
+
+    function toggleChapterRevision(id, revKey) {
+      playAudioChime('click');
+      const list = state.chapters[state.activeChapterSubject];
+      const ch = list.find(c => c.id === id);
+      if (ch) {
+        ch[revKey] = !ch[revKey];
+        saveData();
+        renderChapterRows();
+      }
+    }
+
+    function deleteChapterRow(id) {
+      state.chapters[state.activeChapterSubject] = state.chapters[state.activeChapterSubject].filter(c => c.id !== id);
+      saveData();
+      renderChapterRows();
+    }
+
+    function addNewChapterToSubject() {
+      const name = prompt(`Enter chapter name to add in ${state.activeChapterSubject} Index:`);
+      if (name && name.trim()) {
+        if (!state.chapters[state.activeChapterSubject]) state.chapters[state.activeChapterSubject] = [];
+        state.chapters[state.activeChapterSubject].push({
+          id: Date.now().toString(),
+          name: name.trim(),
+          r1: false, r2: false, r3: false, r4: false
+        });
+        saveData();
+        renderChapterRows();
+      }
+    }
 
     // Subject Memory Wall Functions
     function addCustomSubjectFolder() {
@@ -1388,8 +1680,9 @@
         tasks: state.tasks,
         logs: state.logs,
         subjects: state.subjects,
+        chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v17'),
+        examDate: localStorage.getItem('sp_exam_date_v18'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -1467,7 +1760,7 @@
           playAudioChime('complete');
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
-          alert("❌ Invalid backup file format! Try using 'Paste Backup String' instead.");
+          alert("❌ Invalid backup file format!");
         } finally {
           event.target.value = '';
         }
@@ -1479,14 +1772,16 @@
       if (data.tasks && Array.isArray(data.tasks)) state.tasks = data.tasks;
       if (data.logs && Array.isArray(data.logs)) state.logs = data.logs;
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
+      if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v17', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v18', data.examDate);
 
       saveData();
       renderTasks();
       renderCalendarGrid();
       initCharts();
       renderMemoryWall();
+      renderChapterTracker();
       updateExamCountdown();
     }
 
@@ -1682,7 +1977,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v17');
+      const savedDate = localStorage.getItem('sp_exam_date_v18');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -1694,14 +1989,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v17', val);
+        localStorage.setItem('sp_exam_date_v18', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v17');
+      const savedDate = localStorage.getItem('sp_exam_date_v18');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -1714,8 +2009,38 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine (Scaled 0 to 18 Hours)
-    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
+    // Activity Goal Heatmap Grid Renderer
+    function renderActivityHeatmap() {
+      const gridContainer = document.getElementById('activity-heatmap-grid');
+      gridContainer.innerHTML = '';
+
+      const now = new Date();
+      for (let i = 29; i >= 0; i--) {
+        const d = new Date(now);
+        d.setDate(now.getDate() - i);
+        const dateStr = d.toISOString().split('T')[0];
+
+        const dayMins = state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0);
+        const hrs = dayMins / 60;
+
+        let bgClass = "bg-slate-200 dark:bg-slate-800 text-slate-400";
+        if (hrs >= 10) bgClass = "bg-emerald-500 text-white font-bold";
+        else if (hrs >= 7) bgClass = "bg-emerald-600/80 text-white font-bold";
+        else if (hrs >= 4) bgClass = "bg-indigo-600/80 text-white font-bold";
+        else if (hrs > 0) bgClass = "bg-indigo-500/30 text-indigo-400";
+
+        const box = document.createElement('div');
+        box.className = `p-2 rounded-xl text-center text-[10px] flex flex-col justify-between h-14 ${bgClass}`;
+        box.innerHTML = `
+          <span class="opacity-70">${d.getDate()} ${d.toLocaleDateString('en-US', { month: 'short' })}</span>
+          <span class="font-extrabold">${hrs.toFixed(1)}h</span>
+        `;
+        gridContainer.appendChild(box);
+      }
+    }
+
+    // Charts Engine (Scaled 0 to 18 Hours + Hourly Distribution)
+    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart, hourlyDistributionChart;
 
     function initCharts() {
       // Overview Spline (Min 0, Max 18 Hours)
@@ -1734,7 +2059,7 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } }, ticks: { display: false } } } }
       });
 
-      // Analytics Spline (Min 0, Max 18 Hours)
+      // Analytics Spline
       const ctxSpline = document.getElementById('studySplineChart').getContext('2d');
       studySplineChart = new Chart(ctxSpline, {
         type: 'line',
@@ -1742,7 +2067,16 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
-      // Date-Wise Bar Chart (Min 0, Max 18 Hours)
+      // Hourly Focus Distribution Chart (24 Hours)
+      const ctxHourly = document.getElementById('hourlyDistributionChart').getContext('2d');
+      const hourLabels = Array.from({length: 24}, (_, i) => `${i.toString().padStart(2, '0')}:00`);
+      hourlyDistributionChart = new Chart(ctxHourly, {
+        type: 'bar',
+        data: { labels: hourLabels, datasets: [{ label: 'Minutes Logged', data: Array(24).fill(0), backgroundColor: 'rgba(168, 85, 247, 0.6)', borderColor: 'rgba(168, 85, 247, 1)', borderWidth: 1, borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } } } }
+      });
+
+      // Date-Wise Bar Chart
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
       dateWiseBarChart = new Chart(ctxDate, {
         type: 'bar',
@@ -1784,6 +2118,16 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
+      // Hourly Distribution Data
+      const hourlyData = Array(24).fill(0);
+      state.logs.forEach(l => {
+        if (l.hour !== undefined && l.hour >= 0 && l.hour < 24) {
+          hourlyData[l.hour] += l.minutes;
+        }
+      });
+      hourlyDistributionChart.data.datasets[0].data = hourlyData;
+      hourlyDistributionChart.update();
+
       // Date-Wise Fixed 0 to 18 Bar Chart Data
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
@@ -1795,6 +2139,7 @@
       calculateStreak();
       updateSplineChartData();
       updateExamCountdown();
+      renderActivityHeatmap();
     }
 
     document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
@@ -1876,7 +2221,7 @@
       const textColor = isDark ? '#94a3b8' : '#334155';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)';
 
-      [overviewSplineChart, studySplineChart, dateWiseBarChart].forEach(chart => {
+      [overviewSplineChart, studySplineChart, dateWiseBarChart, hourlyDistributionChart].forEach(chart => {
         chart.options.scales.y.ticks.color = textColor;
         chart.options.scales.y.grid.color = gridColor;
         chart.options.scales.x.ticks.color = textColor;
@@ -1889,10 +2234,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v17', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v17', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v17', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_stickies_v17', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v18', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v18', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v18', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v18', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v18', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
