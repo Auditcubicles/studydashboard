@@ -1197,13 +1197,13 @@
       pomoRecordFilter: 'daily',
       focusGoalView: 'monthly',
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v19')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v19')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v19')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v20')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v20')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v20')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v19')) || [],
-      logs: JSON.parse(localStorage.getItem('sp_logs_v19')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v20')) || [],
+      logs: JSON.parse(localStorage.getItem('sp_logs_v20')) || [],
       currentChartTab: 'daily'
     };
 
@@ -1375,26 +1375,327 @@
       setMode('work');
     }
 
-    // Pomodoro Records Time-of-Day Filter Engine (Daily, Weekly Date-wise, Yearly Month-select)
+    // Task Management
+    const todoTaskListEl = document.getElementById('todo-task-list');
+    const pendingTaskListEl = document.getElementById('pending-task-list');
+    const completedTaskListEl = document.getElementById('completed-task-list');
+    const addTaskForm = document.getElementById('add-task-form');
+
+    function renderTasks() {
+      todoTaskListEl.innerHTML = '';
+      pendingTaskListEl.innerHTML = '';
+      completedTaskListEl.innerHTML = '';
+
+      const todayStr = new Date().toISOString().split('T')[0];
+      const todaysTasks = state.tasks.filter(t => t.date === todayStr);
+      const pendingTasks = state.tasks.filter(t => !t.completed && t.date < todayStr);
+
+      let completedCount = 0;
+
+      // Render Pending/Overdue Tasks
+      pendingTasks.forEach(task => {
+        const taskEl = document.createElement('div');
+        taskEl.className = "p-3 rounded-xl border border-rose-500/40 bg-rose-500/10 dark:bg-rose-950/20 flex items-center justify-between gap-2";
+        taskEl.innerHTML = `
+          <div class="flex items-center gap-2 min-w-0">
+            <button onclick="toggleTaskCompletion('${task.id}')" class="text-rose-500 hover:text-emerald-500">
+              <i class="fa-regular fa-circle text-base"></i>
+            </button>
+            <div class="truncate">
+              <p class="text-xs font-bold text-slate-800 dark:text-slate-200">${task.title}</p>
+              <p class="text-[10px] text-rose-600 dark:text-rose-400 font-semibold">
+                Due: ${task.date} • <span class="font-bold">${task.subject}</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-1.5">
+            <button onclick="rescheduleTaskToTomorrow('${task.id}')" title="Reschedule to Tomorrow" class="px-2 py-1 bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] font-bold rounded-lg shadow-sm">
+              ⏩ Tomorrow
+            </button>
+            <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs p-1">
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        `;
+        pendingTaskListEl.appendChild(taskEl);
+      });
+
+      // Render Today's Tasks
+      todaysTasks.forEach(task => {
+        if (task.completed) completedCount++;
+
+        const isSelected = state.activeTaskId === task.id;
+        const taskEl = document.createElement('div');
+        taskEl.className = `p-3 rounded-xl border transition-all ${
+          isSelected 
+            ? 'bg-indigo-950/40 dark:bg-indigo-950/40 light:bg-indigo-100 border-indigo-500/60' 
+            : 'sub-box'
+        }`;
+
+        taskEl.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2 min-w-0">
+              <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-500">
+                <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-500' : 'regular fa-circle'} text-base"></i>
+              </button>
+              <div class="truncate">
+                <p class="text-xs font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">${task.title}</p>
+                <p class="text-[10px] text-slate-500 dark:text-slate-400"><span class="font-bold text-indigo-500">${task.subject}</span> • ${task.type}</p>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-500 dark:text-slate-400 font-mono"><i class="fa-solid fa-fire text-amber-500/80 mr-0.5"></i>${task.completedPomos}/${task.estPomos}</span>
+              ${!task.completed ? `
+                <button onclick="selectActiveTask('${task.id}')" class="text-[10px] px-2 py-1 rounded-md ${
+                  isSelected ? 'bg-indigo-600 text-white' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:text-indigo-500'
+                }">
+                  ${isSelected ? 'Active' : 'Select'}
+                </button>
+              ` : ''}
+              <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500 text-xs">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        `;
+
+        if (task.completed) completedTaskListEl.appendChild(taskEl);
+        else todoTaskListEl.appendChild(taskEl);
+      });
+
+      if (pendingTasks.length === 0) {
+        pendingTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-1">No overdue tasks!</p>`;
+      }
+      if (todaysTasks.filter(t => !t.completed).length === 0) {
+        todoTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No active tasks for today!</p>`;
+      }
+      if (completedCount === 0) {
+        completedTaskListEl.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No completed tasks yet.</p>`;
+      }
+
+      document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
+      updatePomoTaskDropdown();
+    }
+
+    function rescheduleTaskToTomorrow(id) {
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        task.date = tomorrow.toISOString().split('T')[0];
+        saveData();
+        renderTasks();
+        renderCalendarGrid();
+        alert(`Rescheduled "${task.title}" to tomorrow (${task.date})!`);
+      }
+    }
+
+    function toggleTaskCompletion(id) {
+      playAudioChime('click');
+      const task = state.tasks.find(t => t.id === id);
+      if (task) {
+        task.completed = !task.completed;
+        if (task.completed && state.activeTaskId === id) state.activeTaskId = null;
+        saveData();
+        renderTasks();
+      }
+    }
+
+    function selectActiveTask(id) {
+      playAudioChime('click');
+      state.activeTaskId = state.activeTaskId === id ? null : id;
+      renderTasks();
+    }
+
+    function deleteTask(id) {
+      state.tasks = state.tasks.filter(t => t.id !== id);
+      if (state.activeTaskId === id) state.activeTaskId = null;
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+      renderModalTasks();
+    }
+
+    addTaskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('task-input').value.trim();
+      const subject = document.getElementById('task-subject-select').value;
+      const type = document.getElementById('task-type-select').value;
+      const startDateStr = document.getElementById('task-date-input').value;
+      const repeatOpt = document.getElementById('task-repeat-select').value;
+      const estPomos = parseInt(document.getElementById('task-est-input').value) || 1;
+
+      if (!title || !subject || !type || !startDateStr) return;
+
+      let datesToSchedule = [startDateStr];
+      let startDate = new Date(startDateStr);
+
+      if (repeatOpt === 'daily_7') {
+        for (let i = 1; i < 7; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + i);
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
+      } else if (repeatOpt === 'daily_30') {
+        for (let i = 1; i < 30; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + i);
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
+      } else if (repeatOpt === 'weekly_4') {
+        for (let i = 1; i < 4; i++) {
+          let d = new Date(startDate);
+          d.setDate(d.getDate() + (i * 7));
+          datesToSchedule.push(d.toISOString().split('T')[0]);
+        }
+      }
+
+      datesToSchedule.forEach(dateStr => {
+        state.tasks.push({
+          id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
+          title, subject, type, date: dateStr, estPomos, completedPomos: 0, completed: false
+        });
+      });
+
+      document.getElementById('task-input').value = '';
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+    });
+
+    // Chapter Index Engine
+    function renderChapterTracker() {
+      const subjectTabsContainer = document.getElementById('chapter-subject-tabs');
+      subjectTabsContainer.innerHTML = '';
+
+      state.subjects.forEach(sub => {
+        const btn = document.createElement('button');
+        const isActive = state.activeChapterSubject === sub;
+        btn.className = `px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-md' 
+            : 'sub-box text-slate-600 dark:text-slate-300 hover:text-indigo-500'
+        }`;
+        btn.innerHTML = `<i class="fa-solid fa-book"></i> ${sub}`;
+        btn.onclick = () => {
+          state.activeChapterSubject = sub;
+          renderChapterTracker();
+        };
+        subjectTabsContainer.appendChild(btn);
+      });
+
+      document.getElementById('active-chapter-subject-title').textContent = `${state.activeChapterSubject} Chapter Index`;
+      renderChapterRows();
+    }
+
+    function renderChapterRows() {
+      const tbody = document.getElementById('chapter-index-table-body');
+      tbody.innerHTML = '';
+
+      if (!state.chapters[state.activeChapterSubject]) {
+        state.chapters[state.activeChapterSubject] = [];
+      }
+
+      const chapterList = state.chapters[state.activeChapterSubject];
+      let completedChapters = 0;
+
+      if (chapterList.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-slate-400 italic">No chapters in ${state.activeChapterSubject} index yet. Click "+ Add Custom Chapter" above to start building your index!</td></tr>`;
+      } else {
+        chapterList.forEach((ch, idx) => {
+          if (ch.r1 && ch.r2) completedChapters++;
+
+          const row = document.createElement('tr');
+          row.className = "hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors";
+          row.innerHTML = `
+            <td class="p-3 font-semibold text-slate-800 dark:text-slate-200">
+              <span class="text-indigo-500 font-bold mr-1.5">${idx + 1}.</span> ${ch.name}
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r1 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r1')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r2 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r2')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r3 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r3')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-center">
+              <input type="checkbox" ${ch.r4 ? 'checked' : ''} onchange="toggleChapterRevision('${ch.id}', 'r4')" class="accent-indigo-600 w-4 h-4 cursor-pointer">
+            </td>
+            <td class="p-3 text-right">
+              <button onclick="deleteChapterRow('${ch.id}')" class="text-slate-400 hover:text-rose-500 text-xs">
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      const total = chapterList.length;
+      document.getElementById('active-subject-progress-text').textContent = `Progress: ${completedChapters} / ${total} Chapters Revised (2+ Rounds)`;
+      const pct = total > 0 ? Math.round((completedChapters / total) * 100) : 0;
+      document.getElementById('subject-revision-progress-bar').style.width = `${pct}%`;
+    }
+
+    function toggleChapterRevision(id, revKey) {
+      playAudioChime('click');
+      const list = state.chapters[state.activeChapterSubject];
+      const ch = list.find(c => c.id === id);
+      if (ch) {
+        ch[revKey] = !ch[revKey];
+        saveData();
+        renderChapterRows();
+      }
+    }
+
+    function deleteChapterRow(id) {
+      state.chapters[state.activeChapterSubject] = state.chapters[state.activeChapterSubject].filter(c => c.id !== id);
+      saveData();
+      renderChapterRows();
+    }
+
+    function addNewChapterToSubject() {
+      const name = prompt(`Enter chapter name to add in ${state.activeChapterSubject} Index:`);
+      if (name && name.trim()) {
+        if (!state.chapters[state.activeChapterSubject]) state.chapters[state.activeChapterSubject] = [];
+        state.chapters[state.activeChapterSubject].push({
+          id: Date.now().toString(),
+          name: name.trim(),
+          r1: false, r2: false, r3: false, r4: false
+        });
+        saveData();
+        renderChapterRows();
+      }
+    }
+
+    // Pomodoro Records Filter Switcher
     function setPomoRecordFilter(mode) {
       state.pomoRecordFilter = mode;
       ['daily', 'weekly', 'yearly'].forEach(m => {
         const btn = document.getElementById(`pomo-filter-${m}`);
-        btn.className = mode === m 
-          ? "px-3 py-1 text-xs font-bold rounded-lg bg-purple-600 text-white transition-all"
-          : "px-3 py-1 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-purple-500 transition-all";
+        if (btn) {
+          btn.className = mode === m 
+            ? "px-3 py-1 text-xs font-bold rounded-lg bg-purple-600 text-white transition-all"
+            : "px-3 py-1 text-xs font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-purple-500 transition-all";
+        }
       });
       updateMetricsAndCharts();
     }
 
-    // Focus Time Goal View Engine (Monthly, Weekly, Yearly)
+    // Focus Time Goal View Switcher
     function setFocusGoalView(view) {
       state.focusGoalView = view;
       ['monthly', 'weekly', 'yearly'].forEach(v => {
         const btn = document.getElementById(`focus-view-${v}`);
-        btn.className = view === v
-          ? "px-3 py-1 font-bold rounded-lg bg-amber-500 text-slate-900"
-          : "px-3 py-1 font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-amber-500";
+        if (btn) {
+          btn.className = view === v
+            ? "px-3 py-1 font-bold rounded-lg bg-amber-500 text-slate-900"
+            : "px-3 py-1 font-bold rounded-lg text-slate-600 dark:text-slate-400 hover:text-amber-500";
+        }
       });
       renderFocusGoalCalendar();
     }
@@ -1411,6 +1712,7 @@
 
     function renderFocusGoalCalendar() {
       const container = document.getElementById('focus-goal-container');
+      if (!container) return;
       container.innerHTML = '';
 
       document.getElementById('focus-goal-badge').textContent = `Goal: ${state.dailyGoalHours}H`;
@@ -1466,13 +1768,651 @@
         `Focus Days: ${focusDays} days, Completed Goal Days: ${completedGoalDays} days, Goal Completion Rate: ${rate}%`;
     }
 
-    // Backup & Save
+    // Memory Wall
+    function addCustomSubjectFolder() {
+      const subName = prompt("Enter Custom Subject Code/Name (e.g. LAW, GST):");
+      if (subName && !state.subjects.includes(subName.toUpperCase())) {
+        const cleanName = subName.trim().toUpperCase();
+        state.subjects.push(cleanName);
+        state.activeWallSubject = cleanName;
+        saveData();
+        renderMemoryWall();
+      }
+    }
+
+    function renderMemoryWall() {
+      const folderTabsContainer = document.getElementById('subject-folder-tabs');
+      folderTabsContainer.innerHTML = '';
+
+      state.subjects.forEach(sub => {
+        const btn = document.createElement('button');
+        const isActive = state.activeWallSubject === sub;
+        btn.className = `px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
+          isActive 
+            ? 'bg-indigo-600 text-white shadow-md' 
+            : 'sub-box text-slate-600 dark:text-slate-300 hover:text-indigo-500'
+        }`;
+        btn.innerHTML = `<i class="fa-solid fa-folder${isActive ? '-open' : ''}"></i> ${sub}`;
+        btn.onclick = () => {
+          state.activeWallSubject = sub;
+          renderMemoryWall();
+        };
+        folderTabsContainer.appendChild(btn);
+      });
+
+      document.getElementById('active-wall-subject-title').innerHTML = `
+        <i class="fa-solid fa-folder-open"></i> ${state.activeWallSubject} Memory Wall
+      `;
+
+      renderStickyNotes();
+    }
+
+    function renderStickyNotes() {
+      const grid = document.getElementById('sticky-notes-grid');
+      grid.innerHTML = '';
+
+      const currentNotes = state.stickyNotes.filter(n => n.subject === state.activeWallSubject);
+
+      if (currentNotes.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full border-2 border-dashed border-slate-300 dark:border-slate-800 rounded-2xl p-8 text-center text-slate-400">
+            <i class="fa-solid fa-note-sticky text-3xl mb-2 text-amber-500/50"></i>
+            <p class="text-xs font-bold">No Memory Sticky Notes pinned for ${state.activeWallSubject} yet.</p>
+            <p class="text-[11px] text-slate-500 mt-1">Click "+ Add Sticky Note" above to paste key formulas or provisions on this wall!</p>
+          </div>
+        `;
+        return;
+      }
+
+      currentNotes.forEach(note => {
+        const noteEl = document.createElement('div');
+        const colorClass = `sticky-note-${note.color || 'yellow'}`;
+        noteEl.className = `p-4 rounded-2xl shadow-lg relative flex flex-col justify-between transition-transform hover:-translate-y-1 ${colorClass}`;
+        
+        noteEl.innerHTML = `
+          <div>
+            <div class="flex justify-between items-start mb-2 pr-4">
+              <h5 class="font-extrabold text-sm border-b border-black/10 pb-1 w-full">${note.title}</h5>
+            </div>
+            <p class="text-xs whitespace-pre-line leading-relaxed font-semibold opacity-90">${note.content}</p>
+          </div>
+          <div class="flex justify-end mt-4 pt-2 border-t border-black/10">
+            <button onclick="deleteStickyNote('${note.id}')" class="text-xs text-rose-700 hover:text-rose-900 font-bold flex items-center gap-1">
+              <i class="fa-solid fa-trash"></i> Remove
+            </button>
+          </div>
+        `;
+        grid.appendChild(noteEl);
+      });
+    }
+
+    const stickyModal = document.getElementById('sticky-modal');
+    function openStickyNoteModal() { stickyModal.classList.remove('hidden'); }
+    function closeStickyNoteModal() { stickyModal.classList.add('hidden'); }
+
+    document.getElementById('add-sticky-form').onsubmit = (e) => {
+      e.preventDefault();
+      const title = document.getElementById('sticky-title-input').value.trim();
+      const content = document.getElementById('sticky-content-input').value.trim();
+      const color = document.getElementById('sticky-color-select').value;
+
+      if (!title || !content) return;
+
+      state.stickyNotes.push({
+        id: Date.now().toString(),
+        subject: state.activeWallSubject,
+        title, content, color
+      });
+
+      document.getElementById('sticky-title-input').value = '';
+      document.getElementById('sticky-content-input').value = '';
+      saveData();
+      closeStickyNoteModal();
+      renderStickyNotes();
+    };
+
+    function deleteStickyNote(id) {
+      state.stickyNotes = state.stickyNotes.filter(n => n.id !== id);
+      saveData();
+      renderStickyNotes();
+    }
+
+    // Backup Engine
+    function getBackupDataObj() {
+      return {
+        tasks: state.tasks,
+        logs: state.logs,
+        subjects: state.subjects,
+        chapters: state.chapters,
+        stickyNotes: state.stickyNotes,
+        examDate: localStorage.getItem('sp_exam_date_v20'),
+        exportedAt: new Date().toISOString()
+      };
+    }
+
+    function exportDataFile() {
+      const backupData = getBackupDataObj();
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const blob = new Blob([jsonString], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      
+      const downloadAnchor = document.createElement('a');
+      downloadAnchor.href = url;
+      downloadAnchor.download = `CA_Study_Notion_Backup_${new Date().toISOString().split('T')[0]}.json`;
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      URL.revokeObjectURL(url);
+
+      playAudioChime('complete');
+    }
+
+    function viewRawJsonData() {
+      const backupData = getBackupDataObj();
+      const jsonString = JSON.stringify(backupData, null, 2);
+      const win = window.open("", "_blank");
+      if (win) {
+        win.document.write(`<pre style="word-wrap: break-word; white-space: pre-wrap; font-family: monospace; padding: 20px;">${jsonString}</pre>`);
+        win.document.title = "CA_Study_Notion_Backup.json";
+      } else {
+        alert("Please allow popups to view raw JSON text.");
+      }
+    }
+
+    function copyDataStringToClipboard() {
+      const backupData = getBackupDataObj();
+      const b64Str = btoa(unescape(encodeURIComponent(JSON.stringify(backupData))));
+      
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(b64Str).then(() => {
+          playAudioChime('complete');
+          alert("📋 Backup string copied to clipboard!");
+        }).catch(() => {
+          prompt("Copy your backup string below:", b64Str);
+        });
+      } else {
+        prompt("Copy your backup string below:", b64Str);
+      }
+    }
+
+    function pasteAndRestoreString() {
+      const b64Str = prompt("Paste your Backup String here:");
+      if (!b64Str) return;
+
+      try {
+        const jsonStr = decodeURIComponent(escape(atob(b64Str.trim())));
+        const data = JSON.parse(jsonStr);
+        applyImportData(data);
+        playAudioChime('complete');
+        alert("📥 Progress restored successfully from backup string!");
+      } catch (err) {
+        alert("❌ Invalid backup string format.");
+      }
+    }
+
+    function importDataFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const rawText = e.target.result;
+          const data = JSON.parse(rawText);
+          applyImportData(data);
+          playAudioChime('complete');
+          alert("📥 Data backup successfully imported and restored!");
+        } catch (err) {
+          alert("❌ Invalid backup file format!");
+        } finally {
+          event.target.value = '';
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    function applyImportData(data) {
+      if (data.tasks && Array.isArray(data.tasks)) state.tasks = data.tasks;
+      if (data.logs && Array.isArray(data.logs)) state.logs = data.logs;
+      if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
+      if (data.chapters) state.chapters = data.chapters;
+      if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
+      if (data.examDate) localStorage.setItem('sp_exam_date_v20', data.examDate);
+
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+      initCharts();
+      renderMemoryWall();
+      renderChapterTracker();
+      updateExamCountdown();
+    }
+
+    function resetAllAppLocalData() {
+      if (confirm("⚠️ Are you sure you want to clear all tasks, study logs, and notes? This cannot be undone.")) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // Calendar Modal
+    const calendarModal = document.getElementById('calendar-modal');
+    const closeCalendarModalBtn = document.getElementById('close-calendar-modal-btn');
+    const modalAddTaskForm = document.getElementById('modal-add-task-form');
+
+    function openCalendarModal(dateStr) {
+      state.selectedCalendarDate = dateStr;
+      document.getElementById('modal-date-title').innerHTML = `<i class="fa-solid fa-calendar-day"></i> Tasks for ${dateStr}`;
+      renderModalTasks();
+      calendarModal.classList.remove('hidden');
+    }
+
+    closeCalendarModalBtn.onclick = () => calendarModal.classList.add('hidden');
+
+    function renderModalTasks() {
+      const modalTaskList = document.getElementById('modal-task-list');
+      modalTaskList.innerHTML = '';
+
+      const scheduledTasks = state.tasks.filter(t => t.date === state.selectedCalendarDate);
+
+      if (scheduledTasks.length === 0) {
+        modalTaskList.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No tasks scheduled for this date yet.</p>`;
+        return;
+      }
+
+      scheduledTasks.forEach(task => {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-xl sub-box flex justify-between items-center text-xs";
+        item.innerHTML = `
+          <div class="flex items-center gap-2">
+            <button onclick="toggleTaskCompletion('${task.id}')" class="text-slate-500 hover:text-indigo-500">
+              <i class="fa-${task.completed ? 'solid fa-circle-check text-indigo-500' : 'regular fa-circle'} text-sm"></i>
+            </button>
+            <div>
+              <p class="font-semibold ${task.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">${task.title}</p>
+              <p class="text-[10px] text-slate-500 dark:text-slate-400"><span class="text-indigo-500 font-bold">${task.subject}</span> • ${task.type}</p>
+            </div>
+          </div>
+          <button onclick="deleteTask('${task.id}')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash"></i></button>
+        `;
+        modalTaskList.appendChild(item);
+      });
+    }
+
+    modalAddTaskForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const title = document.getElementById('modal-task-title').value.trim();
+      const subject = document.getElementById('modal-task-subject').value;
+      const type = document.getElementById('modal-task-type').value;
+      const estPomos = parseInt(document.getElementById('modal-task-est').value) || 1;
+
+      if (!title || !subject || !type) return;
+
+      state.tasks.push({
+        id: Date.now().toString(),
+        title, subject, type, date: state.selectedCalendarDate, estPomos, completedPomos: 0, completed: false
+      });
+
+      document.getElementById('modal-task-title').value = '';
+      saveData();
+      renderTasks();
+      renderCalendarGrid();
+      renderModalTasks();
+    });
+
+    function renderCalendarGrid() {
+      const calendarGridEl = document.getElementById('calendar-days-grid');
+      const monthYearLabelEl = document.getElementById('calendar-month-year-label');
+      calendarGridEl.innerHTML = '';
+
+      const viewDate = state.calendarViewDate;
+      const year = viewDate.getFullYear();
+      const month = viewDate.getMonth();
+
+      monthYearLabelEl.textContent = viewDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+      const firstDay = new Date(year, month, 1).getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        calendarGridEl.appendChild(document.createElement('div'));
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        const hasTasks = state.tasks.some(t => t.date === dateStr);
+        const isToday = dateStr === new Date().toISOString().split('T')[0];
+
+        const dayEl = document.createElement('button');
+        dayEl.className = `p-2.5 rounded-xl transition-all text-xs font-bold relative ${
+          isToday 
+            ? 'border-2 border-indigo-500 text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30' 
+            : 'hover:bg-slate-200 dark:hover:bg-slate-800/60 text-slate-700 dark:text-slate-300'
+        }`;
+        dayEl.textContent = day;
+
+        if (hasTasks) {
+          const dot = document.createElement('span');
+          dot.className = "absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-indigo-500 rounded-full";
+          dayEl.appendChild(dot);
+        }
+
+        dayEl.onclick = () => openCalendarModal(dateStr);
+        calendarGridEl.appendChild(dayEl);
+      }
+    }
+
+    document.getElementById('prev-month-btn').onclick = () => {
+      state.calendarViewDate.setMonth(state.calendarViewDate.getMonth() - 1);
+      renderCalendarGrid();
+    };
+    document.getElementById('next-month-btn').onclick = () => {
+      state.calendarViewDate.setMonth(state.calendarViewDate.getMonth() + 1);
+      renderCalendarGrid();
+    };
+    document.getElementById('today-jump-btn').onclick = () => {
+      state.calendarViewDate = new Date();
+      renderCalendarGrid();
+    };
+
+    // Streak Modal
+    const streakModal = document.getElementById('streak-modal');
+    function openStreakModal() {
+      const streakList = document.getElementById('streak-activity-list');
+      streakList.innerHTML = '';
+
+      const uniqueDates = [...new Set(state.logs.map(l => l.date))].sort().reverse();
+
+      if (uniqueDates.length === 0) {
+        streakList.innerHTML = `<p class="text-xs text-slate-500 italic p-2">No study activity logged yet.</p>`;
+      } else {
+        uniqueDates.forEach(date => {
+          const dayMins = state.logs.filter(l => l.date === date).reduce((a, c) => a + c.minutes, 0);
+          const item = document.createElement('div');
+          item.className = "p-2.5 sub-box rounded-xl flex justify-between items-center text-xs";
+          item.innerHTML = `
+            <span class="font-mono text-slate-700 dark:text-slate-300">${date}</span>
+            <span class="text-amber-500 font-bold">${dayMins} Mins Studied</span>
+          `;
+          streakList.appendChild(item);
+        });
+      }
+
+      streakModal.classList.remove('hidden');
+    }
+    function closeStreakModal() { streakModal.classList.add('hidden'); }
+
+    // Session History
+    function renderSessionHistory() {
+      const tbody = document.getElementById('session-history-table-body');
+      tbody.innerHTML = '';
+
+      if (state.logs.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="p-4 text-center text-slate-500 italic">No study sessions logged yet.</td></tr>`;
+        return;
+      }
+
+      [...state.logs].reverse().forEach(log => {
+        const row = document.createElement('tr');
+        row.className = "hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-colors";
+        row.innerHTML = `
+          <td class="p-3 font-mono font-semibold">${log.date}</td>
+          <td class="p-3"><span class="px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 font-bold">${log.subject || 'General'}</span></td>
+          <td class="p-3 text-slate-700 dark:text-slate-300">${log.type || 'Study'}</td>
+          <td class="p-3 font-bold text-emerald-600 dark:text-emerald-400">${log.minutes} mins</td>
+          <td class="p-3 text-slate-500 dark:text-slate-400">${log.timestamp || 'Recorded'}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
+
+    document.getElementById('clear-history-btn').onclick = () => {
+      if (confirm('Clear all historical session logs?')) {
+        state.logs = [];
+        saveData();
+        renderSessionHistory();
+        updateMetricsAndCharts();
+      }
+    };
+
+    // Target Exam Date Modal Selector
+    const examDateModal = document.getElementById('exam-date-modal');
+    const examDateModalInput = document.getElementById('exam-date-modal-input');
+
+    function openExamDateModal() {
+      const savedDate = localStorage.getItem('sp_exam_date_v20');
+      if (savedDate) examDateModalInput.value = savedDate;
+      examDateModal.classList.remove('hidden');
+    }
+
+    function closeExamDateModal() {
+      examDateModal.classList.add('hidden');
+    }
+
+    function saveTargetExamDate() {
+      const val = examDateModalInput.value;
+      if (val) {
+        localStorage.setItem('sp_exam_date_v20', val);
+        updateExamCountdown();
+        closeExamDateModal();
+      }
+    }
+
+    function updateExamCountdown() {
+      const savedDate = localStorage.getItem('sp_exam_date_v20');
+      if (!savedDate) {
+        document.getElementById('report-exam-days').textContent = 'Set Target';
+        return;
+      }
+      const targetDate = new Date(savedDate);
+      const today = new Date();
+      const diffTime = targetDate - today;
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
+    }
+
+    // Charts Engine
+    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart, pomodoroRecordsChart;
+
+    function initCharts() {
+      // Overview Spline
+      const ctxOverviewSpline = document.getElementById('overviewSplineChart').getContext('2d');
+      overviewSplineChart = new Chart(ctxOverviewSpline, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+      });
+
+      // Overview Radar
+      const ctxOverviewRadar = document.getElementById('overviewRadarChart').getContext('2d');
+      overviewRadarChart = new Chart(ctxOverviewRadar, {
+        type: 'radar',
+        data: { labels: ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'], datasets: [{ label: 'Hours', data: [0,0,0,0,0,0], backgroundColor: 'rgba(168, 85, 247, 0.2)', borderColor: 'rgba(168, 85, 247, 1)', borderWidth: 2 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } }, ticks: { display: false } } } }
+      });
+
+      // Analytics Spline
+      const ctxSpline = document.getElementById('studySplineChart').getContext('2d');
+      studySplineChart = new Chart(ctxSpline, {
+        type: 'line',
+        data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+      });
+
+      // Pomodoro Time-of-Day 2-Hour Slots Chart (0:00 to 22:00)
+      const ctxPomoRec = document.getElementById('pomodoroRecordsChart').getContext('2d');
+      const timeSlots = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
+      pomodoroRecordsChart = new Chart(ctxPomoRec, {
+        type: 'bar',
+        data: { labels: timeSlots, datasets: [{ label: 'Mins Logged', data: Array(12).fill(0), backgroundColor: 'rgba(168, 85, 247, 0.6)', borderColor: 'rgba(168, 85, 247, 1)', borderWidth: 1, borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+      });
+
+      // Date-Wise Bar Chart
+      const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
+      dateWiseBarChart = new Chart(ctxDate, {
+        type: 'bar',
+        data: { labels: ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'], datasets: [{ label: 'Hours Studied', data: [0, 0, 0, 0, 0, 0], backgroundColor: 'rgba(16, 185, 129, 0.6)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1.5, borderRadius: 6 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+      });
+
+      updateMetricsAndCharts();
+    }
+
+    function updateMetricsAndCharts() {
+      const selectedDate = document.getElementById('graph-date-picker').value;
+      const todayStr = new Date().toISOString().split('T')[0];
+      const subjects = ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'];
+
+      // Today's Hours
+      const todayMins = state.logs.filter(l => l.date === todayStr).reduce((a, c) => a + c.minutes, 0);
+      document.getElementById('report-today-hours').textContent = `${(todayMins / 60).toFixed(1)} hrs`;
+
+      // Cumulative Total Hours
+      const totalMins = state.logs.reduce((a, c) => a + c.minutes, 0);
+      document.getElementById('report-total-hours').textContent = `${(totalMins / 60).toFixed(1)} hrs`;
+
+      // Completion Rate
+      const totalTasks = state.tasks.length;
+      const completedTasks = state.tasks.filter(t => t.completed).length;
+      const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
+      document.getElementById('report-completion-rate').textContent = `${completionRate}%`;
+
+      // Avg Session Length
+      const avgSession = state.logs.length > 0 ? Math.round(totalMins / state.logs.length) : 0;
+      document.getElementById('report-avg-session').textContent = `${avgSession} mins`;
+
+      // Radar Subject Distribution Data
+      const radarHours = subjects.map(sub => {
+        const mins = state.logs.filter(l => l.subject === sub).reduce((a, c) => a + c.minutes, 0);
+        return parseFloat((mins / 60).toFixed(1));
+      });
+      overviewRadarChart.data.datasets[0].data = radarHours;
+      overviewRadarChart.update();
+
+      // Pomodoro Time-of-Day 2-Hour Slot Records Data
+      const slotMins = Array(12).fill(0);
+      state.logs.forEach(l => {
+        if (l.hour !== undefined && l.hour >= 0 && l.hour < 24) {
+          const slotIndex = Math.floor(l.hour / 2);
+          slotMins[slotIndex] += l.minutes;
+        }
+      });
+      pomodoroRecordsChart.data.datasets[0].data = slotMins;
+      pomodoroRecordsChart.update();
+
+      // Date-Wise Fixed 0 to 18 Bar Chart Data
+      const dateMins = subjects.map(sub => {
+        const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
+        return parseFloat((mins / 60).toFixed(1));
+      });
+      dateWiseBarChart.data.datasets[0].data = dateMins;
+      dateWiseBarChart.update();
+
+      calculateStreak();
+      updateSplineChartData();
+      updateExamCountdown();
+      renderFocusGoalCalendar();
+    }
+
+    document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
+
+    function updateSplineChartData() {
+      let labels = [], data = [];
+      const now = new Date();
+
+      if (state.currentChartTab === 'daily') {
+        for (let i = 6; i >= 0; i--) {
+          const d = new Date(now);
+          d.setDate(now.getDate() - i);
+          const dateStr = d.toISOString().split('T')[0];
+          labels.push(d.toLocaleDateString('en-US', { weekday: 'short' }));
+          const mins = state.logs.filter(l => l.date === dateStr).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
+        }
+      } else if (state.currentChartTab === 'weekly') {
+        for (let i = 3; i >= 0; i--) {
+          const startOfWeek = new Date(now);
+          startOfWeek.setDate(now.getDate() - (i * 7 + 6));
+          const endOfWeek = new Date(now);
+          endOfWeek.setDate(now.getDate() - (i * 7));
+          labels.push(`Wk ${4 - i}`);
+          const mins = state.logs.filter(l => {
+            const d = new Date(l.date);
+            return d >= startOfWeek && d <= endOfWeek;
+          }).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
+        }
+      } else if (state.currentChartTab === 'monthly') {
+        for (let i = 5; i >= 0; i--) {
+          const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+          labels.push(d.toLocaleDateString('en-US', { month: 'short' }));
+          const mins = state.logs.filter(l => {
+            const logD = new Date(l.date);
+            return logD.getMonth() === d.getMonth() && logD.getFullYear() === d.getFullYear();
+          }).reduce((a, c) => a + c.minutes, 0);
+          data.push(parseFloat((mins / 60).toFixed(1)));
+        }
+      }
+
+      overviewSplineChart.data.labels = labels;
+      overviewSplineChart.data.datasets[0].data = data;
+      overviewSplineChart.update();
+
+      studySplineChart.data.labels = labels;
+      studySplineChart.data.datasets[0].data = data;
+      studySplineChart.update();
+    }
+
+    function calculateStreak() {
+      if (state.logs.length === 0) {
+        document.getElementById('streak-counter').textContent = '0 Days';
+        return;
+      }
+      const uniqueDates = [...new Set(state.logs.map(l => l.date))].sort().reverse();
+      let streak = 0;
+      let checkDate = new Date();
+
+      for (let i = 0; i < uniqueDates.length; i++) {
+        const formattedCheck = checkDate.toISOString().split('T')[0];
+        if (uniqueDates[i] === formattedCheck) {
+          streak++;
+          checkDate.setDate(checkDate.getDate() - 1);
+        } else if (i === 0) {
+          checkDate.setDate(checkDate.getDate() - 1);
+          if (uniqueDates[i] === checkDate.toISOString().split('T')[0]) {
+            streak++;
+            checkDate.setDate(checkDate.getDate() - 1);
+          } else break;
+        } else break;
+      }
+      document.getElementById('streak-counter').textContent = `${streak} Days`;
+    }
+
+    function updateChartColors() {
+      const isDark = document.documentElement.classList.contains('dark');
+      const textColor = isDark ? '#94a3b8' : '#334155';
+      const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)';
+
+      [overviewSplineChart, studySplineChart, dateWiseBarChart, pomodoroRecordsChart].forEach(chart => {
+        chart.options.scales.y.ticks.color = textColor;
+        chart.options.scales.y.grid.color = gridColor;
+        chart.options.scales.x.ticks.color = textColor;
+        chart.update();
+      });
+
+      overviewRadarChart.options.scales.r.pointLabels.color = textColor;
+      overviewRadarChart.options.scales.r.grid.color = gridColor;
+      overviewRadarChart.update();
+    }
+
     function saveData() {
-      localStorage.setItem('sp_tasks_v19', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v19', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v19', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v19', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v19', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v20', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v20', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v20', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v20', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v20', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
