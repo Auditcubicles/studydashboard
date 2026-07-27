@@ -71,7 +71,7 @@
     .dark .pomo-fullscreen-active { background: #070a12 !important; }
     .light .pomo-fullscreen-active { background: #ffffff !important; }
 
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 4px; }
     .light .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.8); border-radius: 4px; }
@@ -543,7 +543,7 @@
       <!-- PAGE 5: DETAILED ANALYTICS PAGE -->
       <div id="page-analytics" class="page-view hidden space-y-8">
         
-        <!-- Spline Progress Graph with Calendar Date-Range Picker -->
+        <!-- Spline Progress Graph -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
@@ -553,7 +553,6 @@
               <p class="text-xs text-slate-500 dark:text-slate-400">Select custom start and end dates to visualize your trend</p>
             </div>
 
-            <!-- Custom Calendar Date Range Picker Controls -->
             <div class="flex flex-wrap items-center gap-2 sub-box p-1.5 rounded-xl text-xs">
               <label class="text-slate-500 dark:text-slate-400 font-bold px-1">From:</label>
               <input type="date" id="spline-start-date" onchange="updateSplineChartData()" class="input-field border rounded-lg px-2 py-1 text-xs">
@@ -567,17 +566,16 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records Grid with Month Calendar Selector Controls -->
+        <!-- Pomodoro Records (Scrollable Window Container + Capped to Today Only) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Visual Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Proportional fill slots showing study time across 2-hour slots</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Scrollable matrix capped up to today's date with proportional study fill</p>
             </div>
 
-            <!-- Month Calendar Navigation Bar -->
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
               <button onclick="prevPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
               <span id="pomo-matrix-month-year-label">July 2026</span>
@@ -585,7 +583,8 @@
             </div>
           </div>
 
-          <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl overflow-x-auto custom-scrollbar"></div>
+          <!-- Scrollable Container Box (max-h-80) -->
+          <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl max-h-80 overflow-y-auto overflow-x-auto custom-scrollbar"></div>
         </section>
 
         <!-- Focus Time Goal Monthly Calendar -->
@@ -1212,7 +1211,7 @@
     };
 
     // Load State
-    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v25')) || [];
+    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v26')) || [];
     let state = {
       timer: {
         mode: 'work',
@@ -1230,12 +1229,12 @@
       focusGoalViewDate: new Date(),
       pomoMatrixViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v25')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v25')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v25')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v26')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v26')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v26')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v25')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v26')) || [],
       logs: rawLogs.map(l => {
         if (!l.id) l.id = Date.now().toString() + Math.random().toString(36).substr(2, 4);
         return l;
@@ -1780,7 +1779,7 @@
       }
     }
 
-    // Pomodoro Records Month Calendar Navigation Controls
+    // Pomodoro Records Month Navigation Controls
     function prevPomoMatrixMonth() {
       state.pomoMatrixViewDate.setMonth(state.pomoMatrixViewDate.getMonth() - 1);
       renderPomodoroMatrixGrid();
@@ -1791,7 +1790,7 @@
       renderPomodoroMatrixGrid();
     }
 
-    // Pomodoro Records Matrix Renderer (Full Month Calendar Selection)
+    // Pomodoro Records Matrix Renderer (Capped strictly up to Today's Date)
     function renderPomodoroMatrixGrid() {
       const container = document.getElementById('pomo-matrix-container');
       if (!container) return;
@@ -1805,13 +1804,19 @@
         viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
       const slots = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-      const daysInMonth = new Date(year, month + 1, 0).getDate();
-      const todayStr = new Date().toISOString().split('T')[0];
+      
+      const now = new Date();
+      const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
+
+      // If current month, cap at today's day number. Otherwise, show all days of past months.
+      const maxDayToDisplay = isCurrentMonth ? now.getDate() : new Date(year, month + 1, 0).getDate();
+      const todayStr = now.toISOString().split('T')[0];
 
       const table = document.createElement('table');
-      table.className = "w-full border-collapse text-xs";
+      table.className = "w-full border-collapse text-xs relative";
 
-      let theadHtml = `<thead><tr class="border-b border-slate-300 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
+      // Sticky Header Row (X-Axis)
+      let theadHtml = `<thead class="sticky top-0 z-10 bg-slate-200 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800"><tr class="text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
       slots.forEach(slot => {
         theadHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
       });
@@ -1821,8 +1826,8 @@
       const tbody = document.createElement('tbody');
       tbody.className = "divide-y divide-slate-200 dark:divide-slate-800/40 font-mono";
 
-      // Render All Days of the Selected Month in Descending Order
-      for (let day = daysInMonth; day >= 1; day--) {
+      // Render Days Descending from Max Available Day down to 1
+      for (let day = maxDayToDisplay; day >= 1; day--) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
         let label = `${day} ${viewDate.toLocaleDateString('en-US', { month: 'short' })}`;
@@ -2064,7 +2069,7 @@
         subjects: state.subjects,
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
-        examDate: localStorage.getItem('sp_exam_date_v25'),
+        examDate: localStorage.getItem('sp_exam_date_v26'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2161,7 +2166,7 @@
       if (data.subjects && Array.isArray(data.subjects)) state.subjects = data.subjects;
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v25', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v26', data.examDate);
 
       saveData();
       renderTasks();
@@ -2471,7 +2476,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v25');
+      const savedDate = localStorage.getItem('sp_exam_date_v26');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2483,14 +2488,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v25', val);
+        localStorage.setItem('sp_exam_date_v26', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v25');
+      const savedDate = localStorage.getItem('sp_exam_date_v26');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2507,7 +2512,6 @@
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
-      // Overview Spline
       const ctxOverviewSpline = document.getElementById('overviewSplineChart').getContext('2d');
       overviewSplineChart = new Chart(ctxOverviewSpline, {
         type: 'line',
@@ -2515,7 +2519,6 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
-      // Overview Radar
       const ctxOverviewRadar = document.getElementById('overviewRadarChart').getContext('2d');
       overviewRadarChart = new Chart(ctxOverviewRadar, {
         type: 'radar',
@@ -2523,7 +2526,6 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { r: { angleLines: { color: 'rgba(255,255,255,0.1)' }, grid: { color: 'rgba(255,255,255,0.1)' }, pointLabels: { color: '#94a3b8', font: { size: 10, weight: 'bold' } }, ticks: { display: false } } } }
       });
 
-      // Analytics Spline (Plotted by Calendar Range Selection)
       const ctxSpline = document.getElementById('studySplineChart').getContext('2d');
       studySplineChart = new Chart(ctxSpline, {
         type: 'line',
@@ -2531,7 +2533,6 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
-      // Date-Wise Bar Chart
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
       dateWiseBarChart = new Chart(ctxDate, {
         type: 'bar',
@@ -2547,25 +2548,20 @@
       const todayStr = new Date().toISOString().split('T')[0];
       const subjects = ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'];
 
-      // Today's Hours
       const todayMins = state.logs.filter(l => l.date === todayStr).reduce((a, c) => a + c.minutes, 0);
       document.getElementById('report-today-hours').textContent = `${(todayMins / 60).toFixed(1)} hrs`;
 
-      // Cumulative Total Hours
       const totalMins = state.logs.reduce((a, c) => a + c.minutes, 0);
       document.getElementById('report-total-hours').textContent = `${(totalMins / 60).toFixed(1)} hrs`;
 
-      // Completion Rate
       const totalTasks = state.tasks.length;
       const completedTasks = state.tasks.filter(t => t.completed).length;
       const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
       document.getElementById('report-completion-rate').textContent = `${completionRate}%`;
 
-      // Avg Session Length
       const avgSession = state.logs.length > 0 ? Math.round(totalMins / state.logs.length) : 0;
       document.getElementById('report-avg-session').textContent = `${avgSession} mins`;
 
-      // Radar Subject Distribution Data
       const radarHours = subjects.map(sub => {
         const mins = state.logs.filter(l => l.subject === sub).reduce((a, c) => a + c.minutes, 0);
         return parseFloat((mins / 60).toFixed(1));
@@ -2573,10 +2569,8 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      // Render Pomodoro Matrix Grid
       renderPomodoroMatrixGrid();
 
-      // Date-Wise Fixed 0 to 18 Bar Chart Data
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
         return parseFloat((mins / 60).toFixed(1));
@@ -2592,11 +2586,9 @@
 
     document.getElementById('graph-date-picker').onchange = updateMetricsAndCharts;
 
-    // Plotted dynamically based on Custom Start & End Date Selection
     function updateSplineChartData() {
       let labels = [], data = [];
 
-      // Overview Spline (Default Last 7 Days)
       const now = new Date();
       let overviewLabels = [], overviewData = [];
       for (let i = 6; i >= 0; i--) {
@@ -2611,7 +2603,6 @@
       overviewSplineChart.data.datasets[0].data = overviewData;
       overviewSplineChart.update();
 
-      // Analytics Spline (Range Selected by Start/End Date Pickers)
       const startDateVal = document.getElementById('spline-start-date').value;
       const endDateVal = document.getElementById('spline-end-date').value;
 
@@ -2678,11 +2669,11 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v25', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v25', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v25', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v25', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v25', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_tasks_v26', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v26', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v26', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v26', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v26', JSON.stringify(state.stickyNotes));
     }
 
     // Modal Preferences
