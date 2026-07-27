@@ -566,14 +566,14 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Scrollable Window Container + Capped to Today Only) -->
+        <!-- Pomodoro Records (Clean Professional Fixed Header + Scrollable Rows Body) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Visual Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Scrollable matrix capped up to today's date with proportional study fill</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Fixed top header with smooth scrollable date history capped up to today</p>
             </div>
 
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
@@ -583,8 +583,18 @@
             </div>
           </div>
 
-          <!-- Scrollable Container Box (max-h-80) -->
-          <div id="pomo-matrix-container" class="sub-box p-4 rounded-2xl max-h-80 overflow-y-auto overflow-x-auto custom-scrollbar"></div>
+          <!-- Professional Grid Container Box -->
+          <div class="sub-box rounded-2xl overflow-hidden shadow-inner border border-slate-300 dark:border-slate-800">
+            <!-- Fixed Non-Scrolling Top Header Bar -->
+            <div id="pomo-matrix-fixed-header" class="bg-slate-200/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-2.5 border-b border-slate-300 dark:border-slate-800 shadow-sm overflow-x-auto custom-scrollbar">
+              <!-- Rendered by JS -->
+            </div>
+
+            <!-- Scrollable Body for Date Rows Only -->
+            <div id="pomo-matrix-scroll-body" class="p-4 max-h-72 overflow-y-auto overflow-x-auto custom-scrollbar">
+              <!-- Rendered by JS -->
+            </div>
+          </div>
         </section>
 
         <!-- Focus Time Goal Monthly Calendar -->
@@ -1790,11 +1800,14 @@
       renderPomodoroMatrixGrid();
     }
 
-    // Pomodoro Records Matrix Renderer (Capped strictly up to Today's Date)
+    // Pomodoro Records Matrix Renderer (Separated Header + Clean Scroll Body)
     function renderPomodoroMatrixGrid() {
-      const container = document.getElementById('pomo-matrix-container');
-      if (!container) return;
-      container.innerHTML = '';
+      const fixedHeaderContainer = document.getElementById('pomo-matrix-fixed-header');
+      const scrollBodyContainer = document.getElementById('pomo-matrix-scroll-body');
+      if (!fixedHeaderContainer || !scrollBodyContainer) return;
+
+      fixedHeaderContainer.innerHTML = '';
+      scrollBodyContainer.innerHTML = '';
 
       const viewDate = state.pomoMatrixViewDate;
       const year = viewDate.getFullYear();
@@ -1808,25 +1821,26 @@
       const now = new Date();
       const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
 
-      // If current month, cap at today's day number. Otherwise, show all days of past months.
       const maxDayToDisplay = isCurrentMonth ? now.getDate() : new Date(year, month + 1, 0).getDate();
       const todayStr = now.toISOString().split('T')[0];
 
-      const table = document.createElement('table');
-      table.className = "w-full border-collapse text-xs relative";
-
-      // Sticky Header Row (X-Axis)
-      let theadHtml = `<thead class="sticky top-0 z-10 bg-slate-200 dark:bg-slate-900 border-b border-slate-300 dark:border-slate-800"><tr class="text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
+      // 1. Build Fixed Top Header Row
+      let headerTable = document.createElement('table');
+      headerTable.className = "w-full border-collapse text-xs";
+      let headerHtml = `<thead><tr class="text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
       slots.forEach(slot => {
-        theadHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
+        headerHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
       });
-      theadHtml += `</tr></thead>`;
-      table.innerHTML = theadHtml;
+      headerHtml += `</tr></thead>`;
+      headerTable.innerHTML = headerHtml;
+      fixedHeaderContainer.appendChild(headerTable);
 
+      // 2. Build Scrollable Body Rows Only
+      let bodyTable = document.createElement('table');
+      bodyTable.className = "w-full border-collapse text-xs";
       const tbody = document.createElement('tbody');
       tbody.className = "divide-y divide-slate-200 dark:divide-slate-800/40 font-mono";
 
-      // Render Days Descending from Max Available Day down to 1
       for (let day = maxDayToDisplay; day >= 1; day--) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
@@ -1835,7 +1849,7 @@
 
         const dayLogs = state.logs.filter(l => l.date === dateStr);
 
-        let rowHtml = `<tr><td class="p-2 text-slate-600 dark:text-slate-400 font-bold font-sans">${label}</td>`;
+        let rowHtml = `<tr><td class="p-2 text-slate-600 dark:text-slate-400 font-bold font-sans w-24">${label}</td>`;
 
         slots.forEach((slot, slotIdx) => {
           const slotStartHour = slotIdx * 2;
@@ -1847,8 +1861,8 @@
           const fillPct = Math.min(100, Math.round((slotMins / 120) * 100));
 
           rowHtml += `
-            <td class="p-1 text-center align-middle">
-              <div class="w-full bg-slate-400/40 dark:bg-slate-700/50 rounded-xl h-6 overflow-hidden relative" title="${slotMins} mins studied">
+            <td class="p-1 text-center align-middle w-16">
+              <div class="w-full bg-slate-300/50 dark:bg-slate-700/50 rounded-xl h-6 overflow-hidden relative" title="${slotMins} mins studied">
                 <div class="bg-purple-600 h-full rounded-xl transition-all duration-500" style="width: ${fillPct}%;"></div>
               </div>
             </td>
@@ -1859,8 +1873,8 @@
         tbody.innerHTML += rowHtml;
       }
 
-      table.appendChild(tbody);
-      container.appendChild(table);
+      bodyTable.appendChild(tbody);
+      scrollBodyContainer.appendChild(bodyTable);
     }
 
     // Focus Goal Calendar
