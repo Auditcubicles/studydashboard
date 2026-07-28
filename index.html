@@ -76,7 +76,7 @@
     .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(51, 65, 85, 0.6); border-radius: 4px; }
     .light .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.8); border-radius: 4px; }
 
-    /* Sticky Note Styles with Fixed Boundaries */
+    /* Sticky Note Styles */
     .sticky-note-yellow { background-color: #fef08a; color: #713f12; border: 1px solid #fde047; }
     .sticky-note-green  { background-color: #bbf7d0; color: #14532d; border: 1px solid #86efac; }
     .sticky-note-blue   { background-color: #bfdbfe; color: #1e3a8a; border: 1px solid #93c5fd; }
@@ -109,7 +109,7 @@
           <i class="fa-solid fa-stopwatch"></i> Focus Timer
         </button>
         <button id="nav-scheduler" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
-          <i class="fa-solid fa-calendar-days"></i> Scheduler & Time-Block
+          <i class="fa-solid fa-calendar-days"></i> Scheduler & Timeline
         </button>
         <button id="nav-chapters" class="nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5">
           <i class="fa-solid fa-book-open"></i> Chapter Index
@@ -363,7 +363,7 @@
         </div>
       </div>
 
-      <!-- PAGE 3: ADVANCED SCHEDULER, TASKS & DAILY TIME-BLOCKING TIMELINE -->
+      <!-- PAGE 3: ADVANCED SCHEDULER, TASKS & PROFESSIONAL VERTICAL TIMELINE -->
       <div id="page-scheduler" class="page-view hidden space-y-8">
         
         <!-- Overdue / Pending Tasks Section -->
@@ -383,44 +383,46 @@
           <div id="pending-task-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 max-h-60 overflow-y-auto custom-scrollbar pr-1"></div>
         </section>
 
-        <!-- Daily Time-Blocking & Timeline Planner Tool -->
+        <!-- Professional Vertical Time-Blocking Timeline -->
         <section class="glass-card p-6 rounded-2xl border-l-4 border-l-amber-500 shadow-xl">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
             <div>
               <h3 class="text-base font-extrabold text-amber-500 flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-lg"></i> Daily Time-Blocking & Study Slot Planner
+                <i class="fa-solid fa-timeline text-lg"></i> Daily Time-Blocking & Study Slot Planner
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Plan out your hourly study slots for today or duplicate the timeline forward</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Structure your day in dedicated time blocks and track slot completion</p>
             </div>
 
             <div class="flex items-center gap-2">
-              <input type="date" id="timeblock-date-picker" onchange="renderTimeBlocks()" class="input-field border rounded-xl px-3 py-1 text-xs font-bold">
-              <button onclick="forwardScheduleToNextDay()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1 shadow-md">
+              <input type="date" id="timeblock-date-picker" onchange="renderTimeBlocks()" class="input-field border rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none">
+              <button onclick="forwardScheduleToNextDay()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shadow-md">
                 <i class="fa-solid fa-forward"></i> Forward to Tomorrow
               </button>
             </div>
           </div>
 
-          <!-- Add Time Block Form -->
-          <form id="add-timeblock-form" class="grid grid-cols-1 sm:grid-cols-12 gap-2 sub-box p-3 rounded-xl mb-4">
+          <!-- Add Slot Box -->
+          <form id="add-timeblock-form" class="grid grid-cols-1 sm:grid-cols-12 gap-2 sub-box p-3 rounded-xl mb-6">
             <div class="sm:col-span-3">
-              <input type="time" id="tb-start-time" required class="w-full input-field border rounded-lg px-2 py-1 text-xs font-bold">
+              <input type="time" id="tb-start-time" required class="w-full input-field border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none">
             </div>
             <div class="sm:col-span-3">
-              <input type="time" id="tb-end-time" required class="w-full input-field border rounded-lg px-2 py-1 text-xs font-bold">
+              <input type="time" id="tb-end-time" required class="w-full input-field border rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none">
             </div>
             <div class="sm:col-span-4">
-              <input type="text" id="tb-title-input" placeholder="Slot activity (e.g., FR Ind AS 115)..." required class="w-full input-field border rounded-lg px-3 py-1 text-xs">
+              <input type="text" id="tb-title-input" placeholder="Slot activity (e.g., FR Ind AS 115 Practice)..." required class="w-full input-field border rounded-lg px-3 py-1.5 text-xs focus:outline-none">
             </div>
             <div class="sm:col-span-2">
-              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold py-1 rounded-lg text-xs transition-all shadow-md">
+              <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold py-1.5 rounded-lg text-xs transition-all shadow-md">
                 + Add Slot
               </button>
             </div>
           </form>
 
-          <!-- Timeline Slots Display Container -->
-          <div id="timeblock-timeline-list" class="space-y-2 max-h-60 overflow-y-auto custom-scrollbar pr-1"></div>
+          <!-- Professional Vertical Timeline Grid -->
+          <div class="relative pl-6 sm:pl-8 border-l-2 border-indigo-500/30 space-y-4 my-2" id="timeblock-timeline-list">
+            <!-- Rendered via JS -->
+          </div>
         </section>
 
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -606,7 +608,7 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records -->
+        <!-- Pomodoro Records Grid -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
@@ -700,7 +702,7 @@
         </section>
       </div>
 
-      <!-- PAGE 7: SUBJECT MEMORY WALL & FORMULA PINBOARD & SUBJECT RESOURCE LINKS -->
+      <!-- PAGE 7: SUBJECT MEMORY WALL & FORMULA PINBOARD -->
       <div id="page-wall" class="page-view hidden space-y-8">
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
@@ -718,7 +720,7 @@
 
           <div id="subject-folder-tabs" class="flex flex-wrap gap-2 mb-6 border-b border-slate-200 dark:border-slate-800/80 pb-4"></div>
 
-          <!-- Subject Resource Links Section -->
+          <!-- Subject Resource Links -->
           <div class="sub-box p-5 rounded-2xl mb-8 border border-slate-300 dark:border-slate-800">
             <div class="flex justify-between items-center mb-3">
               <h4 class="text-xs font-bold text-indigo-500 uppercase tracking-wider flex items-center gap-2">
@@ -731,7 +733,6 @@
             <div id="subject-links-container" class="flex flex-wrap gap-2.5"></div>
           </div>
 
-          <!-- Active Subject Memory Wall Sticky Notes Board -->
           <div>
             <div class="flex justify-between items-center mb-4">
               <h4 id="active-wall-subject-title" class="text-base font-black text-indigo-500 flex items-center gap-2">
@@ -1093,7 +1094,7 @@
     const pageTitles = {
       overview: "Holistic Performance Report",
       pomodoro: "Deep Focus Pomodoro Timer",
-      scheduler: "Advance Study Scheduler & Time-Block Planner",
+      scheduler: "Advance Study Scheduler & Timeline Planner",
       chapters: "CA Final Chapter Index & Revision Tracker",
       analytics: "Graphical Analytics & Focus Pattern",
       history: "Date-Wise & Month-Wise Session Logs",
@@ -1150,7 +1151,7 @@
       renderPomodoroMatrixGrid();
     };
 
-    // Default Chapter Data Loaded Directly from PDF Source
+    // Default Chapter Data
     const defaultChaptersData = {
       "FR": [
         { id: 'fr_1', name: 'Ind AS 115 - Revenue from Contracts with Customers', r1: false, r2: false, r3: false, r4: false },
@@ -1267,7 +1268,7 @@
     };
 
     // Load State
-    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v27')) || [];
+    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v28')) || [];
     let state = {
       timer: {
         mode: 'work',
@@ -1285,21 +1286,21 @@
       focusGoalViewDate: new Date(),
       pomoMatrixViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v27')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v27')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v27')) || [],
-      resourceLinks: JSON.parse(localStorage.getItem('sp_links_v27')) || [],
-      timeBlocks: JSON.parse(localStorage.getItem('sp_timeblocks_v27')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v28')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v28')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v28')) || [],
+      resourceLinks: JSON.parse(localStorage.getItem('sp_links_v28')) || [],
+      timeBlocks: JSON.parse(localStorage.getItem('sp_timeblocks_v28')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v27')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v28')) || [],
       logs: rawLogs.map(l => {
         if (!l.id) l.id = Date.now().toString() + Math.random().toString(36).substr(2, 4);
         return l;
       })
     };
 
-    // Set Default Calendar Picker Values for Spline Chart (Last 7 Days)
+    // Set Default Calendar Picker Values
     const initEndDate = new Date();
     const initStartDate = new Date();
     initStartDate.setDate(initStartDate.getDate() - 6);
@@ -1350,7 +1351,7 @@
       alert(`🎉 Successfully logged ${mins} mins of ${sub} study!`);
     };
 
-    // Daily Time-Blocking Engine
+    // Professional Vertical Timeline Engine
     document.getElementById('add-timeblock-form').onsubmit = (e) => {
       e.preventDefault();
       const startTime = document.getElementById('tb-start-time').value;
@@ -1380,31 +1381,42 @@
       const blocks = state.timeBlocks.filter(b => b.date === targetDate).sort((a,b) => a.startTime.localeCompare(b.startTime));
 
       if (blocks.length === 0) {
-        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2 text-center">No study time slots scheduled for ${targetDate}. Add a time slot above!</p>`;
+        container.innerHTML = `<p class="text-xs text-slate-500 italic p-2 text-center">No study slots scheduled for ${targetDate}. Add a time slot above!</p>`;
         return;
       }
 
       blocks.forEach(block => {
         const item = document.createElement('div');
-        item.className = `p-3 rounded-xl sub-box flex justify-between items-center text-xs border transition-all ${
-          block.completed ? 'border-emerald-500/40 bg-emerald-500/10' : 'border-amber-500/30'
-        }`;
+        item.className = "relative flex items-center justify-between p-3.5 rounded-2xl sub-box border transition-all hover:translate-x-1";
 
         item.innerHTML = `
-          <div class="flex items-center gap-3">
-            <button onclick="toggleTimeBlockCompletion('${block.id}')" class="text-slate-500 hover:text-emerald-500">
-              <i class="fa-${block.completed ? 'solid fa-circle-check text-emerald-500' : 'regular fa-circle'} text-base"></i>
+          <!-- Glowing Node Marker -->
+          <span class="absolute -left-[31px] sm:-left-[39px] top-1/2 -translate-y-1/2 w-4 h-4 rounded-full border-2 ${
+            block.completed ? 'bg-emerald-500 border-emerald-400 shadow-md shadow-emerald-500/50' : 'bg-amber-500 border-amber-400 shadow-md shadow-amber-500/50'
+          }"></span>
+
+          <div class="flex items-center gap-3 min-w-0">
+            <button onclick="toggleTimeBlockCompletion('${block.id}')" class="text-slate-500 hover:text-emerald-500 transition-colors">
+              <i class="fa-${block.completed ? 'solid fa-circle-check text-emerald-500 text-lg' : 'regular fa-circle text-lg'}"></i>
             </button>
-            <div>
-              <span class="px-2 py-0.5 bg-amber-500/20 text-amber-500 rounded font-mono font-bold text-[10px]">
-                ${block.startTime} - ${block.endTime}
-              </span>
-              <span class="font-bold ml-2 ${block.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">
+            <div class="truncate">
+              <div class="flex items-center gap-2 mb-0.5">
+                <span class="px-2 py-0.5 bg-amber-500/10 text-amber-500 font-mono font-extrabold text-[10px] rounded-md border border-amber-500/20">
+                  <i class="fa-regular fa-clock mr-1"></i>${block.startTime} - ${block.endTime}
+                </span>
+                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded ${block.completed ? 'bg-emerald-500/20 text-emerald-400' : 'bg-indigo-500/20 text-indigo-400'}">
+                  ${block.completed ? 'Completed' : 'Planned Slot'}
+                </span>
+              </div>
+              <p class="text-xs font-extrabold ${block.completed ? 'line-through text-slate-400' : 'text-slate-800 dark:text-slate-200'}">
                 ${block.title}
-              </span>
+              </p>
             </div>
           </div>
-          <button onclick="deleteTimeBlock('${block.id}')" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-trash text-xs"></i></button>
+
+          <button onclick="deleteTimeBlock('${block.id}')" class="text-slate-400 hover:text-rose-500 text-xs p-1.5 transition-colors">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
         `;
         container.appendChild(item);
       });
@@ -2235,7 +2247,6 @@
         const noteEl = document.createElement('div');
         const colorClass = `sticky-note-${note.color || 'yellow'}`;
         
-        // Strict boundary confinement with max height & scrollbar
         noteEl.className = `p-4 rounded-2xl shadow-lg relative flex flex-col justify-between max-h-64 overflow-hidden border ${colorClass}`;
         
         noteEl.innerHTML = `
@@ -2294,7 +2305,7 @@
         stickyNotes: state.stickyNotes,
         resourceLinks: state.resourceLinks,
         timeBlocks: state.timeBlocks,
-        examDate: localStorage.getItem('sp_exam_date_v27'),
+        examDate: localStorage.getItem('sp_exam_date_v28'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2355,7 +2366,7 @@
         playAudioChime('complete');
         alert("📥 Progress restored successfully from backup string!");
       } catch (err) {
-        alert("📥 Progress restored successfully from backup string!");
+        alert("❌ Invalid backup string format.");
       }
     }
 
@@ -2372,7 +2383,7 @@
           playAudioChime('complete');
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
-          alert("📥 Data backup successfully imported and restored!");
+          alert("❌ Invalid backup file format!");
         } finally {
           event.target.value = '';
         }
@@ -2393,7 +2404,7 @@
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
       if (data.resourceLinks && Array.isArray(data.resourceLinks)) state.resourceLinks = data.resourceLinks;
       if (data.timeBlocks && Array.isArray(data.timeBlocks)) state.timeBlocks = data.timeBlocks;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v27', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v28', data.examDate);
 
       saveData();
       renderTasks();
@@ -2704,7 +2715,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v27');
+      const savedDate = localStorage.getItem('sp_exam_date_v28');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2716,14 +2727,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v27', val);
+        localStorage.setItem('sp_exam_date_v28', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v27');
+      const savedDate = localStorage.getItem('sp_exam_date_v28');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2897,13 +2908,13 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v27', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v27', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v27', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v27', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v27', JSON.stringify(state.stickyNotes));
-      localStorage.setItem('sp_links_v27', JSON.stringify(state.resourceLinks));
-      localStorage.setItem('sp_timeblocks_v27', JSON.stringify(state.timeBlocks));
+      localStorage.setItem('sp_tasks_v28', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v28', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v28', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v28', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v28', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_links_v28', JSON.stringify(state.resourceLinks));
+      localStorage.setItem('sp_timeblocks_v28', JSON.stringify(state.timeBlocks));
     }
 
     // Modal Preferences
