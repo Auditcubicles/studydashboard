@@ -250,7 +250,7 @@
         </div>
       </div>
 
-      <!-- PAGE 2: FOCUS POMODORO TIMER PAGE & MANUAL LOGGER -->
+      <!-- PAGE 2: FOCUS POMODORO TIMER PAGE & ENHANCED MANUAL LOGGER -->
       <div id="page-pomodoro" class="page-view hidden space-y-8">
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div class="lg:col-span-8">
@@ -304,57 +304,70 @@
             </section>
           </div>
 
+          <!-- Precision Manual Session Logger Box -->
           <div class="lg:col-span-4">
             <section class="glass-card p-6 rounded-3xl shadow-xl h-full flex flex-col justify-between">
               <div>
                 <h3 class="text-base font-bold text-amber-500 mb-1 flex items-center gap-2">
-                  <i class="fa-solid fa-pen-to-square"></i> Manual Session Logger
+                  <i class="fa-solid fa-pen-to-square"></i> Precision Manual Logger
                 </h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Log study sessions completed offline or outside the timer</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Log exact start/end study timestamps mapped directly to your timeline</p>
 
                 <form id="manual-log-form" class="space-y-3">
+                  <!-- Task Selection Option -->
                   <div>
-                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Study Duration (Minutes)</label>
-                    <input type="number" id="manual-mins-input" min="1" max="600" value="60" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
-                  </div>
-
-                  <div>
-                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Select Subject</label>
-                    <select id="manual-subject-select" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
-                      <option value="FR">FR</option>
-                      <option value="AFM">AFM</option>
-                      <option value="AUDIT">AUDIT</option>
-                      <option value="DT">DT</option>
-                      <option value="IDT">IDT</option>
-                      <option value="IBS">IBS</option>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Associate Scheduled Task (Optional)</label>
+                    <select id="manual-task-select" class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                      <option value="">-- Unlinked Session --</option>
                     </select>
                   </div>
 
                   <div>
-                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Study Type</label>
-                    <select id="manual-type-select" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
-                      <option value="Self Revision">Self Revision</option>
-                      <option value="Lecture">Lecture</option>
-                      <option value="Youtube Revision">Youtube Revision</option>
-                      <option value="Mock Test">Mock Test</option>
-                      <option value="Question Practice">Question Practice</option>
-                    </select>
-                  </div>
-
-                  <div class="grid grid-cols-2 gap-2">
-                    <div>
-                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Date</label>
-                      <input type="date" id="manual-date-input" required class="w-full input-field border rounded-xl px-2 py-1.5 text-xs">
-                    </div>
-                    <div>
-                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Time Slot (Hour)</label>
-                      <select id="manual-hour-select" required class="w-full input-field border rounded-xl px-2 py-1.5 text-xs font-bold">
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Select Subject & Type</label>
+                    <div class="grid grid-cols-2 gap-2">
+                      <select id="manual-subject-select" required class="w-full input-field border rounded-xl px-2 py-2 text-xs font-bold focus:outline-none">
+                        <option value="FR">FR</option>
+                        <option value="AFM">AFM</option>
+                        <option value="AUDIT">AUDIT</option>
+                        <option value="DT">DT</option>
+                        <option value="IDT">IDT</option>
+                        <option value="IBS">IBS</option>
+                      </select>
+                      <select id="manual-type-select" required class="w-full input-field border rounded-xl px-2 py-2 text-xs font-bold focus:outline-none">
+                        <option value="Self Revision">Self Revision</option>
+                        <option value="Lecture">Lecture</option>
+                        <option value="Youtube Revision">Youtube Revision</option>
+                        <option value="Mock Test">Mock Test</option>
+                        <option value="Question Practice">Question Practice</option>
                       </select>
                     </div>
                   </div>
 
+                  <div>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Study Date</label>
+                    <input type="date" id="manual-date-input" required class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold">
+                  </div>
+
+                  <!-- Precision Start Time and End Time -->
+                  <div class="grid grid-cols-2 gap-2">
+                    <div>
+                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Start Time</label>
+                      <input type="time" id="manual-start-time" required onchange="calculateManualDuration()" class="w-full input-field border rounded-xl px-2 py-1.5 text-xs font-bold">
+                    </div>
+                    <div>
+                      <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">End Time</label>
+                      <input type="time" id="manual-end-time" required onchange="calculateManualDuration()" class="w-full input-field border rounded-xl px-2 py-1.5 text-xs font-bold">
+                    </div>
+                  </div>
+
+                  <!-- Calculated Hours Output Box -->
+                  <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Calculated Study Time</p>
+                    <p id="manual-calc-duration-text" class="text-sm font-black text-amber-500">0 Mins (0.0 Hrs)</p>
+                  </div>
+
                   <button type="submit" class="w-full bg-amber-500 hover:bg-amber-400 text-slate-900 font-extrabold py-2.5 rounded-xl text-xs transition-all shadow-md mt-2">
-                    <i class="fa-solid fa-plus-circle"></i> Log Manual Time
+                    <i class="fa-solid fa-plus-circle"></i> Log Precision Time
                   </button>
                 </form>
               </div>
@@ -365,8 +378,6 @@
 
       <!-- PAGE 3: ADVANCED SCHEDULER & TASKS PAGE -->
       <div id="page-scheduler" class="page-view hidden space-y-8">
-        
-        <!-- Overdue / Pending Tasks Section -->
         <section class="glass-card p-6 rounded-2xl border-l-4 border-l-rose-500 shadow-xl">
           <div class="flex justify-between items-center mb-4">
             <div>
@@ -566,14 +577,14 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records -->
+        <!-- Pomodoro Records (Real Fractional Timeline Algorithm) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Time-of-Day Visual Grid)
+                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Real Time-of-Day Grid)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Fixed top header with smooth scrollable date history capped up to today</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Visual timeline calculating exact study start and end times across 2-hour slots</p>
             </div>
 
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
@@ -1071,7 +1082,10 @@
       navButtons[pageKey].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-1.5";
       document.getElementById('page-title').textContent = pageTitles[pageKey];
 
-      if (pageKey === 'pomodoro') updatePomoTaskDropdown();
+      if (pageKey === 'pomodoro') {
+        updatePomoTaskDropdown();
+        populateManualTaskDropdown();
+      }
       if (pageKey === 'overview' || pageKey === 'analytics') updateMetricsAndCharts();
       if (pageKey === 'history') renderSessionHistory();
       if (pageKey === 'wall') renderMemoryWall();
@@ -1225,7 +1239,7 @@
     };
 
     // Load State
-    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v29')) || [];
+    let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v30')) || [];
     let state = {
       timer: {
         mode: 'work',
@@ -1243,13 +1257,13 @@
       focusGoalViewDate: new Date(),
       pomoMatrixViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
-      subjects: JSON.parse(localStorage.getItem('sp_subjects_v29')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
-      chapters: JSON.parse(localStorage.getItem('sp_chapters_v29')) || defaultChaptersData,
-      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v29')) || [],
-      resourceLinks: JSON.parse(localStorage.getItem('sp_links_v29')) || [],
+      subjects: JSON.parse(localStorage.getItem('sp_subjects_v30')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+      chapters: JSON.parse(localStorage.getItem('sp_chapters_v30')) || defaultChaptersData,
+      stickyNotes: JSON.parse(localStorage.getItem('sp_stickies_v30')) || [],
+      resourceLinks: JSON.parse(localStorage.getItem('sp_links_v30')) || [],
       calendarViewDate: new Date(),
       selectedCalendarDate: new Date().toISOString().split('T')[0],
-      tasks: JSON.parse(localStorage.getItem('sp_tasks_v29')) || [],
+      tasks: JSON.parse(localStorage.getItem('sp_tasks_v30')) || [],
       logs: rawLogs.map(l => {
         if (!l.id) l.id = Date.now().toString() + Math.random().toString(36).substr(2, 4);
         return l;
@@ -1268,42 +1282,93 @@
     document.getElementById('graph-date-picker').value = state.selectedCalendarDate;
     document.getElementById('manual-date-input').value = state.selectedCalendarDate;
 
-    // Populate Manual Logger Hours Dropdown (0 to 23)
-    const manualHourSelect = document.getElementById('manual-hour-select');
-    for (let h = 0; h < 24; h++) {
-      const opt = document.createElement('option');
-      opt.value = h;
-      opt.textContent = `${h.toString().padStart(2, '0')}:00 - ${(h+1).toString().padStart(2, '0')}:00`;
-      if (h === new Date().getHours()) opt.selected = true;
-      manualHourSelect.appendChild(opt);
+    // Set Default Start/End Time for Manual Logger
+    const nowHour = new Date().getHours();
+    document.getElementById('manual-start-time').value = `${nowHour.toString().padStart(2, '0')}:00`;
+    document.getElementById('manual-end-time').value = `${(nowHour + 1).toString().padStart(2, '0')}:00`;
+
+    function calculateManualDuration() {
+      const st = document.getElementById('manual-start-time').value;
+      const et = document.getElementById('manual-end-time').value;
+      if (!st || !et) return 0;
+
+      const [sh, sm] = st.split(':').map(Number);
+      const [eh, em] = et.split(':').map(Number);
+
+      let totalStartMins = sh * 60 + sm;
+      let totalEndMins = eh * 60 + em;
+
+      if (totalEndMins < totalStartMins) totalEndMins += 24 * 60; // Overnight shift edge-case
+
+      const durationMins = totalEndMins - totalStartMins;
+      document.getElementById('manual-calc-duration-text').textContent = `${durationMins} Mins (${(durationMins / 60).toFixed(1)} Hrs)`;
+      return durationMins;
+    }
+    calculateManualDuration();
+
+    function populateManualTaskDropdown() {
+      const sel = document.getElementById('manual-task-select');
+      if (!sel) return;
+      sel.innerHTML = `<option value="">-- Unlinked Session --</option>`;
+
+      const selDate = document.getElementById('manual-date-input').value;
+      const filteredTasks = state.tasks.filter(t => t.date === selDate && !t.completed);
+
+      filteredTasks.forEach(task => {
+        const opt = document.createElement('option');
+        opt.value = task.id;
+        opt.textContent = `[${task.subject}] ${task.title}`;
+        sel.appendChild(opt);
+      });
     }
 
-    // Manual Form Submit
+    document.getElementById('manual-date-input').onchange = populateManualTaskDropdown;
+
+    // Enhanced Manual Form Submit Handler
     document.getElementById('manual-log-form').onsubmit = (e) => {
       e.preventDefault();
-      const mins = parseInt(document.getElementById('manual-mins-input').value) || 0;
+      const mins = calculateManualDuration();
       const sub = document.getElementById('manual-subject-select').value;
       const type = document.getElementById('manual-type-select').value;
       const date = document.getElementById('manual-date-input').value;
-      const hour = parseInt(document.getElementById('manual-hour-select').value) || 0;
+      const startTime = document.getElementById('manual-start-time').value;
+      const endTime = document.getElementById('manual-end-time').value;
+      const taskId = document.getElementById('manual-task-select').value;
 
-      if (mins <= 0 || !date) return;
+      if (mins <= 0 || !date || !startTime || !endTime) {
+        alert("Please enter a valid Start Time and End Time.");
+        return;
+      }
 
-      state.logs.push({
+      const [sh] = startTime.split(':').map(Number);
+
+      const logObj = {
         id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
         date,
         minutes: mins,
-        hour: hour,
+        hour: sh,
+        startTime: startTime,
+        endTime: endTime,
         subject: sub,
         type: type,
-        timestamp: `${hour.toString().padStart(2, '0')}:00 (Manual)`
-      });
+        timestamp: `${startTime} - ${endTime}`
+      };
+
+      state.logs.push(logObj);
+
+      if (taskId) {
+        const linkedTask = state.tasks.find(t => t.id === taskId);
+        if (linkedTask) {
+          linkedTask.completedPomos += parseFloat((mins / state.timer.workDuration).toFixed(1));
+        }
+      }
 
       saveData();
       updateMetricsAndCharts();
       renderSessionHistory();
+      renderTasks();
       playAudioChime('complete');
-      alert(`🎉 Successfully logged ${mins} mins of ${sub} study!`);
+      alert(`🎉 Successfully logged ${mins} mins (${startTime} to ${endTime}) for ${sub}!`);
     };
 
     // Subject Resource Links Manager
@@ -1475,14 +1540,21 @@
         const today = new Date().toISOString().split('T')[0];
         const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
 
+        const now = new Date();
+        const start = new Date(now.getTime() - elapsedSeconds);
+        const startTimeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        const endTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
         state.logs.push({
           id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
           date: today,
           minutes: elapsedMinutes,
-          hour: new Date().getHours(),
+          hour: start.getHours(),
+          startTime: startTimeStr,
+          endTime: endTimeStr,
           subject: activeTask ? activeTask.subject : 'General',
           type: activeTask ? activeTask.type : 'Study',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          timestamp: `${startTimeStr} - ${endTimeStr}`
         });
 
         if (activeTask) activeTask.completedPomos += parseFloat((elapsedMinutes / state.timer.workDuration).toFixed(1));
@@ -1505,14 +1577,21 @@
         const today = new Date().toISOString().split('T')[0];
         const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
 
+        const now = new Date();
+        const start = new Date(now.getTime() - (state.timer.workDuration * 60 * 1000));
+        const startTimeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+        const endTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
+
         state.logs.push({
           id: Date.now().toString() + Math.random().toString(36).substr(2, 4),
           date: today,
           minutes: state.timer.workDuration,
-          hour: new Date().getHours(),
+          hour: start.getHours(),
+          startTime: startTimeStr,
+          endTime: endTimeStr,
           subject: activeTask ? activeTask.subject : 'General',
           type: activeTask ? activeTask.type : 'Study',
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+          timestamp: `${startTimeStr} - ${endTimeStr}`
         });
 
         if (activeTask) activeTask.completedPomos++;
@@ -1636,6 +1715,7 @@
 
       document.getElementById('task-completion-stats').textContent = `${completedCount} / ${todaysTasks.length} Done`;
       updatePomoTaskDropdown();
+      populateManualTaskDropdown();
     }
 
     function reassignTaskCustomDate(id) {
@@ -1859,7 +1939,7 @@
       renderPomodoroMatrixGrid();
     }
 
-    // Pomodoro Records Matrix Renderer
+    // Ultra-Realistic Fractional Time-of-Day Matrix Renderer
     function renderPomodoroMatrixGrid() {
       const fixedHeaderContainer = document.getElementById('pomo-matrix-fixed-header');
       const scrollBodyContainer = document.getElementById('pomo-matrix-scroll-body');
@@ -1910,10 +1990,32 @@
 
         slots.forEach((slot, slotIdx) => {
           const slotStartHour = slotIdx * 2;
-          const slotEndHour = slotStartHour + 1;
+          const slotEndHour = slotStartHour + 2;
 
-          const slotMins = dayLogs.filter(l => l.hour !== undefined && (l.hour === slotStartHour || l.hour === slotEndHour))
-                                  .reduce((a, c) => a + c.minutes, 0);
+          let slotMins = 0;
+
+          dayLogs.forEach(l => {
+            let logStartMins = l.hour * 60;
+            let logEndMins = logStartMins + l.minutes;
+
+            if (l.startTime && l.endTime) {
+              const [sh, sm] = l.startTime.split(':').map(Number);
+              const [eh, em] = l.endTime.split(':').map(Number);
+              logStartMins = sh * 60 + sm;
+              logEndMins = eh * 60 + em;
+              if (logEndMins < logStartMins) logEndMins += 24 * 60;
+            }
+
+            const slotStartMins = slotStartHour * 60;
+            const slotEndMins = slotEndHour * 60;
+
+            const overlapStart = Math.max(logStartMins, slotStartMins);
+            const overlapEnd = Math.min(logEndMins, slotEndMins);
+
+            if (overlapStart < overlapEnd) {
+              slotMins += (overlapEnd - overlapStart);
+            }
+          });
 
           const fillPct = Math.min(100, Math.round((slotMins / 120) * 100));
 
@@ -2141,7 +2243,7 @@
         chapters: state.chapters,
         stickyNotes: state.stickyNotes,
         resourceLinks: state.resourceLinks,
-        examDate: localStorage.getItem('sp_exam_date_v29'),
+        examDate: localStorage.getItem('sp_exam_date_v30'),
         exportedAt: new Date().toISOString()
       };
     }
@@ -2202,7 +2304,7 @@
         playAudioChime('complete');
         alert("📥 Progress restored successfully from backup string!");
       } catch (err) {
-        alert("📥 Progress restored successfully from backup string!");
+        alert("❌ Invalid backup string format.");
       }
     }
 
@@ -2219,7 +2321,7 @@
           playAudioChime('complete');
           alert("📥 Data backup successfully imported and restored!");
         } catch (err) {
-          alert("📥 Data backup successfully imported and restored!");
+          alert("❌ Invalid backup file format!");
         } finally {
           event.target.value = '';
         }
@@ -2239,7 +2341,7 @@
       if (data.chapters) state.chapters = data.chapters;
       if (data.stickyNotes && Array.isArray(data.stickyNotes)) state.stickyNotes = data.stickyNotes;
       if (data.resourceLinks && Array.isArray(data.resourceLinks)) state.resourceLinks = data.resourceLinks;
-      if (data.examDate) localStorage.setItem('sp_exam_date_v29', data.examDate);
+      if (data.examDate) localStorage.setItem('sp_exam_date_v30', data.examDate);
 
       saveData();
       renderTasks();
@@ -2549,7 +2651,7 @@
     const examDateModalInput = document.getElementById('exam-date-modal-input');
 
     function openExamDateModal() {
-      const savedDate = localStorage.getItem('sp_exam_date_v29');
+      const savedDate = localStorage.getItem('sp_exam_date_v30');
       if (savedDate) examDateModalInput.value = savedDate;
       examDateModal.classList.remove('hidden');
     }
@@ -2561,14 +2663,14 @@
     function saveTargetExamDate() {
       const val = examDateModalInput.value;
       if (val) {
-        localStorage.setItem('sp_exam_date_v29', val);
+        localStorage.setItem('sp_exam_date_v30', val);
         updateExamCountdown();
         closeExamDateModal();
       }
     }
 
     function updateExamCountdown() {
-      const savedDate = localStorage.getItem('sp_exam_date_v29');
+      const savedDate = localStorage.getItem('sp_exam_date_v30');
       if (!savedDate) {
         document.getElementById('report-exam-days').textContent = 'Set Target';
         return;
@@ -2742,12 +2844,12 @@
     }
 
     function saveData() {
-      localStorage.setItem('sp_tasks_v29', JSON.stringify(state.tasks));
-      localStorage.setItem('sp_logs_v29', JSON.stringify(state.logs));
-      localStorage.setItem('sp_subjects_v29', JSON.stringify(state.subjects));
-      localStorage.setItem('sp_chapters_v29', JSON.stringify(state.chapters));
-      localStorage.setItem('sp_stickies_v29', JSON.stringify(state.stickyNotes));
-      localStorage.setItem('sp_links_v29', JSON.stringify(state.resourceLinks));
+      localStorage.setItem('sp_tasks_v30', JSON.stringify(state.tasks));
+      localStorage.setItem('sp_logs_v30', JSON.stringify(state.logs));
+      localStorage.setItem('sp_subjects_v30', JSON.stringify(state.subjects));
+      localStorage.setItem('sp_chapters_v30', JSON.stringify(state.chapters));
+      localStorage.setItem('sp_stickies_v30', JSON.stringify(state.stickyNotes));
+      localStorage.setItem('sp_links_v30', JSON.stringify(state.resourceLinks));
     }
 
     // Modal Preferences
