@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- PeerJS for Ultra-Lightweight Cross-Device Streaming -->
+  <!-- PeerJS for Low-Bandwidth Tablet Pairing -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&family=Kalam:wght@400;700&display=swap');
@@ -87,31 +87,40 @@
 </head>
 <body class="min-h-screen custom-scrollbar flex flex-col justify-between">
 
-  <!-- ULTRA-LIGHTWEIGHT TABLET KITKAT SCREEN (Shows only when ?mode=tablet is in URL) -->
+  <!-- STANDALONE TABLET COMPANION VIEW (Triggered via #tablet or ?view=tablet) -->
   <div id="tablet-only-screen" class="hidden min-h-screen bg-slate-950 text-white flex flex-col justify-between p-6">
     <div class="flex justify-between items-center border-b border-slate-800 pb-4">
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black">CA</div>
-        <h1 class="text-lg font-black text-indigo-400">StudyPulse Tablet Stream</h1>
+        <h1 class="text-lg font-black text-indigo-400">StudyPulse Tablet Portal</h1>
       </div>
-      <span id="tablet-status-badge" class="px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-lg">Connecting...</span>
+      <span id="tablet-status-badge" class="px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-lg">Enter Laptop PIN</span>
     </div>
 
-    <!-- Live Stream Video / Timer Frame (Works on KitKat HTML5 Video) -->
-    <div class="my-auto flex flex-col items-center justify-center text-center space-y-4">
-      <video id="tablet-stream-video" autoplay playsinline muted class="w-full max-h-[60vh] rounded-2xl border border-slate-800 object-contain bg-black hidden"></video>
-
-      <div id="tablet-fallback-card" class="space-y-4 w-full">
-        <p id="tablet-target-subject" class="text-xl font-extrabold text-indigo-400">[ STUDY FOCUS ]</p>
-        <div id="tablet-timer-display" class="timer-mono text-7xl md:text-8xl font-black text-white tracking-tight">00:00:00</div>
-        <p id="tablet-mode-label" class="text-xs font-extrabold uppercase tracking-widest text-slate-400">CONNECTING TO LAPTOP...</p>
-      </div>
+    <!-- PIN Connect Entry Panel -->
+    <div id="tablet-pin-entry-card" class="my-auto max-w-xs mx-auto w-full space-y-4 p-6 bg-slate-900 border border-slate-800 rounded-3xl text-center">
+      <i class="fa-solid fa-key text-3xl text-indigo-500 mb-1"></i>
+      <h2 class="text-sm font-extrabold text-slate-200">Connect to Laptop</h2>
+      <p class="text-[11px] text-slate-400">Enter the 4-digit PIN displayed in your laptop's Focus Timer:</p>
+      <input type="text" id="tablet-direct-pin-input" maxlength="4" placeholder="----" class="w-full text-center tracking-widest text-3xl font-mono font-black py-2 rounded-xl bg-slate-950 border border-slate-700 text-indigo-400 focus:outline-none focus:border-indigo-500">
+      <button onclick="connectTabletViaDirectPin()" class="w-full bg-indigo-600 active:bg-indigo-700 text-white py-3 rounded-xl font-extrabold text-xs shadow-lg shadow-indigo-600/30">
+        Pair & Sync Display
+      </button>
     </div>
 
-    <div class="flex justify-center gap-3 pt-4 border-t border-slate-800">
-      <button onclick="sendTabletCmd('remote_start')" class="flex-1 bg-indigo-600 active:bg-indigo-700 text-white py-3 rounded-xl font-bold text-sm">Play / Resume</button>
-      <button onclick="sendTabletCmd('remote_pause')" class="flex-1 bg-amber-600 active:bg-amber-700 text-white py-3 rounded-xl font-bold text-sm">Pause</button>
-      <button onclick="sendTabletCmd('remote_stop')" class="flex-1 bg-rose-600 active:bg-rose-700 text-white py-3 rounded-xl font-bold text-sm">Stop & Log</button>
+    <!-- Live Synced Timer Card -->
+    <div id="tablet-live-timer-card" class="hidden my-auto text-center space-y-4">
+      <p id="tablet-target-subject" class="text-xl font-extrabold text-indigo-400 tracking-wider">[ STUDY FOCUS ]</p>
+      <div id="tablet-timer-display" class="timer-mono text-7xl md:text-8xl font-black text-white tracking-tight">00:00:00</div>
+      <p id="tablet-mode-label" class="text-xs font-extrabold uppercase tracking-widest text-slate-400">READY</p>
+      <button onclick="disconnectTabletSession()" class="text-xs text-rose-400 underline font-bold mt-2">Disconnect / Change PIN</button>
+    </div>
+
+    <!-- Remote Controls -->
+    <div id="tablet-action-controls" class="hidden flex justify-center gap-3 pt-4 border-t border-slate-800">
+      <button onclick="sendTabletCmd('remote_start')" class="flex-1 bg-indigo-600 active:bg-indigo-700 text-white py-3.5 rounded-xl font-bold text-sm">Play / Resume</button>
+      <button onclick="sendTabletCmd('remote_pause')" class="flex-1 bg-amber-600 active:bg-amber-700 text-white py-3.5 rounded-xl font-bold text-sm">Pause</button>
+      <button onclick="sendTabletCmd('remote_stop')" class="flex-1 bg-rose-600 active:bg-rose-700 text-white py-3.5 rounded-xl font-bold text-sm">Stop & Log</button>
     </div>
   </div>
 
@@ -292,14 +301,14 @@
                     <i class="fa-solid fa-brain text-indigo-500"></i> Deep Focus Study Hub
                   </h3>
                   <span id="remote-connected-badge" class="hidden px-2 py-0.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 rounded-lg text-[10px] font-extrabold flex items-center gap-1">
-                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Tablet Live Stream Active
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span> Tablet Connected
                   </span>
                 </div>
 
                 <!-- Controls -->
                 <div class="flex flex-wrap gap-2">
                   <button onclick="openTabletCastModal()" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-indigo-500/30 bg-indigo-500/10 flex items-center gap-1.5 font-bold transition-all shadow-sm">
-                    <i class="fa-solid fa-tablet-screen-button"></i> Tablet Screen Cast
+                    <i class="fa-solid fa-tablet-screen-button"></i> Tablet Link
                   </button>
                   <button id="pip-btn" onclick="toggleTimerPiP()" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 flex items-center gap-1.5">
                     <i class="fa-solid fa-window-restore text-indigo-500"></i> Mini PiP
@@ -656,33 +665,21 @@
           </div>
         </section>
 
-        <!-- Fixed & Perfectly Aligned 12-Hour Study Distribution Grid with Custom Slot Filter -->
+        <!-- Fixed & Perfectly Aligned 24-Hour (12 AM to 11 PM) Daily Heatmap Timeline -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Daily Study Heatmap Timeline
+                <i class="fa-solid fa-business-time text-purple-500"></i> 24-Hour Daily Study Heatmap (12-Hour AM/PM Labels)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Visual 12-hour hourly format representation across chosen study timeframes</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Exact hour-by-hour alignment from 12 AM midnight to 11 PM night</p>
             </div>
 
-            <!-- Custom Display Time Slot Selector & Month Controls -->
-            <div class="flex flex-wrap items-center gap-3">
-              <div class="flex items-center gap-1.5 sub-box px-3 py-1 rounded-xl text-xs">
-                <label class="text-slate-500 dark:text-slate-400 font-bold">Slot:</label>
-                <select id="timeline-slot-filter" onchange="renderPomodoroTimelineGrid()" class="bg-transparent text-indigo-500 font-bold focus:outline-none">
-                  <option value="active_14">CA Standard (08 AM to 10 PM)</option>
-                  <option value="full_day">All 24 Hours (12 AM to 12 AM)</option>
-                  <option value="morning_shift">Morning Focus (04 AM to 02 PM)</option>
-                  <option value="night_shift">Night Owl Shift (02 PM to 02 AM)</option>
-                </select>
-              </div>
-
-              <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
-                <button onclick="prevPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
-                <span id="pomo-matrix-month-year-label">August 2026</span>
-                <button onclick="nextPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
-              </div>
+            <!-- Month Navigator -->
+            <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
+              <button onclick="prevPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
+              <span id="pomo-matrix-month-year-label">August 2026</span>
+              <button onclick="nextPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
 
@@ -696,17 +693,20 @@
             <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-cyan-500"></span> IBS</span>
           </div>
 
-          <!-- Timeline Responsive Container -->
+          <!-- Timeline Unified Table View -->
           <div class="sub-box rounded-2xl overflow-hidden shadow-inner border border-slate-300 dark:border-slate-800">
             <div class="overflow-x-auto custom-scrollbar">
-              <div class="min-w-[700px]">
-                <!-- Dynamic Time Slot Grid Header -->
-                <div class="bg-slate-200/90 dark:bg-slate-900/90 backdrop-blur-md px-3 py-2 border-b border-slate-300 dark:border-slate-800 flex items-center text-[10px] font-bold text-slate-500 font-mono">
-                  <div class="w-24 shrink-0 text-slate-700 dark:text-slate-300">Date</div>
-                  <div id="timeline-header-grid" class="flex-1"></div>
+              <div class="min-w-[1100px] p-3">
+                <!-- Synchronized Header Row -->
+                <div class="flex items-center pb-2 border-b border-slate-300 dark:border-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 font-mono">
+                  <div class="w-20 shrink-0 text-slate-700 dark:text-slate-300 font-sans">Date</div>
+                  <div id="timeline-header-grid" class="flex-1 gap-1" style="display: grid; grid-template-columns: repeat(24, minmax(0, 1fr));">
+                    <!-- 24 Headers: 12 AM to 11 PM -->
+                  </div>
                 </div>
-                <!-- Heatmap Rows -->
-                <div id="pomo-timeline-rows" class="p-3 max-h-80 overflow-y-auto custom-scrollbar space-y-1.5"></div>
+
+                <!-- Synchronized Data Rows -->
+                <div id="pomo-timeline-rows" class="pt-2 max-h-80 overflow-y-auto custom-scrollbar space-y-1.5"></div>
               </div>
             </div>
           </div>
@@ -904,51 +904,40 @@
     Copyright 2026 | Made with Love by Niket Talwar
   </footer>
 
-  <!-- Dell Venue 7 (Android KitKat Live Stream Modal) -->
+  <!-- Dell Venue 7 (Tablet Direct View Modal) -->
   <div id="tablet-cast-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
     <div class="glass-card bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-extrabold text-indigo-500 flex items-center gap-2">
-          <i class="fa-solid fa-tablet-screen-button"></i> Tablet Screen Stream & Remote
+          <i class="fa-solid fa-tablet-screen-button"></i> Tablet Direct View Link
         </h3>
         <button onclick="closeTabletCastModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <div class="p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl text-xs space-y-1.5">
         <p class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-display"></i> KitKat Direct Link (No Camera Needed)
+          <i class="fa-solid fa-link"></i> Unique Tablet Link (No Camera Needed)
         </p>
         <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-          Open your Dell Venue 7 tablet browser, type the simple link or 4-digit PIN below to mirror your laptop screen live and control your timer wirelessly!
+          Open the dedicated link on your Dell Venue 7 tablet browser. It will ask for the 4-digit PIN below and link up with zero lag.
         </p>
       </div>
 
       <!-- Room Code -->
       <div class="text-center p-3 sub-box rounded-2xl">
-        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Your 4-Digit Tablet PIN</p>
-        <p id="host-peer-id-display" class="font-mono text-2xl font-black text-indigo-500 tracking-widest select-all">----</p>
-        <p class="text-[10px] text-slate-400 mt-1">Open <span id="tablet-quick-url" class="font-mono font-bold text-indigo-400">...</span> on your tablet</p>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Your 4-Digit Laptop PIN</p>
+        <p id="host-peer-id-display" class="font-mono text-3xl font-black text-indigo-500 tracking-widest select-all">----</p>
+        <p class="text-[10px] text-slate-400 mt-2">Tablet URL:</p>
+        <p id="tablet-dedicated-url-display" class="font-mono text-xs font-bold text-indigo-400 break-all select-all">...</p>
       </div>
 
-      <!-- Action to Start Live Screen Broadcast -->
       <div class="space-y-2">
-        <button onclick="startLaptopScreenBroadcast()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
-          <i class="fa-solid fa-video"></i> Broadcast Entire Screen to Tablet
+        <button onclick="copyTabletDirectURL()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
+          <i class="fa-solid fa-copy"></i> Copy Dedicated Tablet Link
         </button>
-        <button onclick="copyTabletDirectURL()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
-          <i class="fa-solid fa-copy"></i> Copy Direct Tablet Link
+        <button onclick="closeTabletCastModal()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 rounded-xl text-xs font-bold">
+          Done
         </button>
-      </div>
-
-      <!-- Manual Connection Field (if opened on tablet) -->
-      <div class="pt-2 border-t border-slate-200 dark:border-slate-800 space-y-2">
-        <label class="block text-[10px] text-slate-400 font-bold uppercase">Manual Connect (If Tablet):</label>
-        <div class="flex gap-2">
-          <input type="text" id="join-peer-id-input" placeholder="Enter 4-Digit PIN..." class="flex-1 input-field border rounded-xl px-3 py-1.5 text-xs font-mono font-bold">
-          <button onclick="connectTabletToHost()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-xl text-xs font-bold transition-all shadow-md">
-            Connect
-          </button>
-        </div>
       </div>
     </div>
   </div>
@@ -1208,12 +1197,11 @@
       } catch (e) {}
     }
 
-    // PeerJS Ultra-Lightweight Screen Stream & Sync Engine (Compatible with KitKat Android 4.4)
+    // PeerJS Tablet Pairing Engine
     let peer = null;
     let peerConn = null;
-    let peerCall = null;
-    let localScreenStream = null;
-    let pinCode = Math.floor(1000 + Math.random() * 9000).toString();
+    let pinCode = localStorage.getItem('sp_host_pin') || Math.floor(1000 + Math.random() * 9000).toString();
+    localStorage.setItem('sp_host_pin', pinCode);
 
     function initPeerSync() {
       const peerIdName = 'sp-' + pinCode;
@@ -1223,9 +1211,10 @@
         const displayEl = document.getElementById('host-peer-id-display');
         if (displayEl) displayEl.textContent = pinCode;
 
-        const quickUrlEl = document.getElementById('tablet-quick-url');
-        if (quickUrlEl) {
-          quickUrlEl.textContent = window.location.href.split('?')[0] + '?mode=tablet&pin=' + pinCode;
+        const dedicatedUrlEl = document.getElementById('tablet-dedicated-url-display');
+        if (dedicatedUrlEl) {
+          const dedicatedUrl = window.location.href.split('#')[0].split('?')[0] + '#tablet';
+          dedicatedUrlEl.textContent = dedicatedUrl;
         }
       });
 
@@ -1235,36 +1224,6 @@
         document.getElementById('remote-connected-badge').classList.remove('hidden');
         broadcastTimerState();
       });
-
-      peer.on('call', (call) => {
-        // Handshake for tablet receiving video stream
-        call.answer(null);
-        call.on('stream', (remoteStream) => {
-          const videoEl = document.getElementById('tablet-stream-video');
-          const fallbackCard = document.getElementById('tablet-fallback-card');
-          if (videoEl) {
-            videoEl.srcObject = remoteStream;
-            videoEl.classList.remove('hidden');
-            if (fallbackCard) fallbackCard.classList.add('hidden');
-          }
-        });
-      });
-    }
-
-    async function startLaptopScreenBroadcast() {
-      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-        try {
-          localScreenStream = await navigator.mediaDevices.getDisplayMedia({ video: true, audio: false });
-          alert("📺 Screen broadcasting active! Connect your tablet to view this screen live.");
-          if (peerConn) {
-            peer.call(peerConn.peer, localScreenStream);
-          }
-        } catch (err) {
-          alert("Screen broadcast canceled or not supported.");
-        }
-      } else {
-        alert("Screen sharing requires a desktop browser (Chrome, Edge, Firefox, Brave).");
-      }
     }
 
     function setupPeerConnectionHandlers() {
@@ -1291,25 +1250,36 @@
       });
     }
 
-    function connectTabletToHost() {
-      const pin = document.getElementById('join-peer-id-input').value.trim();
-      if (!pin) return;
+    function connectTabletViaDirectPin() {
+      const pin = document.getElementById('tablet-direct-pin-input').value.trim();
+      if (!pin || pin.length < 4) {
+        alert("Please enter a valid 4-digit PIN.");
+        return;
+      }
 
       peerConn = peer.connect('sp-' + pin);
+      const badge = document.getElementById('tablet-status-badge');
+      if (badge) {
+        badge.textContent = "Connecting to " + pin + "...";
+      }
+
       peerConn.on('open', () => {
-        const badge = document.getElementById('tablet-status-badge');
+        localStorage.setItem('sp_saved_tablet_pin', pin);
         if (badge) {
           badge.className = "px-2.5 py-1 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-lg";
           badge.textContent = "● Synced with Laptop";
         }
-        closeTabletCastModal();
+        document.getElementById('tablet-pin-entry-card').classList.add('hidden');
+        document.getElementById('tablet-live-timer-card').classList.remove('hidden');
+        document.getElementById('tablet-action-controls').classList.remove('hidden');
       });
 
       peerConn.on('data', (data) => {
         if (data.type === 'sync') {
-          const hours = Math.floor((data.mode === 'stopwatch' ? data.accumulatedTime : data.timeLeft) / 3600);
-          const mins = Math.floor(((data.mode === 'stopwatch' ? data.accumulatedTime : data.timeLeft) % 3600) / 60);
-          const secs = (data.mode === 'stopwatch' ? data.accumulatedTime : data.timeLeft) % 60;
+          const totalSecs = (data.mode === 'stopwatch' ? data.accumulatedTime : data.timeLeft);
+          const hours = Math.floor(totalSecs / 3600);
+          const mins = Math.floor((totalSecs % 3600) / 60);
+          const secs = totalSecs % 60;
           const timeStr = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
 
           const tTimer = document.getElementById('tablet-timer-display');
@@ -1323,6 +1293,19 @@
       });
     }
 
+    function disconnectTabletSession() {
+      localStorage.removeItem('sp_saved_tablet_pin');
+      if (peerConn) peerConn.close();
+      document.getElementById('tablet-live-timer-card').classList.add('hidden');
+      document.getElementById('tablet-action-controls').classList.add('hidden');
+      document.getElementById('tablet-pin-entry-card').classList.remove('hidden');
+      const badge = document.getElementById('tablet-status-badge');
+      if (badge) {
+        badge.className = "px-2.5 py-1 bg-amber-500/20 text-amber-400 text-xs font-bold rounded-lg";
+        badge.textContent = "Enter Laptop PIN";
+      }
+    }
+
     function sendTabletCmd(cmd) {
       if (peerConn && peerConn.open) {
         peerConn.send({ action: cmd });
@@ -1330,33 +1313,31 @@
     }
 
     function copyTabletDirectURL() {
-      const url = window.location.href.split('?')[0] + '?mode=tablet&pin=' + pinCode;
+      const url = window.location.href.split('#')[0].split('?')[0] + '#tablet';
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(() => alert("📋 Direct Tablet URL copied! Open this on your tablet."));
+        navigator.clipboard.writeText(url).then(() => alert("📋 Tablet Link copied! Open this on your tablet."));
       } else {
         prompt("Copy this URL and open on tablet:", url);
       }
     }
 
-    // Detect Tablet KitKat Mode on Page Load
-    window.addEventListener('load', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const isTablet = urlParams.get('mode') === 'tablet';
-      const pinParam = urlParams.get('pin');
-
+    // Check if viewing as Tablet Portal (#tablet or ?view=tablet)
+    function checkTabletPortalRoute() {
+      const isTablet = window.location.hash === '#tablet' || new URLSearchParams(window.location.search).get('view') === 'tablet';
       if (isTablet) {
         document.getElementById('main-dashboard-app').classList.add('hidden');
         document.getElementById('app-footer').classList.add('hidden');
         document.getElementById('tablet-only-screen').classList.remove('hidden');
 
-        if (pinParam) {
-          setTimeout(() => {
-            document.getElementById('join-peer-id-input').value = pinParam;
-            connectTabletToHost();
-          }, 800);
+        const savedPin = localStorage.getItem('sp_saved_tablet_pin');
+        if (savedPin) {
+          document.getElementById('tablet-direct-pin-input').value = savedPin;
+          setTimeout(connectTabletViaDirectPin, 600);
         }
       }
-    });
+    }
+    window.addEventListener('load', checkTabletPortalRoute);
+    window.addEventListener('hashchange', checkTabletPortalRoute);
 
     function openTabletCastModal() {
       document.getElementById('tablet-cast-modal').classList.remove('hidden');
@@ -1797,7 +1778,7 @@
       }
     };
 
-    // Ultra-Premium Picture-in-Picture Floating Mini Timer
+    // Picture-in-Picture Floating Mini Timer
     const pipCanvas = document.getElementById('pip-canvas');
     const pipVideo = document.getElementById('pip-video');
     const pipCtx = pipCanvas.getContext('2d');
@@ -1906,7 +1887,7 @@
       document.getElementById('pomo-task-select-container').classList.toggle('hidden', !isTask);
     }
 
-    // Timer Engine (Precision Timestamp Delta Engine)
+    // Timer Engine
     const timerMain = document.getElementById('timer-main');
     const timerSec = document.getElementById('timer-sec');
     const startBtn = document.getElementById('start-btn');
@@ -2456,14 +2437,14 @@
     }
 
     // Helper: Convert 24-hour integer to 12-hour AM/PM label
-    function formatHourTo12h(hour24) {
-      const h = hour24 % 24;
+    function formatHourTo12h(h24) {
+      const h = h24 % 24;
       const period = h >= 12 ? 'PM' : 'AM';
       const displayHour = h % 12 === 0 ? 12 : h % 12;
       return `${displayHour.toString().padStart(2, '0')} ${period}`;
     }
 
-    // High-Clarity Custom-Slot Timeline Engine with Robust Inline Grid CSS
+    // High-Clarity 24-Hour Fixed Timeline Engine (12 AM to 11 PM)
     function renderPomodoroTimelineGrid() {
       const headerGrid = document.getElementById('timeline-header-grid');
       const rowsContainer = document.getElementById('pomo-timeline-rows');
@@ -2479,28 +2460,10 @@
       document.getElementById('pomo-matrix-month-year-label').textContent = 
         viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-      // Determine Hours Range from Filter Dropdown
-      const slotFilter = document.getElementById('timeline-slot-filter').value;
-      let startHour = 8, endHour = 21; // Default: 8 AM to 10 PM (14 slots)
-
-      if (slotFilter === 'full_day') {
-        startHour = 0; endHour = 23; // 24 slots (12 AM to 11 PM)
-      } else if (slotFilter === 'morning_shift') {
-        startHour = 4; endHour = 13; // 10 slots (4 AM to 1 PM)
-      } else if (slotFilter === 'night_shift') {
-        startHour = 14; endHour = 25; // 12 slots (2 PM to 1 AM)
-      }
-
-      const totalSlots = (endHour - startHour + 1);
-
-      // Build Header using Explicit Inline CSS Grid
-      headerGrid.style.display = 'grid';
-      headerGrid.style.gridTemplateColumns = `repeat(${totalSlots}, minmax(0, 1fr))`;
-      headerGrid.className = "gap-1 text-center font-mono font-bold text-[9px] text-slate-500 dark:text-slate-400";
-
-      for (let h = startHour; h <= endHour; h++) {
+      // Generate 24 Hourly Headers (12 AM to 11 PM)
+      for (let h = 0; h < 24; h++) {
         const headerCell = document.createElement('div');
-        headerCell.className = "truncate px-0.5 text-center";
+        headerCell.className = "truncate text-center";
         headerCell.textContent = formatHourTo12h(h);
         headerGrid.appendChild(headerCell);
       }
@@ -2528,23 +2491,21 @@
         const dayLogs = state.logs.filter(l => l.date === dateStr);
 
         const rowWrapper = document.createElement('div');
-        rowWrapper.className = "flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/40 transition-all";
+        rowWrapper.className = "flex items-center pb-1 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all";
 
         const dateLabel = document.createElement('div');
-        dateLabel.className = "w-24 shrink-0 text-xs font-bold text-slate-600 dark:text-slate-400";
+        dateLabel.className = "w-20 shrink-0 text-xs font-bold text-slate-600 dark:text-slate-400";
         dateLabel.textContent = label;
         rowWrapper.appendChild(dateLabel);
 
         const trackGrid = document.createElement('div');
         trackGrid.className = "flex-1 gap-1";
         trackGrid.style.display = 'grid';
-        trackGrid.style.gridTemplateColumns = `repeat(${totalSlots}, minmax(0, 1fr))`;
+        trackGrid.style.gridTemplateColumns = 'repeat(24, minmax(0, 1fr))';
 
-        for (let h = startHour; h <= endHour; h++) {
+        for (let h = 0; h < 24; h++) {
           const slotBlock = document.createElement('div');
           slotBlock.className = "h-6 rounded-md bg-slate-200 dark:bg-slate-800/80 transition-all relative border border-slate-300 dark:border-slate-700/40 flex items-center justify-center";
-
-          const actualHour = h % 24;
 
           const logsInHour = dayLogs.filter(l => {
             let logStartHour = l.hour;
@@ -2553,7 +2514,7 @@
               const [sh] = l.startTime.split(':').map(Number);
               logStartHour = sh;
             }
-            return actualHour >= logStartHour && actualHour < (logStartHour + logDurationHours);
+            return h >= logStartHour && h < (logStartHour + logDurationHours);
           });
 
           if (logsInHour.length > 0) {
@@ -2822,7 +2783,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(b64Str).then(() => {
           playAudioChime('complete');
-          alert("📋 Backup string copied to clipboard!");
+          alert("📋 Live sync string copied to clipboard! Paste it on your tablet to sync.");
         }).catch(() => {
           prompt("Copy your backup string below:", b64Str);
         });
