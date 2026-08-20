@@ -30,6 +30,8 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- QRious CDN for Legacy Tablet Pairing -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&family=Kalam:wght@400;700&display=swap');
     
@@ -128,10 +130,11 @@
         </button>
       </nav>
 
-      <!-- Top Right Controls -->
-      <div class="flex items-center gap-3">
-        <button onclick="startScreenCast()" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Cast Screen to Tab/Phone">
-          <i class="fa-solid fa-display text-sm"></i>
+      <!-- Top Right Controls (Including Dedicated Tablet Companion Cast Button) -->
+      <div class="flex items-center gap-2.5">
+        <button onclick="openTabletCastModal()" class="glass-card px-3 py-1.5 rounded-xl text-indigo-500 hover:text-indigo-400 font-bold text-xs flex items-center gap-1.5 transition-all shadow-sm" title="Cast Screen to Dell Venue 7 Tablet">
+          <i class="fa-solid fa-tablet-screen-button text-sm"></i>
+          <span class="hidden sm:inline">Tablet Cast</span>
         </button>
 
         <button id="sound-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Audio Chimes">
@@ -261,11 +264,11 @@
             <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl transition-all">
               <div class="flex flex-wrap justify-between items-center gap-2 mb-6">
                 <h3 class="text-lg font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-stopwatch text-indigo-500"></i> Focus Timer & Stopwatch
+                  <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Timer & Stopwatch
                 </h3>
                 <div class="flex flex-wrap gap-2">
-                  <button id="pip-btn" onclick="toggleTimerPiP()" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 flex items-center gap-1">
-                    <i class="fa-solid fa-window-restore"></i> Mini Floating PiP
+                  <button id="pip-btn" onclick="toggleTimerPiP()" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 flex items-center gap-1.5">
+                    <i class="fa-solid fa-window-restore text-indigo-500"></i> Pro Floating PiP
                   </button>
                   <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
                     <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Fullscreen
@@ -276,12 +279,12 @@
                 </div>
               </div>
 
-              <!-- Mode Selection (Including Stopwatch) -->
+              <!-- Mode Selection (Including Stopwatch & Exact Break Descriptions) -->
               <div class="flex flex-wrap bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60 gap-1">
-                <button id="mode-work" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
-                <button id="mode-stopwatch" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-all">⏱️ Stopwatch</button>
-                <button id="mode-short" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
-                <button id="mode-long" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
+                <button id="mode-work" class="flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
+                <button id="mode-stopwatch" class="flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-all">⏱️ Stopwatch</button>
+                <button id="mode-short" class="flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
+                <button id="mode-long" class="flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
               </div>
 
               <!-- Flexible Session Target (Select Subject directly or Task) -->
@@ -356,7 +359,6 @@
                 <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Auto-syncs subject details when task is picked</p>
 
                 <form id="manual-log-form" class="space-y-3">
-                  <!-- Task Selection Option with Auto Sync -->
                   <div>
                     <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Associate Scheduled Task (Optional)</label>
                     <select id="manual-task-select" onchange="onManualTaskSelectChange()" class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
@@ -365,7 +367,7 @@
                   </div>
 
                   <div>
-                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Subject & Type (Auto-locked if task chosen)</label>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Subject & Type</label>
                     <div class="grid grid-cols-2 gap-2">
                       <select id="manual-subject-select" required class="w-full input-field border rounded-xl px-2 py-2 text-xs font-bold focus:outline-none">
                         <option value="FR">FR</option>
@@ -402,7 +404,6 @@
                     </div>
                   </div>
 
-                  <!-- Calculated Hours Output Box -->
                   <div class="p-2.5 bg-amber-500/10 border border-amber-500/20 rounded-xl text-center">
                     <p class="text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase">Calculated Study Time</p>
                     <p id="manual-calc-duration-text" class="text-sm font-black text-amber-500">0 Mins (0.0 Hrs)</p>
@@ -522,7 +523,7 @@
                 
                 <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-indigo-600 dark:text-indigo-400">
                   <button id="prev-month-btn" class="hover:text-indigo-500 px-1"><i class="fa-solid fa-chevron-left"></i></button>
-                  <span id="calendar-month-year-label">July 2026</span>
+                  <span id="calendar-month-year-label">August 2026</span>
                   <button id="next-month-btn" class="hover:text-indigo-500 px-1"><i class="fa-solid fa-chevron-right"></i></button>
                   <button id="today-jump-btn" class="ml-2 px-2 py-0.5 bg-indigo-600 text-white rounded text-[10px]">Today</button>
                 </div>
@@ -603,7 +604,7 @@
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-chart-area text-indigo-500"></i> Study Trends & Progress
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Select custom start and end dates to visualize your trend (0 to 14 Hours)</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Custom date range trend scaled up to 14 Hours</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 sub-box p-1.5 rounded-xl text-xs">
@@ -619,19 +620,19 @@
           </div>
         </section>
 
-        <!-- Precision Gantt Timeline Grid (24-Hour Continuous Visualizer) -->
+        <!-- Dynamic CA Study Timeline (Active 06:00 AM to 02:00 AM 20-Hour Cycle) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Daily Study Timeline (Exact 24-Hour Gantt Visualizer)
+                <i class="fa-solid fa-business-time text-purple-500"></i> CA Study Timeline (Active 6 AM to 2 AM Cycle)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">True-scale visual timeline showing exact start-to-end timestamps</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Mapped to realistic CA study routines (Early morning 6 AM to 2 AM night study blocks)</p>
             </div>
 
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
               <button onclick="prevPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
-              <span id="pomo-matrix-month-year-label">July 2026</span>
+              <span id="pomo-matrix-month-year-label">August 2026</span>
               <button onclick="nextPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
@@ -641,19 +642,18 @@
             <div class="bg-slate-200/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-2 border-b border-slate-300 dark:border-slate-800 flex items-center text-[10px] font-bold text-slate-500 font-mono">
               <div class="w-24 shrink-0">Date</div>
               <div class="flex-1 flex justify-between px-1">
-                <span>00:00</span>
-                <span>03:00</span>
-                <span>06:00</span>
-                <span>09:00</span>
-                <span>12:00</span>
-                <span>15:00</span>
-                <span>18:00</span>
-                <span>21:00</span>
-                <span>24:00</span>
+                <span>06:00 AM</span>
+                <span>09:00 AM</span>
+                <span>12:00 PM</span>
+                <span>03:00 PM</span>
+                <span>06:00 PM</span>
+                <span>09:00 PM</span>
+                <span>12:00 AM</span>
+                <span>02:00 AM</span>
               </div>
             </div>
             <!-- Timeline Gantt Rows -->
-            <div id="pomo-timeline-rows" class="p-4 max-h-80 overflow-y-auto custom-scrollbar space-y-2"></div>
+            <div id="pomo-timeline-rows" class="p-4 max-h-80 overflow-y-auto custom-scrollbar space-y-2.5"></div>
           </div>
         </section>
 
@@ -676,7 +676,7 @@
 
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-amber-500">
               <button onclick="prevFocusGoalMonth()" class="hover:text-amber-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
-              <span id="focus-calendar-month-year-label">July 2026</span>
+              <span id="focus-calendar-month-year-label">August 2026</span>
               <button onclick="nextFocusGoalMonth()" class="hover:text-amber-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
             </div>
           </div>
@@ -690,7 +690,7 @@
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown (0 to 14 Hours)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Scaled from 0 to 14 hours with 2-hour increments</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Scaled strictly from 0 to 14 hours in multiples of 2</p>
             </div>
             <div class="flex items-center gap-2">
               <label class="text-xs text-slate-600 dark:text-slate-400 font-medium">Select Date:</label>
@@ -844,10 +844,45 @@
     </main>
   </div>
 
-  <!-- Standard Footer -->
-  <footer class="text-center py-6 text-xs text-slate-500 dark:text-slate-400 font-medium border-t border-slate-200 dark:border-slate-800/80 mt-8">
-    Copyright 2026 | StudyPulse Pro CA Hub
+  <!-- Standard Footer Updated with Custom Name -->
+  <footer class="text-center py-6 text-xs text-slate-500 dark:text-slate-400 font-semibold border-t border-slate-200 dark:border-slate-800/80 mt-8">
+    Copyright 2026 | Made with Love by Niket Talwar
   </footer>
+
+  <!-- Dell Venue 7 (Android KitKat) Companion Modal -->
+  <div id="tablet-cast-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+    <div class="glass-card bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-extrabold text-indigo-500 flex items-center gap-2">
+          <i class="fa-solid fa-tablet-screen-button"></i> Dell Venue 7 Tablet Sync
+        </h3>
+        <button onclick="closeTabletCastModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
+      </div>
+
+      <div class="p-4 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl text-xs space-y-2">
+        <p class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
+          <i class="fa-solid fa-bolt"></i> KitKat Direct Pairing Mode
+        </p>
+        <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+          Open this HTML file in the browser of your Dell Venue 7 (or any mobile browser on your local Wi-Fi). Use the 1-Click Sync Token to mirror your sessions seamlessly.
+        </p>
+      </div>
+
+      <div class="flex flex-col items-center justify-center p-3 bg-white rounded-2xl border border-slate-300">
+        <canvas id="qr-code-canvas"></canvas>
+        <p class="text-[10px] text-slate-500 font-bold mt-2">Scan with Tablet to open StudyPulse</p>
+      </div>
+
+      <div class="space-y-2">
+        <button onclick="copyDataStringToClipboard()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-2">
+          <i class="fa-solid fa-copy"></i> Copy Live Sync Token for Tablet
+        </button>
+        <button onclick="closeTabletCastModal()" class="w-full bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 py-2 rounded-xl text-xs font-bold">
+          Done
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- Target Exam Date Modal Picker -->
   <div id="exam-date-modal" class="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
@@ -1008,8 +1043,8 @@
     </div>
   </div>
 
-  <!-- Hidden Canvas and Video Elements for PiP Floating Timer Mode -->
-  <canvas id="pip-canvas" width="360" height="200" class="hidden"></canvas>
+  <!-- Hidden Canvas and Video Elements for Premium PiP Floating Timer Mode -->
+  <canvas id="pip-canvas" width="480" height="260" class="hidden"></canvas>
   <video id="pip-video" autoplay muted class="hidden"></video>
 
   <!-- JavaScript Engine -->
@@ -1101,18 +1136,19 @@
       } catch (e) {}
     }
 
-    // Live Screen Share / Cast Helper for Second Screen / Tab
-    async function startScreenCast() {
-      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
-        try {
-          const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
-          alert("📺 Dashboard Screen Share active! You can now view or mirror this window on your Dell Venue 7 / external screen.");
-        } catch (err) {
-          console.log("Cast dismissed");
-        }
-      } else {
-        alert("Screen sharing is not supported by this browser version. Open this page directly on your tablet via local network URL or file transfer.");
-      }
+    // Dell Venue 7 Tablet Companion Modal & QR Generation
+    function openTabletCastModal() {
+      const qrCanvas = document.getElementById('qr-code-canvas');
+      new QRious({
+        element: qrCanvas,
+        value: window.location.href,
+        size: 140
+      });
+      document.getElementById('tablet-cast-modal').classList.remove('hidden');
+    }
+
+    function closeTabletCastModal() {
+      document.getElementById('tablet-cast-modal').classList.add('hidden');
     }
 
     // Navigation Router
@@ -1547,28 +1583,98 @@
       }
     };
 
-    // Picture-in-Picture Floating Mini Timer
+    // Ultra-Premium Picture-in-Picture Floating Mini Timer
     const pipCanvas = document.getElementById('pip-canvas');
     const pipVideo = document.getElementById('pip-video');
     const pipCtx = pipCanvas.getContext('2d');
 
-    function updatePiPCanvas(timeText, labelText) {
+    function updatePiPCanvas(timeText) {
       if (!pipCtx) return;
-      pipCtx.fillStyle = '#0f172a';
-      pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+      const w = pipCanvas.width;
+      const h = pipCanvas.height;
 
-      pipCtx.fillStyle = '#818cf8';
-      pipCtx.font = 'bold 16px sans-serif';
+      // Dark Glass Background
+      pipCtx.fillStyle = '#070a12';
+      pipCtx.fillRect(0, 0, w, h);
+
+      // Gradient Card Area
+      const grad = pipCtx.createLinearGradient(15, 15, w - 30, h - 30);
+      grad.addColorStop(0, '#0f172a');
+      grad.addColorStop(1, '#1e1b4b');
+      pipCtx.fillStyle = grad;
+      
+      // Round Rect Card
+      roundRect(pipCtx, 15, 15, w - 30, h - 30, 20, true, false);
+      pipCtx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+      pipCtx.lineWidth = 1.5;
+      pipCtx.stroke();
+
+      // Top Mode Badge Label Calculation (Explicit 'SHORT BREAK', 'LONG BREAK', etc.)
+      let badgeLabel = 'WORK FOCUS';
+      let badgeBg = '#4f46e5';
+      let badgeText = '#ffffff';
+
+      if (state.timer.mode === 'short') {
+        badgeLabel = 'SHORT BREAK (5M)';
+        badgeBg = '#9333ea';
+      } else if (state.timer.mode === 'long') {
+        badgeLabel = 'LONG BREAK (15M)';
+        badgeBg = '#059669';
+      } else if (state.timer.mode === 'stopwatch') {
+        badgeLabel = '⏱️ STOPWATCH';
+        badgeBg = '#f59e0b';
+        badgeText = '#0f172a';
+      }
+
+      // Render Badge
+      pipCtx.fillStyle = badgeBg;
+      roundRect(pipCtx, 30, 30, 160, 28, 10, true, false);
+      pipCtx.fillStyle = badgeText;
+      pipCtx.font = 'bold 11px sans-serif';
       pipCtx.textAlign = 'center';
-      pipCtx.fillText(`StudyPulse - ${labelText}`, 180, 45);
+      pipCtx.fillText(badgeLabel, 110, 48);
 
-      pipCtx.fillStyle = '#ffffff';
-      pipCtx.font = 'bold 52px monospace';
-      pipCtx.fillText(timeText, 180, 115);
-
+      // Subject Info Tag
+      const activeSub = (state.timer.mode === 'work' || state.timer.mode === 'stopwatch')
+        ? getPomoSelectedSubjectAndType().subject 
+        : 'Rest Cycle';
       pipCtx.fillStyle = '#94a3b8';
-      pipCtx.font = '12px sans-serif';
-      pipCtx.fillText(state.timer.isRunning ? '● LIVE RUNNING' : '⏸ PAUSED', 180, 160);
+      pipCtx.font = 'bold 12px sans-serif';
+      pipCtx.textAlign = 'right';
+      pipCtx.fillText(`[ ${activeSub} ]`, w - 35, 48);
+
+      // Large Glowing Monospace Timer
+      pipCtx.fillStyle = '#ffffff';
+      pipCtx.font = '800 58px monospace';
+      pipCtx.textAlign = 'center';
+      pipCtx.fillText(timeText, w / 2, 142);
+
+      // Running Status Pill
+      pipCtx.fillStyle = state.timer.isRunning ? '#10b981' : '#f43f5e';
+      pipCtx.beginPath();
+      pipCtx.arc(175, 195, 5, 0, 2 * Math.PI);
+      pipCtx.fill();
+
+      pipCtx.fillStyle = '#cbd5e1';
+      pipCtx.font = 'bold 13px sans-serif';
+      pipCtx.textAlign = 'left';
+      pipCtx.fillText(state.timer.isRunning ? 'RUNNING' : 'PAUSED', 190, 200);
+    }
+
+    function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + width - radius, y);
+      ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+      ctx.lineTo(x + width, y + height - radius);
+      ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+      ctx.lineTo(x + radius, y + height);
+      ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+      if (fill) ctx.fill();
+      if (stroke) ctx.stroke();
     }
 
     async function toggleTimerPiP() {
@@ -1577,7 +1683,7 @@
           await document.exitPictureInPicture();
         } else {
           if (!pipVideo.srcObject) {
-            const stream = pipCanvas.captureStream(10);
+            const stream = pipCanvas.captureStream(15);
             pipVideo.srcObject = stream;
             await pipVideo.play();
           }
@@ -1595,7 +1701,7 @@
       document.getElementById('pomo-task-select-container').classList.toggle('hidden', !isTask);
     }
 
-    // Timer Engine (Precision Timestamp Delta Engine - Immune to tab throttling)
+    // Timer Engine (Precision Timestamp Delta Engine)
     const timerMain = document.getElementById('timer-main');
     const timerSec = document.getElementById('timer-sec');
     const startBtn = document.getElementById('start-btn');
@@ -1637,10 +1743,13 @@
       timerMain.textContent = formattedMain;
       timerSec.textContent = formattedSec;
       
-      const titleTag = state.timer.mode === 'stopwatch' ? '⏱️ Stopwatch' : 'Timer';
-      document.title = `${formattedMain}${formattedSec} - StudyPulse (${titleTag})`;
+      let titleTag = 'Work';
+      if (state.timer.mode === 'stopwatch') titleTag = 'Stopwatch';
+      else if (state.timer.mode === 'short') titleTag = 'Short Break';
+      else if (state.timer.mode === 'long') titleTag = 'Long Break';
 
-      updatePiPCanvas(`${formattedMain}${formattedSec}`, state.timer.mode.toUpperCase());
+      document.title = `${formattedMain}${formattedSec} - StudyPulse (${titleTag})`;
+      updatePiPCanvas(`${formattedMain}${formattedSec}`);
     }
 
     function setMode(mode) {
@@ -1650,26 +1759,26 @@
       startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start`;
 
       ['mode-work', 'mode-stopwatch', 'mode-short', 'mode-long'].forEach(id => {
-        document.getElementById(id).className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
+        document.getElementById(id).className = "flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
       });
 
       const badge = document.getElementById('stopwatch-badge');
 
       if (mode === 'work') {
         state.timer.timeLeft = state.timer.workDuration * 60;
-        document.getElementById('mode-work').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md";
+        document.getElementById('mode-work').className = "flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md";
         badge.classList.add('hidden');
       } else if (mode === 'stopwatch') {
         state.timer.accumulatedTime = 0;
-        document.getElementById('mode-stopwatch').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-amber-500 text-slate-900 transition-all shadow-md";
+        document.getElementById('mode-stopwatch').className = "flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl bg-amber-500 text-slate-900 transition-all shadow-md";
         badge.classList.remove('hidden');
       } else if (mode === 'short') {
         state.timer.timeLeft = state.timer.shortDuration * 60;
-        document.getElementById('mode-short').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-purple-600 text-white transition-all shadow-md";
+        document.getElementById('mode-short').className = "flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl bg-purple-600 text-white transition-all shadow-md";
         badge.classList.add('hidden');
       } else {
         state.timer.timeLeft = state.timer.longDuration * 60;
-        document.getElementById('mode-long').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-emerald-600 text-white transition-all shadow-md";
+        document.getElementById('mode-long').className = "flex-1 min-w-[75px] py-2.5 text-xs font-extrabold rounded-xl bg-emerald-600 text-white transition-all shadow-md";
         badge.classList.add('hidden');
       }
       state.timer.initialTime = state.timer.timeLeft;
@@ -2140,7 +2249,7 @@
       renderPomodoroTimelineGrid();
     }
 
-    // High-Precision Continuous 24h Gantt Timeline Visualizer
+    // High-Utility CA Study Cycle Gantt Visualizer (Active Window: 06:00 AM to 02:00 AM Next Day = 20 Hours Total)
     function renderPomodoroTimelineGrid() {
       const rowsContainer = document.getElementById('pomo-timeline-rows');
       if (!rowsContainer) return;
@@ -2168,6 +2277,10 @@
         'General': 'bg-slate-500 text-white'
       };
 
+      // 20-Hour Focus Horizon Window: 06:00 AM (360 mins) to 02:00 AM (1560 mins) -> 1200 Total Minutes Scale
+      const windowStartMins = 6 * 60; // 360
+      const totalWindowSpanMins = 20 * 60; // 1200 mins
+
       for (let day = maxDayToDisplay; day >= 1; day--) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
         let label = `${day} ${viewDate.toLocaleDateString('en-US', { month: 'short' })}`;
@@ -2184,13 +2297,13 @@
         rowWrapper.appendChild(dateLabel);
 
         const track = document.createElement('div');
-        track.className = "flex-1 h-6 bg-slate-200 dark:bg-slate-800/80 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700/50";
+        track.className = "flex-1 h-7 bg-slate-200 dark:bg-slate-800/80 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700/50";
 
         // Vertical Guide Grid Marks (every 3 hours)
-        for (let g = 1; g < 8; g++) {
+        for (let g = 1; g < 7; g++) {
           const guide = document.createElement('div');
           guide.className = "absolute top-0 bottom-0 border-r border-slate-300 dark:border-slate-700/30";
-          guide.style.left = `${(g / 8) * 100}%`;
+          guide.style.left = `${(g / 7) * 100}%`;
           track.appendChild(guide);
         }
 
@@ -2207,18 +2320,27 @@
             if (endMins < startMins) endMins += 24 * 60;
           }
 
-          const leftPct = ((startMins % 1440) / 1440) * 100;
-          const widthPct = Math.max(1.2, ((endMins - startMins) / 1440) * 100);
+          // Adjust overnight late study blocks (00:00 to 02:00 am mapped past midnight)
+          if (startMins < windowStartMins) {
+            startMins += 24 * 60;
+            endMins += 24 * 60;
+          }
 
-          const bar = document.createElement('div');
-          const colorClass = subColors[l.subject] || 'bg-indigo-500 text-white';
-          bar.className = `absolute top-0.5 bottom-0.5 rounded-md px-1 flex items-center justify-center font-bold text-[9px] truncate shadow-sm transition-all hover:scale-105 cursor-pointer ${colorClass}`;
-          bar.style.left = `${leftPct}%`;
-          bar.style.width = `${widthPct}%`;
-          bar.title = `[${l.subject}] ${l.startTime || ''} - ${l.endTime || ''} (${l.minutes} mins)`;
-          bar.textContent = l.subject;
+          const relativeStart = Math.max(0, startMins - windowStartMins);
+          const leftPct = (relativeStart / totalWindowSpanMins) * 100;
+          const widthPct = Math.max(1.2, ((endMins - startMins) / totalWindowSpanMins) * 100);
 
-          track.appendChild(bar);
+          if (leftPct <= 100) {
+            const bar = document.createElement('div');
+            const colorClass = subColors[l.subject] || 'bg-indigo-500 text-white';
+            bar.className = `absolute top-0.5 bottom-0.5 rounded-md px-1 flex items-center justify-center font-bold text-[9px] truncate shadow-sm transition-all hover:scale-105 cursor-pointer ${colorClass}`;
+            bar.style.left = `${leftPct}%`;
+            bar.style.width = `${Math.min(widthPct, 100 - leftPct)}%`;
+            bar.title = `[${l.subject}] ${l.startTime || ''} - ${l.endTime || ''} (${l.minutes} mins)`;
+            bar.textContent = `${l.subject} (${l.minutes}m)`;
+
+            track.appendChild(bar);
+          }
         });
 
         rowWrapper.appendChild(track);
@@ -2474,7 +2596,7 @@
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(b64Str).then(() => {
           playAudioChime('complete');
-          alert("📋 Backup string copied to clipboard!");
+          alert("📋 Live sync string copied to clipboard! Paste it on your tablet to sync.");
         }).catch(() => {
           prompt("Copy your backup string below:", b64Str);
         });
@@ -2873,7 +2995,7 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine (Updated to 0 to 14 Max Hours with StepSize: 2)
+    // Charts Engine (Scaled 0 to 14 Max Hours with StepSize: 2)
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
