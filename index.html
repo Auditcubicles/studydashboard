@@ -130,6 +130,10 @@
 
       <!-- Top Right Controls -->
       <div class="flex items-center gap-3">
+        <button onclick="startScreenCast()" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Cast Screen to Tab/Phone">
+          <i class="fa-solid fa-display text-sm"></i>
+        </button>
+
         <button id="sound-toggle-btn" class="glass-card p-2 rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-colors" title="Toggle Audio Chimes">
           <i id="sound-icon" class="fa-solid fa-volume-high text-sm"></i>
         </button>
@@ -230,7 +234,7 @@
             <h3 class="text-base font-bold mb-1 flex items-center gap-2">
               <i class="fa-solid fa-chart-line text-indigo-500"></i> Overall Performance Study Trend
             </h3>
-            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Historical view of study hours logged across daily cycles (0 to 18 hrs)</p>
+            <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Historical view of study hours logged across daily cycles (0 to 14 hrs)</p>
             <div class="relative h-64 w-full">
               <canvas id="overviewSplineChart"></canvas>
             </div>
@@ -255,11 +259,14 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div class="lg:col-span-8">
             <section id="pomodoro-card" class="glass-card p-8 rounded-3xl relative shadow-2xl transition-all">
-              <div class="flex justify-between items-center mb-6">
+              <div class="flex flex-wrap justify-between items-center gap-2 mb-6">
                 <h3 class="text-lg font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-stopwatch text-indigo-500"></i> Deep Focus Pomodoro
+                  <i class="fa-solid fa-stopwatch text-indigo-500"></i> Focus Timer & Stopwatch
                 </h3>
-                <div class="flex gap-2">
+                <div class="flex flex-wrap gap-2">
+                  <button id="pip-btn" onclick="toggleTimerPiP()" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40 flex items-center gap-1">
+                    <i class="fa-solid fa-window-restore"></i> Mini Floating PiP
+                  </button>
                   <button id="fullscreen-btn" class="text-slate-600 dark:text-slate-400 hover:text-indigo-500 text-xs px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700/50 bg-slate-100 dark:bg-slate-900/40">
                     <i id="fullscreen-icon" class="fa-solid fa-expand"></i> Fullscreen
                   </button>
@@ -269,25 +276,60 @@
                 </div>
               </div>
 
-              <div class="flex bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60">
-                <button id="mode-work" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
-                <button id="mode-short" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
-                <button id="mode-long" class="flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
+              <!-- Mode Selection (Including Stopwatch) -->
+              <div class="flex flex-wrap bg-slate-200 dark:bg-slate-900/60 p-1.5 rounded-2xl mb-6 border border-slate-300 dark:border-slate-800/60 gap-1">
+                <button id="mode-work" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md">Work (60m)</button>
+                <button id="mode-stopwatch" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-amber-500 transition-all">⏱️ Stopwatch</button>
+                <button id="mode-short" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Short Break (5m)</button>
+                <button id="mode-long" class="flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all">Long Break (15m)</button>
               </div>
 
-              <div class="mb-6">
-                <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1.5 text-center tracking-wider">
-                  Active Task for this Session:
-                </label>
-                <select id="pomo-active-task-select" class="input-field border rounded-xl px-4 py-2.5 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500 shadow-sm">
-                  <option value="">-- Select Active Scheduled Task for Today --</option>
-                </select>
+              <!-- Flexible Session Target (Select Subject directly or Task) -->
+              <div class="mb-6 sub-box p-4 rounded-2xl space-y-3">
+                <div class="flex justify-between items-center">
+                  <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                    Target Study Focus:
+                  </label>
+                  <div class="flex items-center gap-2 text-xs">
+                    <label class="cursor-pointer text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                      <input type="radio" name="pomo_target_type" id="target-by-subject" value="subject" checked onchange="togglePomoTargetMode()" class="accent-indigo-600"> Select Subject
+                    </label>
+                    <label class="cursor-pointer text-[11px] font-bold text-slate-600 dark:text-slate-300 flex items-center gap-1">
+                      <input type="radio" name="pomo_target_type" id="target-by-task" value="task" onchange="togglePomoTargetMode()" class="accent-indigo-600"> Link Day Task
+                    </label>
+                  </div>
+                </div>
+
+                <div id="pomo-subject-select-container" class="grid grid-cols-2 gap-2">
+                  <select id="pomo-direct-subject" class="input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                    <option value="FR">FR (Financial Reporting)</option>
+                    <option value="AFM">AFM (Financial Mgmt)</option>
+                    <option value="AUDIT">AUDIT (Adv Auditing)</option>
+                    <option value="DT">DT (Direct Tax)</option>
+                    <option value="IDT">IDT (Indirect Tax)</option>
+                    <option value="IBS">IBS (Case Study)</option>
+                  </select>
+                  <select id="pomo-direct-type" class="input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                    <option value="Self Revision">Self Revision</option>
+                    <option value="Lecture">Lecture</option>
+                    <option value="Youtube Revision">Youtube Revision</option>
+                    <option value="Mock Test">Mock Test</option>
+                    <option value="Question Practice">Question Practice</option>
+                  </select>
+                </div>
+
+                <div id="pomo-task-select-container" class="hidden">
+                  <select id="pomo-active-task-select" class="input-field border rounded-xl px-4 py-2 text-xs w-full text-center font-bold focus:outline-none focus:border-indigo-500 shadow-sm">
+                    <option value="">-- Select Active Scheduled Task for Today --</option>
+                  </select>
+                </div>
               </div>
 
-              <div class="text-center my-8">
+              <div class="text-center my-6">
                 <div id="timer-display" class="timer-mono text-7xl font-black tracking-tight text-indigo-600 dark:text-indigo-400 flex items-baseline justify-center">
                   <span id="timer-main">01:00</span><span id="timer-sec" class="text-3xl opacity-60 ml-1 font-bold">:00</span>
                 </div>
+                <p id="stopwatch-badge" class="text-xs font-extrabold text-amber-500 mt-2 uppercase tracking-widest hidden">Stopwatch Active (Counts to Infinity)</p>
               </div>
 
               <div class="flex justify-center gap-4">
@@ -311,19 +353,19 @@
                 <h3 class="text-base font-bold text-amber-500 mb-1 flex items-center gap-2">
                   <i class="fa-solid fa-pen-to-square"></i> Precision Manual Logger
                 </h3>
-                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Log exact start/end study timestamps mapped directly to your timeline</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Auto-syncs subject details when task is picked</p>
 
                 <form id="manual-log-form" class="space-y-3">
-                  <!-- Task Selection Option -->
+                  <!-- Task Selection Option with Auto Sync -->
                   <div>
                     <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Associate Scheduled Task (Optional)</label>
-                    <select id="manual-task-select" class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
+                    <select id="manual-task-select" onchange="onManualTaskSelectChange()" class="w-full input-field border rounded-xl px-3 py-2 text-xs font-bold focus:outline-none">
                       <option value="">-- Unlinked Session --</option>
                     </select>
                   </div>
 
                   <div>
-                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Select Subject & Type</label>
+                    <label class="block text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase mb-1">Subject & Type (Auto-locked if task chosen)</label>
                     <div class="grid grid-cols-2 gap-2">
                       <select id="manual-subject-select" required class="w-full input-field border rounded-xl px-2 py-2 text-xs font-bold focus:outline-none">
                         <option value="FR">FR</option>
@@ -561,7 +603,7 @@
               <h3 class="text-base font-bold flex items-center gap-2">
                 <i class="fa-solid fa-chart-area text-indigo-500"></i> Study Trends & Progress
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Select custom start and end dates to visualize your trend</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Select custom start and end dates to visualize your trend (0 to 14 Hours)</p>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 sub-box p-1.5 rounded-xl text-xs">
@@ -577,14 +619,14 @@
           </div>
         </section>
 
-        <!-- Pomodoro Records (Real Fractional Timeline Algorithm) -->
+        <!-- Precision Gantt Timeline Grid (24-Hour Continuous Visualizer) -->
         <section class="glass-card p-6 rounded-2xl">
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> Pomodoro Records (Real Time-of-Day Grid)
+                <i class="fa-solid fa-business-time text-purple-500"></i> Daily Study Timeline (Exact 24-Hour Gantt Visualizer)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Visual timeline calculating exact study start and end times across 2-hour slots</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">True-scale visual timeline showing exact start-to-end timestamps</p>
             </div>
 
             <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
@@ -595,8 +637,23 @@
           </div>
 
           <div class="sub-box rounded-2xl overflow-hidden shadow-inner border border-slate-300 dark:border-slate-800">
-            <div id="pomo-matrix-fixed-header" class="bg-slate-200/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-2.5 border-b border-slate-300 dark:border-slate-800 shadow-sm overflow-x-auto custom-scrollbar"></div>
-            <div id="pomo-matrix-scroll-body" class="p-4 max-h-72 overflow-y-auto overflow-x-auto custom-scrollbar"></div>
+            <!-- Timeline Scale Header -->
+            <div class="bg-slate-200/90 dark:bg-slate-900/90 backdrop-blur-md px-4 py-2 border-b border-slate-300 dark:border-slate-800 flex items-center text-[10px] font-bold text-slate-500 font-mono">
+              <div class="w-24 shrink-0">Date</div>
+              <div class="flex-1 flex justify-between px-1">
+                <span>00:00</span>
+                <span>03:00</span>
+                <span>06:00</span>
+                <span>09:00</span>
+                <span>12:00</span>
+                <span>15:00</span>
+                <span>18:00</span>
+                <span>21:00</span>
+                <span>24:00</span>
+              </div>
+            </div>
+            <!-- Timeline Gantt Rows -->
+            <div id="pomo-timeline-rows" class="p-4 max-h-80 overflow-y-auto custom-scrollbar space-y-2"></div>
           </div>
         </section>
 
@@ -631,9 +688,9 @@
           <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
             <div>
               <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown (0 to 18 Hours)
+                <i class="fa-solid fa-calendar-day text-emerald-500"></i> Date-Wise Session Breakdown (0 to 14 Hours)
               </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400">Bar chart breakdown strictly scaled from 0 to 18 hours for any chosen date</p>
+              <p class="text-xs text-slate-500 dark:text-slate-400">Scaled from 0 to 14 hours with 2-hour increments</p>
             </div>
             <div class="flex items-center gap-2">
               <label class="text-xs text-slate-600 dark:text-slate-400 font-medium">Select Date:</label>
@@ -727,7 +784,7 @@
             </div>
             <h3 class="text-xl font-extrabold text-slate-900 dark:text-slate-100">1-Click Offline Data Backup & Transfer</h3>
             <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 max-w-md mx-auto">
-              Easily export your study logs, scheduled tasks, and sticky notes to transfer between your laptop and mobile phone.
+              Easily export your study logs, scheduled tasks, and sticky notes to transfer between your laptop and tablet.
             </p>
           </div>
 
@@ -737,7 +794,7 @@
                 <i class="fa-solid fa-file-arrow-down text-3xl text-indigo-500 mb-2"></i>
                 <h4 class="font-bold text-sm text-slate-800 dark:text-slate-200">Export Backup Data</h4>
                 <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Downloads a backup JSON file or opens raw text for iPhone/Safari users.
+                  Downloads a backup JSON file or opens raw text for quick copy.
                 </p>
               </div>
 
@@ -746,7 +803,7 @@
                   <i class="fa-solid fa-download"></i> Download JSON File
                 </button>
                 <button onclick="viewRawJsonData()" class="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
-                  <i class="fa-solid fa-mobile-screen"></i> View Raw JSON (iPhone Fix)
+                  <i class="fa-solid fa-mobile-screen"></i> View Raw JSON
                 </button>
                 <button onclick="copyDataStringToClipboard()" class="w-full bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 text-indigo-600 dark:text-indigo-400 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
                   <i class="fa-solid fa-copy"></i> Copy Backup String
@@ -789,7 +846,7 @@
 
   <!-- Standard Footer -->
   <footer class="text-center py-6 text-xs text-slate-500 dark:text-slate-400 font-medium border-t border-slate-200 dark:border-slate-800/80 mt-8">
-    Copyright 2026 | Made with love by Niket Talwar
+    Copyright 2026 | StudyPulse Pro CA Hub
   </footer>
 
   <!-- Target Exam Date Modal Picker -->
@@ -951,6 +1008,10 @@
     </div>
   </div>
 
+  <!-- Hidden Canvas and Video Elements for PiP Floating Timer Mode -->
+  <canvas id="pip-canvas" width="360" height="200" class="hidden"></canvas>
+  <video id="pip-video" autoplay muted class="hidden"></video>
+
   <!-- JavaScript Engine -->
   <script>
     // 30 Shuffling Daily Motivational Quotes
@@ -1002,6 +1063,7 @@
 
     // Sound Engine
     let audioMuted = false;
+    let audioCtx = null;
     const soundToggleBtn = document.getElementById('sound-toggle-btn');
     const soundIcon = document.getElementById('sound-icon');
 
@@ -1013,28 +1075,44 @@
     function playAudioChime(type) {
       if (audioMuted) return;
       try {
-        const ctx = new (window.AudioContext || window.webkitAudioContext)();
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(audioCtx.destination);
 
         if (type === 'complete') {
-          osc.frequency.setValueAtTime(523.25, ctx.currentTime);
-          osc.frequency.setValueAtTime(659.25, ctx.currentTime + 0.1);
-          osc.frequency.setValueAtTime(783.99, ctx.currentTime + 0.2);
-          gain.gain.setValueAtTime(0.3, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.5);
+          osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+          osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+          osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2);
+          gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.5);
           osc.start();
-          osc.stop(ctx.currentTime + 0.5);
+          osc.stop(audioCtx.currentTime + 0.5);
         } else if (type === 'click') {
-          osc.frequency.setValueAtTime(800, ctx.currentTime);
-          gain.gain.setValueAtTime(0.1, ctx.currentTime);
-          gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+          osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.05);
           osc.start();
-          osc.stop(ctx.currentTime + 0.05);
+          osc.stop(audioCtx.currentTime + 0.05);
         }
       } catch (e) {}
+    }
+
+    // Live Screen Share / Cast Helper for Second Screen / Tab
+    async function startScreenCast() {
+      if (navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia) {
+        try {
+          const stream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+          alert("📺 Dashboard Screen Share active! You can now view or mirror this window on your Dell Venue 7 / external screen.");
+        } catch (err) {
+          console.log("Cast dismissed");
+        }
+      } else {
+        alert("Screen sharing is not supported by this browser version. Open this page directly on your tablet via local network URL or file transfer.");
+      }
     }
 
     // Navigation Router
@@ -1062,7 +1140,7 @@
 
     const pageTitles = {
       overview: "Holistic Performance Report",
-      pomodoro: "Deep Focus Pomodoro Timer",
+      pomodoro: "Deep Focus Timer & Stopwatch",
       scheduler: "Advance Study Scheduler",
       chapters: "CA Final Chapter Index & Revision Tracker",
       analytics: "Graphical Analytics & Focus Pattern",
@@ -1119,7 +1197,7 @@
         themeIcon.className = "fa-solid fa-moon text-sm";
       }
       updateChartColors();
-      renderPomodoroMatrixGrid();
+      renderPomodoroTimelineGrid();
     };
 
     // Default Chapter Data
@@ -1242,14 +1320,16 @@
     let rawLogs = JSON.parse(localStorage.getItem('sp_logs_v30')) || [];
     let state = {
       timer: {
-        mode: 'work',
+        mode: 'work', // 'work', 'stopwatch', 'short', 'long'
         workDuration: 60,
         shortDuration: 5,
         longDuration: 15,
         timeLeft: 60 * 60,
         isRunning: false,
         intervalId: null,
-        initialTime: 60 * 60
+        initialTime: 60 * 60,
+        startTimeEpoch: null,
+        accumulatedTime: 0
       },
       activeTaskId: null,
       activeWallSubject: 'FR',
@@ -1298,7 +1378,7 @@
       let totalStartMins = sh * 60 + sm;
       let totalEndMins = eh * 60 + em;
 
-      if (totalEndMins < totalStartMins) totalEndMins += 24 * 60; // Overnight shift edge-case
+      if (totalEndMins < totalStartMins) totalEndMins += 24 * 60; // Overnight shift
 
       const durationMins = totalEndMins - totalStartMins;
       document.getElementById('manual-calc-duration-text').textContent = `${durationMins} Mins (${(durationMins / 60).toFixed(1)} Hrs)`;
@@ -1320,6 +1400,31 @@
         opt.textContent = `[${task.subject}] ${task.title}`;
         sel.appendChild(opt);
       });
+      onManualTaskSelectChange();
+    }
+
+    // Auto-populates and locks subject/type if a task is linked in manual logger
+    function onManualTaskSelectChange() {
+      const taskId = document.getElementById('manual-task-select').value;
+      const subSelect = document.getElementById('manual-subject-select');
+      const typeSelect = document.getElementById('manual-type-select');
+
+      if (taskId) {
+        const task = state.tasks.find(t => t.id === taskId);
+        if (task) {
+          subSelect.value = task.subject;
+          typeSelect.value = task.type;
+          subSelect.disabled = true;
+          typeSelect.disabled = true;
+          subSelect.classList.add('opacity-60', 'cursor-not-allowed');
+          typeSelect.classList.add('opacity-60', 'cursor-not-allowed');
+          return;
+        }
+      }
+      subSelect.disabled = false;
+      typeSelect.disabled = false;
+      subSelect.classList.remove('opacity-60', 'cursor-not-allowed');
+      typeSelect.classList.remove('opacity-60', 'cursor-not-allowed');
     }
 
     document.getElementById('manual-date-input').onchange = populateManualTaskDropdown;
@@ -1442,7 +1547,55 @@
       }
     };
 
-    // Timer Engine
+    // Picture-in-Picture Floating Mini Timer
+    const pipCanvas = document.getElementById('pip-canvas');
+    const pipVideo = document.getElementById('pip-video');
+    const pipCtx = pipCanvas.getContext('2d');
+
+    function updatePiPCanvas(timeText, labelText) {
+      if (!pipCtx) return;
+      pipCtx.fillStyle = '#0f172a';
+      pipCtx.fillRect(0, 0, pipCanvas.width, pipCanvas.height);
+
+      pipCtx.fillStyle = '#818cf8';
+      pipCtx.font = 'bold 16px sans-serif';
+      pipCtx.textAlign = 'center';
+      pipCtx.fillText(`StudyPulse - ${labelText}`, 180, 45);
+
+      pipCtx.fillStyle = '#ffffff';
+      pipCtx.font = 'bold 52px monospace';
+      pipCtx.fillText(timeText, 180, 115);
+
+      pipCtx.fillStyle = '#94a3b8';
+      pipCtx.font = '12px sans-serif';
+      pipCtx.fillText(state.timer.isRunning ? '● LIVE RUNNING' : '⏸ PAUSED', 180, 160);
+    }
+
+    async function toggleTimerPiP() {
+      try {
+        if (document.pictureInPictureElement) {
+          await document.exitPictureInPicture();
+        } else {
+          if (!pipVideo.srcObject) {
+            const stream = pipCanvas.captureStream(10);
+            pipVideo.srcObject = stream;
+            await pipVideo.play();
+          }
+          await pipVideo.requestPictureInPicture();
+        }
+      } catch (err) {
+        alert("Picture-in-Picture mode not supported or allowed in this browser.");
+      }
+    }
+
+    // Toggle Pomo Target (Subject vs Task)
+    function togglePomoTargetMode() {
+      const isTask = document.getElementById('target-by-task').checked;
+      document.getElementById('pomo-subject-select-container').classList.toggle('hidden', isTask);
+      document.getElementById('pomo-task-select-container').classList.toggle('hidden', !isTask);
+    }
+
+    // Timer Engine (Precision Timestamp Delta Engine - Immune to tab throttling)
     const timerMain = document.getElementById('timer-main');
     const timerSec = document.getElementById('timer-sec');
     const startBtn = document.getElementById('start-btn');
@@ -1470,9 +1623,13 @@
     };
 
     function updateTimerDisplay() {
-      const hours = Math.floor(state.timer.timeLeft / 3600);
-      const mins = Math.floor((state.timer.timeLeft % 3600) / 60);
-      const secs = state.timer.timeLeft % 60;
+      let totalSeconds = state.timer.mode === 'stopwatch' 
+        ? state.timer.accumulatedTime 
+        : state.timer.timeLeft;
+
+      const hours = Math.floor(totalSeconds / 3600);
+      const mins = Math.floor((totalSeconds % 3600) / 60);
+      const secs = totalSeconds % 60;
 
       const formattedMain = `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
       const formattedSec = `:${secs.toString().padStart(2, '0')}`;
@@ -1480,7 +1637,10 @@
       timerMain.textContent = formattedMain;
       timerSec.textContent = formattedSec;
       
-      document.title = `${formattedMain}${formattedSec} - StudyPulse`;
+      const titleTag = state.timer.mode === 'stopwatch' ? '⏱️ Stopwatch' : 'Timer';
+      document.title = `${formattedMain}${formattedSec} - StudyPulse (${titleTag})`;
+
+      updatePiPCanvas(`${formattedMain}${formattedSec}`, state.timer.mode.toUpperCase());
     }
 
     function setMode(mode) {
@@ -1489,19 +1649,28 @@
       clearInterval(state.timer.intervalId);
       startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Start`;
 
-      ['mode-work', 'mode-short', 'mode-long'].forEach(id => {
-        document.getElementById(id).className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
+      ['mode-work', 'mode-stopwatch', 'mode-short', 'mode-long'].forEach(id => {
+        document.getElementById(id).className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl text-slate-600 dark:text-slate-400 hover:text-indigo-500 transition-all";
       });
+
+      const badge = document.getElementById('stopwatch-badge');
 
       if (mode === 'work') {
         state.timer.timeLeft = state.timer.workDuration * 60;
-        document.getElementById('mode-work').className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md";
+        document.getElementById('mode-work').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-indigo-600 text-white transition-all shadow-md";
+        badge.classList.add('hidden');
+      } else if (mode === 'stopwatch') {
+        state.timer.accumulatedTime = 0;
+        document.getElementById('mode-stopwatch').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-amber-500 text-slate-900 transition-all shadow-md";
+        badge.classList.remove('hidden');
       } else if (mode === 'short') {
         state.timer.timeLeft = state.timer.shortDuration * 60;
-        document.getElementById('mode-short').className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-purple-600 text-white transition-all shadow-md";
+        document.getElementById('mode-short').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-purple-600 text-white transition-all shadow-md";
+        badge.classList.add('hidden');
       } else {
         state.timer.timeLeft = state.timer.longDuration * 60;
-        document.getElementById('mode-long').className = "flex-1 py-2.5 text-xs font-extrabold rounded-xl bg-emerald-600 text-white transition-all shadow-md";
+        document.getElementById('mode-long').className = "flex-1 min-w-[70px] py-2.5 text-xs font-extrabold rounded-xl bg-emerald-600 text-white transition-all shadow-md";
+        badge.classList.add('hidden');
       }
       state.timer.initialTime = state.timer.timeLeft;
       updateTimerDisplay();
@@ -1513,35 +1682,65 @@
         clearInterval(state.timer.intervalId);
         state.timer.isRunning = false;
         startBtn.innerHTML = `<i class="fa-solid fa-play"></i> Resume`;
+        updateTimerDisplay();
       } else {
         state.timer.isRunning = true;
         startBtn.innerHTML = `<i class="fa-solid fa-pause"></i> Pause`;
+        state.timer.startTimeEpoch = Date.now();
+
+        const baseInitial = state.timer.mode === 'stopwatch' ? state.timer.accumulatedTime : state.timer.timeLeft;
+
         state.timer.intervalId = setInterval(() => {
-          if (state.timer.timeLeft > 0) {
-            state.timer.timeLeft--;
+          const deltaSecs = Math.floor((Date.now() - state.timer.startTimeEpoch) / 1000);
+
+          if (state.timer.mode === 'stopwatch') {
+            state.timer.accumulatedTime = baseInitial + deltaSecs;
             updateTimerDisplay();
           } else {
-            handleTimerCompletion();
+            const rem = baseInitial - deltaSecs;
+            if (rem > 0) {
+              state.timer.timeLeft = rem;
+              updateTimerDisplay();
+            } else {
+              state.timer.timeLeft = 0;
+              updateTimerDisplay();
+              handleTimerCompletion();
+            }
           }
-        }, 1000);
+        }, 500);
       }
     }
 
-    function stopAndLogPartial() {
-      if (!state.timer.isRunning && state.timer.timeLeft === state.timer.initialTime) return;
+    function getPomoSelectedSubjectAndType() {
+      const isTaskMode = document.getElementById('target-by-task').checked;
+      if (isTaskMode && state.activeTaskId) {
+        const t = state.tasks.find(x => x.id === state.activeTaskId);
+        if (t) return { subject: t.subject, type: t.type, linkedTask: t };
+      }
+      const directSub = document.getElementById('pomo-direct-subject').value || 'FR';
+      const directType = document.getElementById('pomo-direct-type').value || 'Self Revision';
+      return { subject: directSub, type: directType, linkedTask: null };
+    }
 
+    function stopAndLogPartial() {
       clearInterval(state.timer.intervalId);
       state.timer.isRunning = false;
 
-      const elapsedSeconds = state.timer.initialTime - state.timer.timeLeft;
+      let elapsedSeconds = 0;
+      if (state.timer.mode === 'stopwatch') {
+        elapsedSeconds = state.timer.accumulatedTime;
+      } else {
+        elapsedSeconds = state.timer.initialTime - state.timer.timeLeft;
+      }
+
       const elapsedMinutes = Math.round(elapsedSeconds / 60);
 
-      if (state.timer.mode === 'work' && elapsedMinutes > 0) {
+      if ((state.timer.mode === 'work' || state.timer.mode === 'stopwatch') && elapsedMinutes > 0) {
         const today = new Date().toISOString().split('T')[0];
-        const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
+        const { subject, type, linkedTask } = getPomoSelectedSubjectAndType();
 
         const now = new Date();
-        const start = new Date(now.getTime() - elapsedSeconds);
+        const start = new Date(now.getTime() - elapsedSeconds * 1000);
         const startTimeStr = start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
         const endTimeStr = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false });
 
@@ -1552,21 +1751,23 @@
           hour: start.getHours(),
           startTime: startTimeStr,
           endTime: endTimeStr,
-          subject: activeTask ? activeTask.subject : 'General',
-          type: activeTask ? activeTask.type : 'Study',
+          subject: subject,
+          type: type,
           timestamp: `${startTimeStr} - ${endTimeStr}`
         });
 
-        if (activeTask) activeTask.completedPomos += parseFloat((elapsedMinutes / state.timer.workDuration).toFixed(1));
+        if (linkedTask) {
+          linkedTask.completedPomos += parseFloat((elapsedMinutes / state.timer.workDuration).toFixed(1));
+        }
 
         saveData();
         renderTasks();
         updateMetricsAndCharts();
         playAudioChime('complete');
-        alert(`Logged ${elapsedMinutes} mins of study time!`);
+        alert(`🎉 Logged ${elapsedMinutes} mins of study time for ${subject}!`);
       }
 
-      setMode('work');
+      setMode(state.timer.mode);
     }
 
     function handleTimerCompletion() {
@@ -1575,7 +1776,7 @@
 
       if (state.timer.mode === 'work') {
         const today = new Date().toISOString().split('T')[0];
-        const activeTask = state.tasks.find(t => t.id === state.activeTaskId);
+        const { subject, type, linkedTask } = getPomoSelectedSubjectAndType();
 
         const now = new Date();
         const start = new Date(now.getTime() - (state.timer.workDuration * 60 * 1000));
@@ -1589,18 +1790,18 @@
           hour: start.getHours(),
           startTime: startTimeStr,
           endTime: endTimeStr,
-          subject: activeTask ? activeTask.subject : 'General',
-          type: activeTask ? activeTask.type : 'Study',
+          subject: subject,
+          type: type,
           timestamp: `${startTimeStr} - ${endTimeStr}`
         });
 
-        if (activeTask) activeTask.completedPomos++;
+        if (linkedTask) linkedTask.completedPomos++;
 
         saveData();
         renderTasks();
         updateMetricsAndCharts();
         playAudioChime('complete');
-        alert('🎉 Session complete! Logged in full.');
+        alert(`🎉 Session complete! Logged in full for ${subject}.`);
       }
 
       setMode('work');
@@ -1931,22 +2132,19 @@
     // Pomodoro Records Month Navigation Controls
     function prevPomoMatrixMonth() {
       state.pomoMatrixViewDate.setMonth(state.pomoMatrixViewDate.getMonth() - 1);
-      renderPomodoroMatrixGrid();
+      renderPomodoroTimelineGrid();
     }
 
     function nextPomoMatrixMonth() {
       state.pomoMatrixViewDate.setMonth(state.pomoMatrixViewDate.getMonth() + 1);
-      renderPomodoroMatrixGrid();
+      renderPomodoroTimelineGrid();
     }
 
-    // Ultra-Realistic Fractional Time-of-Day Matrix Renderer
-    function renderPomodoroMatrixGrid() {
-      const fixedHeaderContainer = document.getElementById('pomo-matrix-fixed-header');
-      const scrollBodyContainer = document.getElementById('pomo-matrix-scroll-body');
-      if (!fixedHeaderContainer || !scrollBodyContainer) return;
-
-      fixedHeaderContainer.innerHTML = '';
-      scrollBodyContainer.innerHTML = '';
+    // High-Precision Continuous 24h Gantt Timeline Visualizer
+    function renderPomodoroTimelineGrid() {
+      const rowsContainer = document.getElementById('pomo-timeline-rows');
+      if (!rowsContainer) return;
+      rowsContainer.innerHTML = '';
 
       const viewDate = state.pomoMatrixViewDate;
       const year = viewDate.getFullYear();
@@ -1955,85 +2153,77 @@
       document.getElementById('pomo-matrix-month-year-label').textContent = 
         viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
 
-      const slots = ['0:00', '2:00', '4:00', '6:00', '8:00', '10:00', '12:00', '14:00', '16:00', '18:00', '20:00', '22:00'];
-      
       const now = new Date();
       const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
-
       const maxDayToDisplay = isCurrentMonth ? now.getDate() : new Date(year, month + 1, 0).getDate();
       const todayStr = now.toISOString().split('T')[0];
 
-      let headerTable = document.createElement('table');
-      headerTable.className = "w-full border-collapse text-xs";
-      let headerHtml = `<thead><tr class="text-slate-500 dark:text-slate-400 font-bold"><th class="p-2 text-left w-24">Date</th>`;
-      slots.forEach(slot => {
-        headerHtml += `<th class="p-2 text-center font-mono w-16">${slot}</th>`;
-      });
-      headerHtml += `</tr></thead>`;
-      headerTable.innerHTML = headerHtml;
-      fixedHeaderContainer.appendChild(headerTable);
-
-      let bodyTable = document.createElement('table');
-      bodyTable.className = "w-full border-collapse text-xs";
-      const tbody = document.createElement('tbody');
-      tbody.className = "divide-y divide-slate-200 dark:divide-slate-800/40 font-mono";
+      const subColors = {
+        'FR': 'bg-indigo-500 text-white',
+        'AFM': 'bg-purple-500 text-white',
+        'AUDIT': 'bg-amber-500 text-slate-950',
+        'DT': 'bg-rose-500 text-white',
+        'IDT': 'bg-emerald-500 text-white',
+        'IBS': 'bg-cyan-500 text-white',
+        'General': 'bg-slate-500 text-white'
+      };
 
       for (let day = maxDayToDisplay; day >= 1; day--) {
         const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-
         let label = `${day} ${viewDate.toLocaleDateString('en-US', { month: 'short' })}`;
         if (dateStr === todayStr) label = "Today";
 
         const dayLogs = state.logs.filter(l => l.date === dateStr);
 
-        let rowHtml = `<tr><td class="p-2 text-slate-600 dark:text-slate-400 font-bold font-sans w-24">${label}</td>`;
+        const rowWrapper = document.createElement('div');
+        rowWrapper.className = "flex items-center gap-3 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/30 transition-all";
 
-        slots.forEach((slot, slotIdx) => {
-          const slotStartHour = slotIdx * 2;
-          const slotEndHour = slotStartHour + 2;
+        const dateLabel = document.createElement('div');
+        dateLabel.className = "w-24 shrink-0 text-xs font-bold text-slate-600 dark:text-slate-400";
+        dateLabel.textContent = label;
+        rowWrapper.appendChild(dateLabel);
 
-          let slotMins = 0;
+        const track = document.createElement('div');
+        track.className = "flex-1 h-6 bg-slate-200 dark:bg-slate-800/80 rounded-lg relative overflow-hidden border border-slate-300 dark:border-slate-700/50";
 
-          dayLogs.forEach(l => {
-            let logStartMins = l.hour * 60;
-            let logEndMins = logStartMins + l.minutes;
+        // Vertical Guide Grid Marks (every 3 hours)
+        for (let g = 1; g < 8; g++) {
+          const guide = document.createElement('div');
+          guide.className = "absolute top-0 bottom-0 border-r border-slate-300 dark:border-slate-700/30";
+          guide.style.left = `${(g / 8) * 100}%`;
+          track.appendChild(guide);
+        }
 
-            if (l.startTime && l.endTime) {
-              const [sh, sm] = l.startTime.split(':').map(Number);
-              const [eh, em] = l.endTime.split(':').map(Number);
-              logStartMins = sh * 60 + sm;
-              logEndMins = eh * 60 + em;
-              if (logEndMins < logStartMins) logEndMins += 24 * 60;
-            }
+        // Render Exact Gantt Bars for Each Logged Session
+        dayLogs.forEach(l => {
+          let startMins = l.hour * 60;
+          let endMins = startMins + l.minutes;
 
-            const slotStartMins = slotStartHour * 60;
-            const slotEndMins = slotEndHour * 60;
+          if (l.startTime && l.endTime) {
+            const [sh, sm] = l.startTime.split(':').map(Number);
+            const [eh, em] = l.endTime.split(':').map(Number);
+            startMins = sh * 60 + sm;
+            endMins = eh * 60 + em;
+            if (endMins < startMins) endMins += 24 * 60;
+          }
 
-            const overlapStart = Math.max(logStartMins, slotStartMins);
-            const overlapEnd = Math.min(logEndMins, slotEndMins);
+          const leftPct = ((startMins % 1440) / 1440) * 100;
+          const widthPct = Math.max(1.2, ((endMins - startMins) / 1440) * 100);
 
-            if (overlapStart < overlapEnd) {
-              slotMins += (overlapEnd - overlapStart);
-            }
-          });
+          const bar = document.createElement('div');
+          const colorClass = subColors[l.subject] || 'bg-indigo-500 text-white';
+          bar.className = `absolute top-0.5 bottom-0.5 rounded-md px-1 flex items-center justify-center font-bold text-[9px] truncate shadow-sm transition-all hover:scale-105 cursor-pointer ${colorClass}`;
+          bar.style.left = `${leftPct}%`;
+          bar.style.width = `${widthPct}%`;
+          bar.title = `[${l.subject}] ${l.startTime || ''} - ${l.endTime || ''} (${l.minutes} mins)`;
+          bar.textContent = l.subject;
 
-          const fillPct = Math.min(100, Math.round((slotMins / 120) * 100));
-
-          rowHtml += `
-            <td class="p-1 text-center align-middle w-16">
-              <div class="w-full bg-slate-300/50 dark:bg-slate-700/50 rounded-xl h-6 overflow-hidden relative" title="${slotMins} mins studied">
-                <div class="bg-purple-600 h-full rounded-xl transition-all duration-500" style="width: ${fillPct}%;"></div>
-              </div>
-            </td>
-          `;
+          track.appendChild(bar);
         });
 
-        rowHtml += `</tr>`;
-        tbody.innerHTML += rowHtml;
+        rowWrapper.appendChild(track);
+        rowsContainer.appendChild(rowWrapper);
       }
-
-      bodyTable.appendChild(tbody);
-      scrollBodyContainer.appendChild(bodyTable);
     }
 
     // Focus Goal Calendar
@@ -2683,7 +2873,7 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine
+    // Charts Engine (Updated to 0 to 14 Max Hours with StepSize: 2)
     let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
 
     function initCharts() {
@@ -2691,7 +2881,7 @@
       overviewSplineChart = new Chart(ctxOverviewSpline, {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       const ctxOverviewRadar = document.getElementById('overviewRadarChart').getContext('2d');
@@ -2705,14 +2895,14 @@
       studySplineChart = new Chart(ctxSpline, {
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
       dateWiseBarChart = new Chart(ctxDate, {
         type: 'bar',
         data: { labels: ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'], datasets: [{ label: 'Hours Studied', data: [0, 0, 0, 0, 0, 0], backgroundColor: 'rgba(16, 185, 129, 0.6)', borderColor: 'rgba(16, 185, 129, 1)', borderWidth: 1.5, borderRadius: 6 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 18, ticks: { stepSize: 3, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
       updateMetricsAndCharts();
@@ -2744,7 +2934,7 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      renderPomodoroMatrixGrid();
+      renderPomodoroTimelineGrid();
 
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
@@ -2873,6 +3063,7 @@
     stopBtn.onclick = stopAndLogPartial;
     resetBtn.onclick = () => setMode(state.timer.mode);
     document.getElementById('mode-work').onclick = () => setMode('work');
+    document.getElementById('mode-stopwatch').onclick = () => setMode('stopwatch');
     document.getElementById('mode-short').onclick = () => setMode('short');
     document.getElementById('mode-long').onclick = () => setMode('long');
 
