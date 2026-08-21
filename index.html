@@ -30,7 +30,7 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <!-- Chart.js CDN -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <!-- PeerJS for Low-Bandwidth Tablet Pairing -->
+  <!-- PeerJS for Tablet Pairing -->
   <script src="https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@600;700;800&family=Kalam:wght@400;700&display=swap');
@@ -665,41 +665,45 @@
           </div>
         </section>
 
-        <!-- HIGH-IMPACT REPLACEMENT ANALYTICS: PEAK FOCUS WINDOW & STUDY TYPE ALLOCATION -->
+        <!-- HIGH-IMPACT ADVANCED ANALYTICS SECTION (Replacing Timeline) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-          <!-- Hourly Peak Productivity Curve -->
-          <section class="lg:col-span-7 glass-card p-6 rounded-2xl flex flex-col justify-between">
+          <!-- Analytics Module 1: Stacked Revision Mode & Subject Activity Breakdown -->
+          <section class="lg:col-span-8 glass-card p-6 rounded-2xl flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <h3 class="text-base font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-bolt text-amber-500"></i> Peak Productivity Hourly Curve
-                </h3>
-                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
-                  Focus Window
-                </span>
+              <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+                <div>
+                  <h3 class="text-base font-bold flex items-center gap-2">
+                    <i class="fa-solid fa-layer-group text-indigo-500"></i> Subject-Wise Study Method Breakdown
+                  </h3>
+                  <p class="text-xs text-slate-500 dark:text-slate-400">Stacked hours per subject by Revision, Lectures, Tests & Practice</p>
+                </div>
+
+                <select id="method-breakdown-month-filter" onchange="updateMethodBreakdownChart()" class="input-field border rounded-xl px-3 py-1.5 text-xs font-bold focus:outline-none">
+                  <option value="all">All Time</option>
+                </select>
               </div>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Total cumulative hours studied across each hour of the day (12 AM - 11 PM)</p>
             </div>
-            <div class="relative h-60 w-full">
-              <canvas id="peakHoursBarChart"></canvas>
+
+            <div class="relative h-72 w-full">
+              <canvas id="subjectMethodStackedChart"></canvas>
             </div>
           </section>
 
-          <!-- Study Method & Activity Breakdown -->
-          <section class="lg:col-span-5 glass-card p-6 rounded-2xl flex flex-col justify-between">
+          <!-- Analytics Module 2: Peak Productivity Slot Distribution -->
+          <section class="lg:col-span-4 glass-card p-6 rounded-2xl flex flex-col justify-between">
             <div>
-              <div class="flex justify-between items-center mb-1">
-                <h3 class="text-base font-bold flex items-center gap-2">
-                  <i class="fa-solid fa-chart-pie text-emerald-500"></i> Study Method Allocation
-                </h3>
-                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
-                  Types
-                </span>
-              </div>
-              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Proportion of Self Revision, Question Practice, Lectures, & Tests</p>
+              <h3 class="text-base font-bold mb-1 flex items-center gap-2">
+                <i class="fa-solid fa-clock-rotate-left text-amber-500"></i> Peak Productivity Time Slots
+              </h3>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Hours logged by time-of-day zones</p>
             </div>
-            <div class="relative h-60 w-full flex items-center justify-center">
-              <canvas id="studyTypeDoughnutChart"></canvas>
+
+            <div class="relative h-56 w-full flex items-center justify-center">
+              <canvas id="productivityDoughnutChart"></canvas>
+            </div>
+
+            <div id="productivity-slot-summary" class="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-[11px] grid grid-cols-2 gap-2 text-slate-600 dark:text-slate-400">
+              <!-- Rendered dynamically -->
             </div>
           </section>
         </div>
@@ -901,21 +905,21 @@
     <div class="glass-card bg-white dark:bg-slate-900 p-6 md:p-8 rounded-3xl max-w-md w-full border border-slate-300 dark:border-slate-700 shadow-2xl space-y-4">
       <div class="flex justify-between items-center">
         <h3 class="text-base font-extrabold text-indigo-500 flex items-center gap-2">
-          <i class="fa-solid fa-tablet-screen-button"></i> Tablet Direct View Link
+          <i class="fa-solid fa-tablet-screen-button"></i> Tablet Direct Portal Link
         </h3>
         <button onclick="closeTabletCastModal()" class="text-slate-400 hover:text-rose-500"><i class="fa-solid fa-xmark text-lg"></i></button>
       </div>
 
       <div class="p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl text-xs space-y-1.5">
         <p class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-link"></i> Dedicated Tablet URL (No Camera Needed)
+          <i class="fa-solid fa-link"></i> Unique Tablet Link (No Camera Needed)
         </p>
         <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-          Open the dedicated link on your Dell Venue 7 tablet browser. Enter the 4-digit PIN below to connect seamlessly.
+          Open the dedicated link on your Dell Venue 7 tablet browser. It will ask for the 4-digit PIN below and link up with zero lag.
         </p>
       </div>
 
-      <!-- PIN Code Display -->
+      <!-- Room Code -->
       <div class="text-center p-3 sub-box rounded-2xl">
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Your 4-Digit Laptop PIN</p>
         <p id="host-peer-id-display" class="font-mono text-3xl font-black text-indigo-500 tracking-widest select-all">----</p>
@@ -1307,13 +1311,12 @@
     function copyTabletDirectURL() {
       const url = window.location.href.split('#')[0].split('?')[0] + '#tablet';
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(() => alert("📋 Dedicated Tablet Link copied! Open this on your tablet."));
+        navigator.clipboard.writeText(url).then(() => alert("📋 Tablet Link copied! Open this on your tablet."));
       } else {
         prompt("Copy this URL and open on tablet:", url);
       }
     }
 
-    // Check if viewing as Tablet Portal (#tablet or ?view=tablet)
     function checkTabletPortalRoute() {
       const isTablet = window.location.hash === '#tablet' || new URLSearchParams(window.location.search).get('view') === 'tablet';
       if (isTablet) {
@@ -1338,6 +1341,91 @@
     function closeTabletCastModal() {
       document.getElementById('tablet-cast-modal').classList.add('hidden');
     }
+
+    // Navigation Router
+    const navButtons = {
+      overview: document.getElementById('nav-overview'),
+      pomodoro: document.getElementById('nav-pomodoro'),
+      scheduler: document.getElementById('nav-scheduler'),
+      chapters: document.getElementById('nav-chapters'),
+      analytics: document.getElementById('nav-analytics'),
+      history: document.getElementById('nav-history'),
+      wall: document.getElementById('nav-wall'),
+      backup: document.getElementById('nav-backup')
+    };
+
+    const pages = {
+      overview: document.getElementById('page-overview'),
+      pomodoro: document.getElementById('page-pomodoro'),
+      scheduler: document.getElementById('page-scheduler'),
+      chapters: document.getElementById('page-chapters'),
+      analytics: document.getElementById('page-analytics'),
+      history: document.getElementById('page-history'),
+      wall: document.getElementById('page-wall'),
+      backup: document.getElementById('page-backup')
+    };
+
+    const pageTitles = {
+      overview: "Holistic Performance Report",
+      pomodoro: "Deep Focus Study & Stopwatch Hub",
+      scheduler: "Advance Study Scheduler",
+      chapters: "CA Final Chapter Index & Revision Tracker",
+      analytics: "Graphical Analytics & Focus Pattern",
+      history: "Date-Wise & Month-Wise Session Logs",
+      wall: "Subject Memory Wall & Resource Links",
+      backup: "Data Backup & 1-Click File Transfer"
+    };
+
+    function switchPage(pageKey) {
+      playAudioChime('click');
+      Object.keys(pages).forEach(key => {
+        pages[key].classList.add('hidden');
+        navButtons[key].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5";
+      });
+
+      pages[pageKey].classList.remove('hidden');
+      navButtons[pageKey].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-1.5";
+      document.getElementById('page-title').textContent = pageTitles[pageKey];
+
+      if (pageKey === 'pomodoro') {
+        updatePomoTaskDropdown();
+        populateManualTaskDropdown();
+      }
+      if (pageKey === 'overview' || pageKey === 'analytics') updateMetricsAndCharts();
+      if (pageKey === 'history') renderSessionHistory();
+      if (pageKey === 'wall') renderMemoryWall();
+      if (pageKey === 'chapters') renderChapterTracker();
+    }
+
+    Object.keys(navButtons).forEach(key => {
+      navButtons[key].onclick = () => switchPage(key);
+    });
+
+    // Theme Switcher
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const themeIcon = document.getElementById('theme-icon');
+
+    if (localStorage.getItem('theme') === 'light') {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.add('light');
+      themeIcon.className = "fa-solid fa-sun text-sm text-amber-500";
+    }
+
+    themeToggleBtn.onclick = () => {
+      if (document.documentElement.classList.contains('dark')) {
+        document.documentElement.classList.remove('dark');
+        document.documentElement.classList.add('light');
+        localStorage.setItem('theme', 'light');
+        themeIcon.className = "fa-solid fa-sun text-sm text-amber-500";
+      } else {
+        document.documentElement.classList.remove('light');
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+        themeIcon.className = "fa-solid fa-moon text-sm";
+      }
+      updateChartColors();
+      updateMethodBreakdownChart();
+    };
 
     // Default Chapter Data
     const defaultChaptersData = {
@@ -1474,7 +1562,6 @@
       activeWallSubject: 'FR',
       activeChapterSubject: 'FR',
       focusGoalViewDate: new Date(),
-      pomoMatrixViewDate: new Date(),
       dailyGoalHours: parseFloat(localStorage.getItem('sp_focus_goal_hrs')) || 3.0,
       subjects: JSON.parse(localStorage.getItem('sp_subjects_v30')) || ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
       chapters: JSON.parse(localStorage.getItem('sp_chapters_v30')) || defaultChaptersData,
@@ -1685,7 +1772,7 @@
       }
     };
 
-    // Picture-in-Picture Floating Mini Timer
+    // Ultra-Premium Picture-in-Picture Floating Mini Timer
     const pipCanvas = document.getElementById('pip-canvas');
     const pipVideo = document.getElementById('pip-video');
     const pipCtx = pipCanvas.getContext('2d');
@@ -2979,8 +3066,9 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine (Scaled 0 to 14 Max Hours with StepSize: 2 + New Productivity Charts)
-    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart, peakHoursBarChart, studyTypeDoughnutChart;
+    // Charts Engine (Scaled 0 to 14 Max Hours with StepSize: 2 + New Advanced Visuals)
+    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
+    let subjectMethodStackedChart, productivityDoughnutChart;
 
     function initCharts() {
       const ctxOverviewSpline = document.getElementById('overviewSplineChart').getContext('2d');
@@ -3004,47 +3092,6 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
-      const ctxPeakHours = document.getElementById('peakHoursBarChart').getContext('2d');
-      const hourLabels12h = [
-        '12 AM','1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM',
-        '12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM'
-      ];
-      peakHoursBarChart = new Chart(ctxPeakHours, {
-        type: 'bar',
-        data: { labels: hourLabels12h, datasets: [{ label: 'Total Hours Studied', data: Array(24).fill(0), backgroundColor: 'rgba(245, 158, 11, 0.65)', borderColor: '#f59e0b', borderWidth: 1.5, borderRadius: 5 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } } } }
-      });
-
-      const ctxStudyType = document.getElementById('studyTypeDoughnutChart').getContext('2d');
-      studyTypeDoughnutChart = new Chart(ctxStudyType, {
-        type: 'doughnut',
-        data: {
-          labels: ['Self Revision', 'Lecture', 'Youtube Revision', 'Mock Test', 'Question Practice'],
-          datasets: [{
-            data: [0, 0, 0, 0, 0],
-            backgroundColor: [
-              'rgba(99, 102, 241, 0.8)',
-              'rgba(168, 85, 247, 0.8)',
-              'rgba(244, 63, 94, 0.8)',
-              'rgba(16, 185, 129, 0.8)',
-              'rgba(245, 158, 11, 0.8)'
-            ],
-            borderWidth: 0
-          }]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: {
-              position: 'bottom',
-              labels: { boxWidth: 10, color: '#94a3b8', font: { size: 10, weight: 'bold' } }
-            }
-          },
-          cutout: '65%'
-        }
-      });
-
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
       dateWiseBarChart = new Chart(ctxDate, {
         type: 'bar',
@@ -3052,7 +3099,130 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
       });
 
+      // New Chart 1: Stacked Study Method Breakdown
+      const ctxStacked = document.getElementById('subjectMethodStackedChart').getContext('2d');
+      subjectMethodStackedChart = new Chart(ctxStacked, {
+        type: 'bar',
+        data: {
+          labels: ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'],
+          datasets: [
+            { label: 'Self Revision', data: [0,0,0,0,0,0], backgroundColor: '#6366f1' },
+            { label: 'Lecture', data: [0,0,0,0,0,0], backgroundColor: '#a855f7' },
+            { label: 'Youtube Revision', data: [0,0,0,0,0,0], backgroundColor: '#f43f5e' },
+            { label: 'Mock Test', data: [0,0,0,0,0,0], backgroundColor: '#10b981' },
+            { label: 'Question Practice', data: [0,0,0,0,0,0], backgroundColor: '#f59e0b' }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, color: '#94a3b8' } }
+          },
+          scales: {
+            x: { stacked: true, grid: { display: false }, ticks: { color: '#94a3b8', font: { weight: 'bold' } } },
+            y: { stacked: true, min: 0, ticks: { color: '#94a3b8', stepSize: 2 }, grid: { color: 'rgba(255,255,255,0.05)' } }
+          }
+        }
+      });
+
+      // New Chart 2: Peak Productivity Time Zones
+      const ctxDoughnut = document.getElementById('productivityDoughnutChart').getContext('2d');
+      productivityDoughnutChart = new Chart(ctxDoughnut, {
+        type: 'doughnut',
+        data: {
+          labels: ['Early Morning (4A-8A)', 'Morning (8A-12P)', 'Afternoon (12P-5P)', 'Evening (5P-9P)', 'Night (9P-4A)'],
+          datasets: [{
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: ['#38bdf8', '#818cf8', '#f59e0b', '#f43f5e', '#a855f7'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          cutout: '70%'
+        }
+      });
+
       updateMetricsAndCharts();
+    }
+
+    function updateMethodBreakdownChart() {
+      const monthFilter = document.getElementById('method-breakdown-month-filter').value;
+      const subjects = ['FR', 'AFM', 'AUDIT', 'DT', 'IDT', 'IBS'];
+      const methods = ['Self Revision', 'Lecture', 'Youtube Revision', 'Mock Test', 'Question Practice'];
+
+      let logs = [...state.logs];
+      if (monthFilter !== 'all') {
+        logs = logs.filter(l => l.date.startsWith(monthFilter));
+      }
+
+      methods.forEach((method, idx) => {
+        const methodData = subjects.map(sub => {
+          const mins = logs.filter(l => l.subject === sub && l.type === method).reduce((a, c) => a + c.minutes, 0);
+          return parseFloat((mins / 60).toFixed(1));
+        });
+        subjectMethodStackedChart.data.datasets[idx].data = methodData;
+      });
+      subjectMethodStackedChart.update();
+
+      // Update Productivity Slots
+      let slots = [0, 0, 0, 0, 0]; // 4A-8A, 8A-12P, 12P-5P, 5P-9P, 9P-4A
+      logs.forEach(l => {
+        let h = l.hour;
+        if (l.startTime) {
+          const [sh] = l.startTime.split(':').map(Number);
+          h = sh;
+        }
+        if (h >= 4 && h < 8) slots[0] += l.minutes;
+        else if (h >= 8 && h < 12) slots[1] += l.minutes;
+        else if (h >= 12 && h < 17) slots[2] += l.minutes;
+        else if (h >= 17 && h < 21) slots[3] += l.minutes;
+        else slots[4] += l.minutes;
+      });
+
+      const slotHours = slots.map(m => parseFloat((m / 60).toFixed(1)));
+      productivityDoughnutChart.data.datasets[0].data = slotHours;
+      productivityDoughnutChart.update();
+
+      const summaryContainer = document.getElementById('productivity-slot-summary');
+      if (summaryContainer) {
+        summaryContainer.innerHTML = `
+          <div><span class="font-bold text-sky-400">🌅 4A-8A:</span> ${slotHours[0]}h</div>
+          <div><span class="font-bold text-indigo-400">☀️ 8A-12P:</span> ${slotHours[1]}h</div>
+          <div><span class="font-bold text-amber-400">☕ 12P-5P:</span> ${slotHours[2]}h</div>
+          <div><span class="font-bold text-rose-400">🌆 5P-9P:</span> ${slotHours[3]}h</div>
+          <div class="col-span-2 text-center pt-1 border-t border-slate-200 dark:border-slate-800"><span class="font-bold text-purple-400">🌙 9P-4A Night Owl:</span> ${slotHours[4]}h</div>
+        `;
+      }
+    }
+
+    function populateMethodMonthDropdown() {
+      const monthFilterSelect = document.getElementById('method-breakdown-month-filter');
+      if (!monthFilterSelect) return;
+      const monthSet = new Set();
+      state.logs.forEach(l => {
+        const logDate = new Date(l.date);
+        const mKey = `${logDate.getFullYear()}-${String(logDate.getMonth() + 1).padStart(2, '0')}`;
+        monthSet.add(mKey);
+      });
+
+      const curVal = monthFilterSelect.value;
+      monthFilterSelect.innerHTML = `<option value="all">All Time</option>`;
+      Array.from(monthSet).sort().reverse().forEach(mKey => {
+        const [y, m] = mKey.split('-');
+        const dateObj = new Date(y, m - 1, 1);
+        const label = dateObj.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        const opt = document.createElement('option');
+        opt.value = mKey;
+        opt.textContent = label;
+        if (curVal === mKey) opt.selected = true;
+        monthFilterSelect.appendChild(opt);
+      });
     }
 
     function updateMetricsAndCharts() {
@@ -3081,27 +3251,8 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      // Update Peak Productivity Hourly Curve Data
-      const hourlyDistribution = Array(24).fill(0);
-      state.logs.forEach(l => {
-        let startH = l.hour || 0;
-        if (l.startTime) {
-          const [sh] = l.startTime.split(':').map(Number);
-          startH = sh;
-        }
-        hourlyDistribution[startH % 24] += (l.minutes / 60);
-      });
-      peakHoursBarChart.data.datasets[0].data = hourlyDistribution.map(h => parseFloat(h.toFixed(1)));
-      peakHoursBarChart.update();
-
-      // Update Study Type Allocation Data
-      const studyTypes = ['Self Revision', 'Lecture', 'Youtube Revision', 'Mock Test', 'Question Practice'];
-      const typeHours = studyTypes.map(t => {
-        const mins = state.logs.filter(l => l.type === t).reduce((a, c) => a + c.minutes, 0);
-        return parseFloat((mins / 60).toFixed(1));
-      });
-      studyTypeDoughnutChart.data.datasets[0].data = typeHours;
-      studyTypeDoughnutChart.update();
+      populateMethodMonthDropdown();
+      updateMethodBreakdownChart();
 
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
@@ -3188,19 +3339,18 @@
       const textColor = isDark ? '#94a3b8' : '#334155';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)';
 
-      [overviewSplineChart, studySplineChart, dateWiseBarChart, peakHoursBarChart].forEach(chart => {
-        if (chart) {
-          chart.options.scales.y.ticks.color = textColor;
-          chart.options.scales.y.grid.color = gridColor;
-          chart.options.scales.x.ticks.color = textColor;
+      [overviewSplineChart, studySplineChart, dateWiseBarChart, subjectMethodStackedChart].forEach(chart => {
+        if (chart && chart.options && chart.options.scales) {
+          if (chart.options.scales.y) {
+            chart.options.scales.y.ticks.color = textColor;
+            chart.options.scales.y.grid.color = gridColor;
+          }
+          if (chart.options.scales.x) {
+            chart.options.scales.x.ticks.color = textColor;
+          }
           chart.update();
         }
       });
-
-      if (studyTypeDoughnutChart) {
-        studyTypeDoughnutChart.options.plugins.legend.labels.color = textColor;
-        studyTypeDoughnutChart.update();
-      }
 
       if (overviewRadarChart) {
         overviewRadarChart.options.scales.r.pointLabels.color = textColor;
