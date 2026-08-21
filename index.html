@@ -665,52 +665,44 @@
           </div>
         </section>
 
-        <!-- Fixed & Perfectly Aligned 24-Hour (12 AM to 11 PM) Daily Heatmap Timeline -->
-        <section class="glass-card p-6 rounded-2xl">
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+        <!-- HIGH-IMPACT REPLACEMENT ANALYTICS: PEAK FOCUS WINDOW & STUDY TYPE ALLOCATION -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <!-- Hourly Peak Productivity Curve -->
+          <section class="lg:col-span-7 glass-card p-6 rounded-2xl flex flex-col justify-between">
             <div>
-              <h3 class="text-base font-bold flex items-center gap-2">
-                <i class="fa-solid fa-business-time text-purple-500"></i> 24-Hour Daily Study Heatmap (12-Hour AM/PM Labels)
-              </h3>
-              <p class="text-xs text-slate-500 dark:text-slate-400 font-medium">Exact hour-by-hour alignment from 12 AM midnight to 11 PM night</p>
-            </div>
-
-            <!-- Month Navigator -->
-            <div class="flex items-center gap-2 sub-box px-3 py-1.5 rounded-xl text-xs font-bold text-purple-500">
-              <button onclick="prevPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-left"></i></button>
-              <span id="pomo-matrix-month-year-label">August 2026</span>
-              <button onclick="nextPomoMatrixMonth()" class="hover:text-purple-400 px-1"><i class="fa-solid fa-chevron-right"></i></button>
-            </div>
-          </div>
-
-          <!-- Color Legend -->
-          <div class="flex flex-wrap items-center gap-3 text-[10px] font-bold mb-3 px-1 text-slate-400">
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-indigo-500"></span> FR</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-purple-500"></span> AFM</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-amber-500"></span> AUDIT</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-rose-500"></span> DT</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-emerald-500"></span> IDT</span>
-            <span class="flex items-center gap-1"><span class="w-2.5 h-2.5 rounded bg-cyan-500"></span> IBS</span>
-          </div>
-
-          <!-- Timeline Unified Table View -->
-          <div class="sub-box rounded-2xl overflow-hidden shadow-inner border border-slate-300 dark:border-slate-800">
-            <div class="overflow-x-auto custom-scrollbar">
-              <div class="min-w-[1100px] p-3">
-                <!-- Synchronized Header Row -->
-                <div class="flex items-center pb-2 border-b border-slate-300 dark:border-slate-800 text-[10px] font-bold text-slate-500 dark:text-slate-400 font-mono">
-                  <div class="w-20 shrink-0 text-slate-700 dark:text-slate-300 font-sans">Date</div>
-                  <div id="timeline-header-grid" class="flex-1 gap-1" style="display: grid; grid-template-columns: repeat(24, minmax(0, 1fr));">
-                    <!-- 24 Headers: 12 AM to 11 PM -->
-                  </div>
-                </div>
-
-                <!-- Synchronized Data Rows -->
-                <div id="pomo-timeline-rows" class="pt-2 max-h-80 overflow-y-auto custom-scrollbar space-y-1.5"></div>
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="text-base font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-bolt text-amber-500"></i> Peak Productivity Hourly Curve
+                </h3>
+                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-amber-500/20 text-amber-400">
+                  Focus Window
+                </span>
               </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Total cumulative hours studied across each hour of the day (12 AM - 11 PM)</p>
             </div>
-          </div>
-        </section>
+            <div class="relative h-60 w-full">
+              <canvas id="peakHoursBarChart"></canvas>
+            </div>
+          </section>
+
+          <!-- Study Method & Activity Breakdown -->
+          <section class="lg:col-span-5 glass-card p-6 rounded-2xl flex flex-col justify-between">
+            <div>
+              <div class="flex justify-between items-center mb-1">
+                <h3 class="text-base font-bold flex items-center gap-2">
+                  <i class="fa-solid fa-chart-pie text-emerald-500"></i> Study Method Allocation
+                </h3>
+                <span class="text-[10px] uppercase font-extrabold tracking-wider px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400">
+                  Types
+                </span>
+              </div>
+              <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Proportion of Self Revision, Question Practice, Lectures, & Tests</p>
+            </div>
+            <div class="relative h-60 w-full flex items-center justify-center">
+              <canvas id="studyTypeDoughnutChart"></canvas>
+            </div>
+          </section>
+        </div>
 
         <!-- Focus Time Goal Monthly Calendar -->
         <section class="glass-card p-6 rounded-2xl">
@@ -916,14 +908,14 @@
 
       <div class="p-3.5 bg-indigo-500/10 border border-indigo-500/30 rounded-2xl text-xs space-y-1.5">
         <p class="font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-1.5">
-          <i class="fa-solid fa-link"></i> Unique Tablet Link (No Camera Needed)
+          <i class="fa-solid fa-link"></i> Dedicated Tablet URL (No Camera Needed)
         </p>
         <p class="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
-          Open the dedicated link on your Dell Venue 7 tablet browser. It will ask for the 4-digit PIN below and link up with zero lag.
+          Open the dedicated link on your Dell Venue 7 tablet browser. Enter the 4-digit PIN below to connect seamlessly.
         </p>
       </div>
 
-      <!-- Room Code -->
+      <!-- PIN Code Display -->
       <div class="text-center p-3 sub-box rounded-2xl">
         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mb-1">Your 4-Digit Laptop PIN</p>
         <p id="host-peer-id-display" class="font-mono text-3xl font-black text-indigo-500 tracking-widest select-all">----</p>
@@ -1315,7 +1307,7 @@
     function copyTabletDirectURL() {
       const url = window.location.href.split('#')[0].split('?')[0] + '#tablet';
       if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(url).then(() => alert("📋 Tablet Link copied! Open this on your tablet."));
+        navigator.clipboard.writeText(url).then(() => alert("📋 Dedicated Tablet Link copied! Open this on your tablet."));
       } else {
         prompt("Copy this URL and open on tablet:", url);
       }
@@ -1346,91 +1338,6 @@
     function closeTabletCastModal() {
       document.getElementById('tablet-cast-modal').classList.add('hidden');
     }
-
-    // Navigation Router
-    const navButtons = {
-      overview: document.getElementById('nav-overview'),
-      pomodoro: document.getElementById('nav-pomodoro'),
-      scheduler: document.getElementById('nav-scheduler'),
-      chapters: document.getElementById('nav-chapters'),
-      analytics: document.getElementById('nav-analytics'),
-      history: document.getElementById('nav-history'),
-      wall: document.getElementById('nav-wall'),
-      backup: document.getElementById('nav-backup')
-    };
-
-    const pages = {
-      overview: document.getElementById('page-overview'),
-      pomodoro: document.getElementById('page-pomodoro'),
-      scheduler: document.getElementById('page-scheduler'),
-      chapters: document.getElementById('page-chapters'),
-      analytics: document.getElementById('page-analytics'),
-      history: document.getElementById('page-history'),
-      wall: document.getElementById('page-wall'),
-      backup: document.getElementById('page-backup')
-    };
-
-    const pageTitles = {
-      overview: "Holistic Performance Report",
-      pomodoro: "Deep Focus Study & Stopwatch Hub",
-      scheduler: "Advance Study Scheduler",
-      chapters: "CA Final Chapter Index & Revision Tracker",
-      analytics: "Graphical Analytics & Focus Pattern",
-      history: "Date-Wise & Month-Wise Session Logs",
-      wall: "Subject Memory Wall & Resource Links",
-      backup: "Data Backup & 1-Click File Transfer"
-    };
-
-    function switchPage(pageKey) {
-      playAudioChime('click');
-      Object.keys(pages).forEach(key => {
-        pages[key].classList.add('hidden');
-        navButtons[key].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-indigo-500 flex items-center gap-1.5";
-      });
-
-      pages[pageKey].classList.remove('hidden');
-      navButtons[pageKey].className = "nav-btn px-3 py-1.5 rounded-xl text-xs font-bold transition-all bg-indigo-600 text-white shadow-md flex items-center gap-1.5";
-      document.getElementById('page-title').textContent = pageTitles[pageKey];
-
-      if (pageKey === 'pomodoro') {
-        updatePomoTaskDropdown();
-        populateManualTaskDropdown();
-      }
-      if (pageKey === 'overview' || pageKey === 'analytics') updateMetricsAndCharts();
-      if (pageKey === 'history') renderSessionHistory();
-      if (pageKey === 'wall') renderMemoryWall();
-      if (pageKey === 'chapters') renderChapterTracker();
-    }
-
-    Object.keys(navButtons).forEach(key => {
-      navButtons[key].onclick = () => switchPage(key);
-    });
-
-    // Theme Switcher
-    const themeToggleBtn = document.getElementById('theme-toggle-btn');
-    const themeIcon = document.getElementById('theme-icon');
-
-    if (localStorage.getItem('theme') === 'light') {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.classList.add('light');
-      themeIcon.className = "fa-solid fa-sun text-sm text-amber-500";
-    }
-
-    themeToggleBtn.onclick = () => {
-      if (document.documentElement.classList.contains('dark')) {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
-        localStorage.setItem('theme', 'light');
-        themeIcon.className = "fa-solid fa-sun text-sm text-amber-500";
-      } else {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-        localStorage.setItem('theme', 'dark');
-        themeIcon.className = "fa-solid fa-moon text-sm";
-      }
-      updateChartColors();
-      renderPomodoroTimelineGrid();
-    };
 
     // Default Chapter Data
     const defaultChaptersData = {
@@ -2425,116 +2332,6 @@
       }
     }
 
-    // Month Navigation Controls
-    function prevPomoMatrixMonth() {
-      state.pomoMatrixViewDate.setMonth(state.pomoMatrixViewDate.getMonth() - 1);
-      renderPomodoroTimelineGrid();
-    }
-
-    function nextPomoMatrixMonth() {
-      state.pomoMatrixViewDate.setMonth(state.pomoMatrixViewDate.getMonth() + 1);
-      renderPomodoroTimelineGrid();
-    }
-
-    // Helper: Convert 24-hour integer to 12-hour AM/PM label
-    function formatHourTo12h(h24) {
-      const h = h24 % 24;
-      const period = h >= 12 ? 'PM' : 'AM';
-      const displayHour = h % 12 === 0 ? 12 : h % 12;
-      return `${displayHour.toString().padStart(2, '0')} ${period}`;
-    }
-
-    // High-Clarity 24-Hour Fixed Timeline Engine (12 AM to 11 PM)
-    function renderPomodoroTimelineGrid() {
-      const headerGrid = document.getElementById('timeline-header-grid');
-      const rowsContainer = document.getElementById('pomo-timeline-rows');
-      if (!headerGrid || !rowsContainer) return;
-
-      headerGrid.innerHTML = '';
-      rowsContainer.innerHTML = '';
-
-      const viewDate = state.pomoMatrixViewDate;
-      const year = viewDate.getFullYear();
-      const month = viewDate.getMonth();
-
-      document.getElementById('pomo-matrix-month-year-label').textContent = 
-        viewDate.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
-
-      // Generate 24 Hourly Headers (12 AM to 11 PM)
-      for (let h = 0; h < 24; h++) {
-        const headerCell = document.createElement('div');
-        headerCell.className = "truncate text-center";
-        headerCell.textContent = formatHourTo12h(h);
-        headerGrid.appendChild(headerCell);
-      }
-
-      const now = new Date();
-      const isCurrentMonth = (year === now.getFullYear() && month === now.getMonth());
-      const maxDayToDisplay = isCurrentMonth ? now.getDate() : new Date(year, month + 1, 0).getDate();
-      const todayStr = now.toISOString().split('T')[0];
-
-      const subColors = {
-        'FR': 'bg-indigo-500 text-white',
-        'AFM': 'bg-purple-500 text-white',
-        'AUDIT': 'bg-amber-500 text-slate-950',
-        'DT': 'bg-rose-500 text-white',
-        'IDT': 'bg-emerald-500 text-white',
-        'IBS': 'bg-cyan-500 text-white',
-        'General': 'bg-slate-500 text-white'
-      };
-
-      for (let day = maxDayToDisplay; day >= 1; day--) {
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        let label = `${day} ${viewDate.toLocaleDateString('en-US', { month: 'short' })}`;
-        if (dateStr === todayStr) label = "Today";
-
-        const dayLogs = state.logs.filter(l => l.date === dateStr);
-
-        const rowWrapper = document.createElement('div');
-        rowWrapper.className = "flex items-center pb-1 hover:bg-slate-100 dark:hover:bg-slate-800/40 rounded-xl transition-all";
-
-        const dateLabel = document.createElement('div');
-        dateLabel.className = "w-20 shrink-0 text-xs font-bold text-slate-600 dark:text-slate-400";
-        dateLabel.textContent = label;
-        rowWrapper.appendChild(dateLabel);
-
-        const trackGrid = document.createElement('div');
-        trackGrid.className = "flex-1 gap-1";
-        trackGrid.style.display = 'grid';
-        trackGrid.style.gridTemplateColumns = 'repeat(24, minmax(0, 1fr))';
-
-        for (let h = 0; h < 24; h++) {
-          const slotBlock = document.createElement('div');
-          slotBlock.className = "h-6 rounded-md bg-slate-200 dark:bg-slate-800/80 transition-all relative border border-slate-300 dark:border-slate-700/40 flex items-center justify-center";
-
-          const logsInHour = dayLogs.filter(l => {
-            let logStartHour = l.hour;
-            let logDurationHours = Math.max(1, Math.ceil(l.minutes / 60));
-            if (l.startTime) {
-              const [sh] = l.startTime.split(':').map(Number);
-              logStartHour = sh;
-            }
-            return h >= logStartHour && h < (logStartHour + logDurationHours);
-          });
-
-          if (logsInHour.length > 0) {
-            const topLog = logsInHour[0];
-            const colorClass = subColors[topLog.subject] || 'bg-indigo-500 text-white';
-            slotBlock.className = `h-6 rounded-md ${colorClass} shadow-sm cursor-pointer hover:scale-105 transition-transform flex items-center justify-center text-[9px] font-black tracking-tight`;
-            slotBlock.textContent = topLog.subject;
-            slotBlock.title = `${formatHourTo12h(h)} - [${topLog.subject}] ${topLog.minutes} mins studied (${topLog.type})`;
-          } else {
-            slotBlock.title = `${formatHourTo12h(h)} - No study logged`;
-          }
-
-          trackGrid.appendChild(slotBlock);
-        }
-
-        rowWrapper.appendChild(trackGrid);
-        rowsContainer.appendChild(rowWrapper);
-      }
-    }
-
     // Focus Goal Calendar
     function setCustomFocusGoal() {
       const val = prompt("Enter Daily Study Focus Goal (in Hours):", state.dailyGoalHours);
@@ -3182,8 +2979,8 @@
       document.getElementById('report-exam-days').textContent = diffDays > 0 ? `${diffDays} Days` : 'Exam Day!';
     }
 
-    // Charts Engine (Scaled 0 to 14 Max Hours with StepSize: 2)
-    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart;
+    // Charts Engine (Scaled 0 to 14 Max Hours with StepSize: 2 + New Productivity Charts)
+    let overviewSplineChart, overviewRadarChart, studySplineChart, dateWiseBarChart, peakHoursBarChart, studyTypeDoughnutChart;
 
     function initCharts() {
       const ctxOverviewSpline = document.getElementById('overviewSplineChart').getContext('2d');
@@ -3205,6 +3002,47 @@
         type: 'line',
         data: { labels: [], datasets: [{ label: 'Study Hours', data: [], fill: true, backgroundColor: 'rgba(99, 102, 241, 0.2)', borderColor: 'rgba(99, 102, 241, 1)', borderWidth: 3, tension: 0.4 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 14, ticks: { stepSize: 2, color: '#94a3b8' }, grid: { color: 'rgba(255,255,255,0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8' } } } }
+      });
+
+      const ctxPeakHours = document.getElementById('peakHoursBarChart').getContext('2d');
+      const hourLabels12h = [
+        '12 AM','1 AM','2 AM','3 AM','4 AM','5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM',
+        '12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM','9 PM','10 PM','11 PM'
+      ];
+      peakHoursBarChart = new Chart(ctxPeakHours, {
+        type: 'bar',
+        data: { labels: hourLabels12h, datasets: [{ label: 'Total Hours Studied', data: Array(24).fill(0), backgroundColor: 'rgba(245, 158, 11, 0.65)', borderColor: '#f59e0b', borderWidth: 1.5, borderRadius: 5 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { color: '#94a3b8' }, grid: { color: 'rgba(255, 255, 255, 0.05)' } }, x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { size: 9 } } } } }
+      });
+
+      const ctxStudyType = document.getElementById('studyTypeDoughnutChart').getContext('2d');
+      studyTypeDoughnutChart = new Chart(ctxStudyType, {
+        type: 'doughnut',
+        data: {
+          labels: ['Self Revision', 'Lecture', 'Youtube Revision', 'Mock Test', 'Question Practice'],
+          datasets: [{
+            data: [0, 0, 0, 0, 0],
+            backgroundColor: [
+              'rgba(99, 102, 241, 0.8)',
+              'rgba(168, 85, 247, 0.8)',
+              'rgba(244, 63, 94, 0.8)',
+              'rgba(16, 185, 129, 0.8)',
+              'rgba(245, 158, 11, 0.8)'
+            ],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 10, color: '#94a3b8', font: { size: 10, weight: 'bold' } }
+            }
+          },
+          cutout: '65%'
+        }
       });
 
       const ctxDate = document.getElementById('dateWiseBarChart').getContext('2d');
@@ -3243,7 +3081,27 @@
       overviewRadarChart.data.datasets[0].data = radarHours;
       overviewRadarChart.update();
 
-      renderPomodoroTimelineGrid();
+      // Update Peak Productivity Hourly Curve Data
+      const hourlyDistribution = Array(24).fill(0);
+      state.logs.forEach(l => {
+        let startH = l.hour || 0;
+        if (l.startTime) {
+          const [sh] = l.startTime.split(':').map(Number);
+          startH = sh;
+        }
+        hourlyDistribution[startH % 24] += (l.minutes / 60);
+      });
+      peakHoursBarChart.data.datasets[0].data = hourlyDistribution.map(h => parseFloat(h.toFixed(1)));
+      peakHoursBarChart.update();
+
+      // Update Study Type Allocation Data
+      const studyTypes = ['Self Revision', 'Lecture', 'Youtube Revision', 'Mock Test', 'Question Practice'];
+      const typeHours = studyTypes.map(t => {
+        const mins = state.logs.filter(l => l.type === t).reduce((a, c) => a + c.minutes, 0);
+        return parseFloat((mins / 60).toFixed(1));
+      });
+      studyTypeDoughnutChart.data.datasets[0].data = typeHours;
+      studyTypeDoughnutChart.update();
 
       const dateMins = subjects.map(sub => {
         const mins = state.logs.filter(l => l.date === selectedDate && l.subject === sub).reduce((a, c) => a + c.minutes, 0);
@@ -3330,16 +3188,25 @@
       const textColor = isDark ? '#94a3b8' : '#334155';
       const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.08)';
 
-      [overviewSplineChart, studySplineChart, dateWiseBarChart].forEach(chart => {
-        chart.options.scales.y.ticks.color = textColor;
-        chart.options.scales.y.grid.color = gridColor;
-        chart.options.scales.x.ticks.color = textColor;
-        chart.update();
+      [overviewSplineChart, studySplineChart, dateWiseBarChart, peakHoursBarChart].forEach(chart => {
+        if (chart) {
+          chart.options.scales.y.ticks.color = textColor;
+          chart.options.scales.y.grid.color = gridColor;
+          chart.options.scales.x.ticks.color = textColor;
+          chart.update();
+        }
       });
 
-      overviewRadarChart.options.scales.r.pointLabels.color = textColor;
-      overviewRadarChart.options.scales.r.grid.color = gridColor;
-      overviewRadarChart.update();
+      if (studyTypeDoughnutChart) {
+        studyTypeDoughnutChart.options.plugins.legend.labels.color = textColor;
+        studyTypeDoughnutChart.update();
+      }
+
+      if (overviewRadarChart) {
+        overviewRadarChart.options.scales.r.pointLabels.color = textColor;
+        overviewRadarChart.options.scales.r.grid.color = gridColor;
+        overviewRadarChart.update();
+      }
     }
 
     function saveData() {
